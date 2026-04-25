@@ -8,6 +8,14 @@ save_backups/
 tools/Godot/
 tools/GDRE_tools/
 tools/GDRE_tools-*.zip
+tools/DepotDownloader/
+
+# --- Steam-fetched / decompile scratch (regenerated each backfill) ---
+tools/_versions/
+
+# --- Mod-impact diff reports (contain decompiled source diffs — keep local only) ---
+diff_reports/*
+!diff_reports/README.md
 
 # --- Mod build outputs ---
 **/*.vmz

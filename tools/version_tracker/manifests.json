@@ -1,0 +1,28 @@
+{
+  "_comment": "Registry of known Road to Vostok Steam manifests. Manifest IDs sourced from https://steamdb.info/depot/1963611/manifests/ — copy from browser since SteamDB blocks automated requests. Add new versions with: python fetch_version.py add <label> --manifest <id> --build <id>",
+  "app_id": 1963610,
+  "depot_id": 1963611,
+  "versions": [
+    {
+      "label": "0.1.0.0",
+      "build_id": "22674175",
+      "manifest_id": "1669269531586957312",
+      "date": "2026-04-07",
+      "note": "Early Access Launch"
+    },
+    {
+      "label": "0.1.1.1",
+      "build_id": "22906957",
+      "manifest_id": "6470049032110238162",
+      "date": "2026-04-22",
+      "note": "Patch 0.1.1.1 + Changelog"
+    },
+    {
+      "label": "0.1.1.3",
+      "build_id": "22913400",
+      "manifest_id": "4946304968806901228",
+      "date": "2026-04-22",
+      "note": "Hotfix 0.1.1.3"
+    }
+  ]
+}

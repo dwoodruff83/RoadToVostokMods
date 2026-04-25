@@ -162,6 +162,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--source", type=Path, default=SOURCE_DIR, help=f"source decompile dir (default: {SOURCE_DIR})")
     p.add_argument("--history", type=Path, default=HISTORY_DIR, help=f"history repo dir (default: {HISTORY_DIR})")
     p.add_argument("--label", help="override auto-detected version label")
+    p.add_argument("--build", help="override auto-detected build id (use when appmanifest has drifted past the decompiled version)")
     p.add_argument("--message", help="override commit message")
     p.add_argument("--dry-run", action="store_true", help="print planned actions without writing")
     p.add_argument("--init", action="store_true", help="initialize history repo if missing")
@@ -183,7 +184,14 @@ def main() -> int:
     version = args.label or detect_version(args.source / "project.godot")
     if not version:
         raise SystemExit("could not detect version — pass --label to override")
-    buildid = detect_buildid(APPMANIFEST)
+    buildid = args.build or detect_buildid(APPMANIFEST)
+
+    project_version = detect_version(args.source / "project.godot")
+    if args.label and project_version and project_version != args.label and not args.build:
+        print(
+            f"[warn] --label {args.label!r} doesn't match project.godot ({project_version!r}); "
+            f"appmanifest buildid {buildid} probably doesn't apply — pass --build explicitly"
+        )
 
     print(f"version: {version}")
     print(f"buildid: {buildid or '(not found)'}")
