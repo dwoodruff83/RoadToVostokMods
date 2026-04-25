@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://dcjex4ahduthv"]
+
+[ext_resource type="Material" uid="uid://bigofhlj5i476" path="res://UI/Effects/MT_Item.tres" id="1"]
+[ext_resource type="Texture2D" uid="uid://dddipqa5or284" path="res://mods/CatAutoFeed/assets/icons/Cat_Bowl.png" id="2"]
+
+[node name="Cat_Bowl" type="Sprite2D" unique_id=2097238736]
+material = ExtResource("1")
+position = Vector2(64, 64)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2")

@@ -1,0 +1,9 @@
+[mod]
+name="Punisher Guarantee"
+id="PunisherGuarantee"
+version="0.1.0"
+
+[autoload]
+PunisherGuaranteeLog="res://mods/PunisherGuarantee/Logger.gd"
+PunisherGuaranteeConfig="res://mods/PunisherGuarantee/config.gd"
+PunisherGuarantee="res://mods/PunisherGuarantee/Main.gd"

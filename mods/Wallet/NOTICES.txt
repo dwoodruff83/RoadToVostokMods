@@ -1,0 +1,31 @@
+Wallet — Third-Party Asset Notices
+===================================
+
+This mod includes content created by third parties. Original license terms
+are preserved below, verbatim.
+
+---
+
+3D Models
+---------
+
+"Wallet" (https://skfb.ly/6UX8z) by apleesee is licensed under Creative Commons
+Attribution (http://creativecommons.org/licenses/by/4.0/).
+
+Modifications: model imported into Godot; no geometry or texture edits.
+
+---
+
+"Ammo Case" (https://skfb.ly/oL6sP) by Replexx is licensed under Creative
+Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+
+Modifications: model imported into Godot; no geometry or texture edits.
+
+---
+
+"Case with money | Low poly" (https://skfb.ly/6SJ7u) by tasha.kosaykina is
+licensed under Creative Commons Attribution
+(http://creativecommons.org/licenses/by/4.0/).
+
+Modifications: one duplicate case removed in Blender; origin recentred to
+world zero; re-exported as glTF Binary (.glb). No texture edits.

@@ -1,0 +1,30 @@
+# --- Game decompile / reference (sensitive: do not push) ---
+reference/
+
+# --- Personal save backups ---
+save_backups/
+
+# --- Third-party / large binary tools ---
+tools/Godot/
+tools/GDRE_tools/
+tools/GDRE_tools-*.zip
+
+# --- Mod build outputs ---
+**/*.vmz
+
+# --- Godot import cache (regenerated on import; only needed inside .vmz) ---
+**/.godot/
+
+# --- MCM runtime config (per-user) ---
+mods/*/MCM/
+
+# --- Blender autosaves ---
+*.blend1
+
+# --- Agent / IDE / OS junk ---
+.claude/
+.vscode/
+*.tmp
+*.log
+Thumbs.db
+.DS_Store

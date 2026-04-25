@@ -1,0 +1,9 @@
+[mod]
+name="Cat Auto Feed"
+id="CatAutoFeed"
+version="0.1.0"
+
+[autoload]
+CatAutoFeedLog="res://mods/CatAutoFeed/Logger.gd"
+CatAutoFeedConfig="res://mods/CatAutoFeed/config.gd"
+CatAutoFeed="res://mods/CatAutoFeed/Main.gd"

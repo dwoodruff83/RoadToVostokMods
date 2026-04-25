@@ -1,0 +1,29 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://mods/Wallet/WalletPickup.gd" id="1"]
+[ext_resource type="PackedScene" path="res://mods/Wallet/assets/models/Money_Case.glb" id="2"]
+[ext_resource type="Resource" path="res://mods/Wallet/Money_Case.tres" id="3"]
+[ext_resource type="Script" path="res://Scripts/SlotData.gd" id="4"]
+[ext_resource type="PhysicsMaterial" path="res://Items/Physics/Item_Physics.tres" id="5"]
+
+[sub_resource type="Resource" id="Resource_slot"]
+script = ExtResource("4")
+itemData = ExtResource("3")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_placeholder"]
+size = Vector3(0.45, 0.12, 0.35)
+
+[node name="Money_Case" type="RigidBody3D" node_paths=PackedStringArray("collision") groups=["Item"]]
+collision_layer = 4
+collision_mask = 29
+physics_material_override = ExtResource("5")
+script = ExtResource("1")
+slotData = SubResource("Resource_slot")
+collision = NodePath("Collision")
+
+[node name="GLB" parent="." instance=ExtResource("2")]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0.06, 0)
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0)
+shape = SubResource("BoxShape3D_placeholder")

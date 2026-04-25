@@ -1,0 +1,16 @@
+Cat Auto Feed — Third-Party Asset Notices
+==========================================
+
+This mod includes content created by third parties. Original license terms
+are preserved below, verbatim.
+
+---
+
+3D Models
+---------
+
+"Cat bowl" (https://skfb.ly/otWXJ) by Justyna.sliwinska is licensed under
+Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+
+Modifications: model imported into Godot as a .tres resource. No geometry
+or texture edits.

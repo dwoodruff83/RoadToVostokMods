@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://mods/CatAutoFeed/assets/icons/Cat_Bowl.png" id="1"]
+[ext_resource type="Script" path="res://Scripts/ItemData.gd" id="2"]
+[ext_resource type="PackedScene" path="res://mods/CatAutoFeed/Cat_Bowl_2x2.tscn" id="3"]
+
+[resource]
+script = ExtResource("2")
+file = "Cat_Bowl"
+name = "Cat Food Bowl"
+inventory = "Cat Food Bowl"
+rotated = "Cat Food Bowl"
+equipment = "Cat Food Bowl"
+display = "Cat Bowl"
+type = "Furniture"
+weight = 0.5
+value = 150
+rarity = 1
+icon = ExtResource("1")
+tetris = ExtResource("3")
+size = Vector2(2, 2)
+civilian = true
