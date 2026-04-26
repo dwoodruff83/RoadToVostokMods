@@ -8,6 +8,8 @@ var enabled := true
 var feed_threshold := 25.0
 var show_notification := true
 var show_hunger_warning := true
+var allow_shelter_fallback := false
+var bowl_in_loot := true
 
 var _mcm_helpers = null
 
@@ -56,6 +58,24 @@ func _ready() -> void:
         "value" = true,
         "category" = "General",
         "menu_pos" = 4,
+    })
+
+    config.set_value("Bool", "allow_shelter_fallback", {
+        "name" = "Allow Shelter Fallback",
+        "tooltip" = "When OFF (default), the cat ONLY eats from the Cat Food Bowl — you must keep it filled. When ON, the cat will also raid raw food on the floor or inside cabinets/fridges in the cat's shelter if the bowl is empty.",
+        "default" = false,
+        "value" = false,
+        "category" = "General",
+        "menu_pos" = 5,
+    })
+
+    config.set_value("Bool", "bowl_in_loot", {
+        "name" = "Bowl in Loot Tables",
+        "tooltip" = "When ON (default), Cat Food Bowl is added to the master loot table so it can spawn in civilian containers (rarity Legendary, ~1 in 120 containers). Turn off if you want the bowl as a trader-only or unfindable item. Reload the game for changes to take effect.",
+        "default" = true,
+        "value" = true,
+        "category" = "General",
+        "menu_pos" = 6,
     })
 
     var logger_for_schema = get_node_or_null("/root/CatAutoFeedLog")
@@ -124,6 +144,8 @@ func _apply(config: ConfigFile) -> void:
     feed_threshold = float(config.get_value("Float", "feed_threshold", {"value": 25.0})["value"])
     show_notification = config.get_value("Bool", "show_notification", {"value": true})["value"]
     show_hunger_warning = config.get_value("Bool", "show_hunger_warning", {"value": true})["value"]
+    allow_shelter_fallback = config.get_value("Bool", "allow_shelter_fallback", {"value": false})["value"]
+    bowl_in_loot = config.get_value("Bool", "bowl_in_loot", {"value": true})["value"]
 
     var logger = get_node_or_null("/root/CatAutoFeedLog")
     if logger == null:
