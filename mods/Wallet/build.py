@@ -17,7 +17,7 @@ import zipfile
 from pathlib import Path
 
 MOD_ID = "Wallet"
-ROOT_FILES = ["mod.txt", "README.md", "CHANGELOG.md", "NOTICES.txt"]
+ROOT_FILES = ["mod.txt", "README.md", "CHANGELOG.md", "NOTICES.txt", "LICENSE"]
 MOD_FILES = [
     "Main.gd",
     "config.gd",
@@ -35,6 +35,9 @@ MOD_FILES = [
     "Money_Case.tres",
     "Money_Case_3x2.tscn",
     "Money_Case.tscn",
+    "Cash.tres",
+    "Cash_1x1.tscn",
+    "Cash.tscn",
 ]
 ASSET_DIRS = ["assets"]
 GAME_MODS_DIR = Path(r"C:\Program Files (x86)\Steam\steamapps\common\Road to Vostok\mods")

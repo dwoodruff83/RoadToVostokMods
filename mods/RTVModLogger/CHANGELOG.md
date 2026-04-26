@@ -3,6 +3,20 @@
 All notable changes to the RTV Mod Logger are documented here. Dates are
 YYYY-MM-DD.
 
+## 1.0.0 — 2026-04-25
+
+First public release. API is stable; embed `Logger.gd` freely.
+
+- **Quiet boot.** Demoted the demo's load-time announcement from `info` to
+  `debug` so the in-game overlay no longer shows "RTVModLogger demo loaded"
+  on every game launch at the default log level. Matches the workspace-wide
+  log-level audit that quieted load-time chatter across all consumer mods.
+- **Build packaging.** `build.py` now bundles `README.md`, `CHANGELOG.md`,
+  `LOGGER.md`, and `LICENSE` at the root of the `.vmz` so the package is
+  fully self-documenting on extraction. Also adds `--version X.Y.Z` to bump
+  `mod.txt` in-place before building, matching the convention used by the
+  other workspace mods.
+
 ## 0.1.0 — 2026-04-25
 
 Initial release as a standalone mod.

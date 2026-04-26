@@ -168,10 +168,38 @@ without the back-to-base pilgrimage every 40 minutes.
       (d) the bowl appearing in trader supply (proves Misc / Legendary tier displays
           correctly with the purple rarity badge).
 - [ ] First publish via the ModWorkshop web form.
-- [ ] Write the assigned mod id into `mods/CatAutoFeed/.publish` so future
-      `publish.bat` runs open the right edit page.
+- [ ] **Post-publish:** write assigned mod id into `mods/CatAutoFeed/.publish` AND add
+      `[updates]\nmodworkshop=<id>` to `mod.txt`, then rebuild + re-upload so the shipped
+      `.vmz` is update-aware (see "Update flow" section below).
 - [ ] Once **RTVModItemRegistry** is also published, replace the `PENDING` placeholder
       in the description's Recommended section with the assigned mod id link.
+
+## Update flow (Metro Mod Loader)
+
+Metro Mod Loader has a built-in **Updates** tab that auto-checks ModWorkshop and offers a
+one-click Download button per mod. To opt in, `mod.txt` must include both:
+
+```
+[mod]
+version="1.0.0"
+
+[updates]
+modworkshop=<mod_id>
+```
+
+Then on each release:
+
+1. Bump `version=` (or pass `--version X.Y.Z` to `publish.bat`)
+2. Build the new `.vmz`
+3. **Upload to the existing ModWorkshop mod page (replace the file, do NOT create a new mod)**
+4. Users hit Check on the loader's Updates tab → see "update: vX.Y.Z" → click Download
+
+Loader endpoints (read-only, both on `api.modworkshop.net`):
+- `POST /mods/versions` with `{"mod_ids":[...]}` for the diff check
+- `GET /mods/<id>/download` to fetch the new file
+
+No separate "submit" or external changelog log is required — the ModWorkshop page IS the
+source of truth.
 
 ## References
 

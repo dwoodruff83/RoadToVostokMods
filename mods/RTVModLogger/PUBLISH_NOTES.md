@@ -123,19 +123,50 @@ Full reference: see LOGGER.md inside the mod's folder.
 
 ## TODO before publish
 
-- [ ] Verify `mods/RTVModLogger/build.py` builds: `publish.bat RTVModLogger --no-open`
-- [ ] Confirm `LOGGER.md` is current — this is the public reference modders will follow
-- [ ] Capture an in-game screenshot or short gif showing the demo (Test All cycling through
-      the levels with notifications in the corner) — best single asset for the mod page
-- [ ] Bump version to 1.0.0 (signals "stable API, embed it freely")
+- [x] Verify `mods/RTVModLogger/build.py` builds: `publish.bat RTVModLogger --no-open`
+      — build.py now supports `--version X.Y.Z` and bundles README/CHANGELOG/LOGGER/LICENSE
+- [x] Confirm `LOGGER.md` is current — this is the public reference modders will follow
+- [x] Capture an in-game screenshot or short gif showing the demo (Test All cycling through
+      the levels with notifications in the corner) — `screenshots/01-overview.png` shows
+      all six levels stacked with self-documenting strings; `02-mcm.png` shows the MCM page
+- [x] Bump version to 1.0.0 (signals "stable API, embed it freely")
 - [ ] Test on a clean profile: install standalone, press Test Hotkey (F12), confirm all six
       level outputs render correctly
 - [ ] Test as a dependency: install + a consumer mod (e.g. CatAutoFeed) that uses the
       logger; confirm both MCM pages appear and don't conflict
 - [ ] First publish via web form
-- [ ] Write assigned mod id into `mods/RTVModLogger/.publish` after publish
+- [ ] **Post-publish:** write assigned mod id into `mods/RTVModLogger/.publish` AND add
+      `[updates]\nmodworkshop=<id>` to `mod.txt`, then rebuild + re-upload so the shipped
+      `.vmz` is update-aware (see "Update flow" section below)
 - [ ] Once supported, point CatAutoFeed and Wallet to declare this as an *optional*
       dependency (they each ship their own copy of Logger.gd, but reference is friendly)
+
+## Update flow (Metro Mod Loader)
+
+Metro Mod Loader has a built-in **Updates** tab that auto-checks ModWorkshop and offers a
+one-click Download button per mod. To opt in, `mod.txt` must include both:
+
+```
+[mod]
+version="1.0.0"
+
+[updates]
+modworkshop=<mod_id>
+```
+
+Then on each release:
+
+1. Bump `version=` (or pass `--version X.Y.Z` to `publish.bat`)
+2. Build the new `.vmz`
+3. **Upload to the existing ModWorkshop mod page (replace the file, do NOT create a new mod)**
+4. Users hit Check on the loader's Updates tab → see "update: vX.Y.Z" → click Download
+
+Loader endpoints (read-only, both on `api.modworkshop.net`):
+- `POST /mods/versions` with `{"mod_ids":[...]}` for the diff check
+- `GET /mods/<id>/download` to fetch the new file
+
+No separate "submit" or external changelog log is required — the ModWorkshop page IS the
+source of truth. The version in `mod.txt` inside the new `.vmz` is what drives the diff.
 
 ## References
 

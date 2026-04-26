@@ -159,9 +159,38 @@ See NOTICES.txt in the .vmz for verbatim attribution.
       with fallback to current direct injection — only do this AFTER RTVModItemRegistry is
       published so users can install both
 - [ ] First publish via web form
-- [ ] Write assigned mod id into `mods/Wallet/.publish`
+- [ ] **Post-publish:** write assigned mod id into `mods/Wallet/.publish` AND add
+      `[updates]\nmodworkshop=<id>` to `mod.txt`, then rebuild + re-upload so the shipped
+      `.vmz` is update-aware (see "Update flow" section below)
 - [ ] Comment on Wallet & Cash's mod page (friendly, link our mod, frame as "alternative
       for the physical-container crowd" not as competition) — this is goodwill insurance
+
+## Update flow (Metro Mod Loader)
+
+Metro Mod Loader has a built-in **Updates** tab that auto-checks ModWorkshop and offers a
+one-click Download button per mod. To opt in, `mod.txt` must include both:
+
+```
+[mod]
+version="1.0.0"
+
+[updates]
+modworkshop=<mod_id>
+```
+
+Then on each release:
+
+1. Bump `version=` (or pass `--version X.Y.Z` to `publish.bat`)
+2. Build the new `.vmz`
+3. **Upload to the existing ModWorkshop mod page (replace the file, do NOT create a new mod)**
+4. Users hit Check on the loader's Updates tab → see "update: vX.Y.Z" → click Download
+
+Loader endpoints (read-only, both on `api.modworkshop.net`):
+- `POST /mods/versions` with `{"mod_ids":[...]}` for the diff check
+- `GET /mods/<id>/download` to fetch the new file
+
+No separate "submit" or external changelog log is required — the ModWorkshop page IS the
+source of truth.
 
 ## References
 
