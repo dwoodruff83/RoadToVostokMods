@@ -1,0 +1,9 @@
+[mod]
+name="RTV Mod Logger"
+id="RTVModLogger"
+version="0.1.0"
+
+[autoload]
+RTVModLoggerLog="res://mods/RTVModLogger/Logger.gd"
+RTVModLoggerConfig="res://mods/RTVModLogger/config.gd"
+RTVModLogger="res://mods/RTVModLogger/Main.gd"

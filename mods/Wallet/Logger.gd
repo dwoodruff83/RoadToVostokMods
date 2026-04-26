@@ -47,16 +47,38 @@ func _ready() -> void:
     print("[", mod_id, "] Logger ready at /root/", name, " (to_file=", to_file, " to_overlay=", to_overlay, ")")
 
 func debug(msg: String) -> void:
-    _write(Level.DEBUG, msg, "gray")
+    _write(Level.DEBUG, "DEBUG", msg, Color.GRAY)
 
 func info(msg: String) -> void:
-    _write(Level.INFO, msg, "white")
+    _write(Level.INFO, "INFO", msg, Color.WHITE)
+
+func success(msg: String) -> void:
+    # Same severity as INFO, rendered in green to match vanilla notification style
+    # (e.g., "Cat Fed", "Boss Killed"). Filtered by INFO threshold.
+    _write(Level.INFO, "SUCCESS", msg, Color.GREEN)
 
 func warn(msg: String) -> void:
-    _write(Level.WARN, msg, "orange")
+    _write(Level.WARN, "WARN", msg, Color.ORANGE)
 
 func error(msg: String) -> void:
-    _write(Level.ERROR, msg, "red")
+    _write(Level.ERROR, "ERROR", msg, Color.RED)
+
+# User-facing notification. ALWAYS shows in-game, regardless of log level
+# threshold or to_overlay toggle. Use this for messages players must see
+# (boss spawned, save loaded, etc.). Goes to print() and the in-game
+# notification system; respects to_file if enabled.
+func notify(msg: String, color: Color = Color.WHITE) -> void:
+    var line := "[%s] [NOTIFY] %s" % [_timestamp(), msg]
+    print("[", mod_id, "] ", line)
+    if to_file:
+        _write_file(line)
+    var loader = get_node_or_null("/root/Loader")
+    if loader != null and loader.has_method("Message"):
+        loader.Message(msg, color)
+        return
+    # Fallback: only happens if Loader isn't ready (rare; mostly during boot).
+    _ensure_overlay()
+    _append_overlay(msg, "#" + color.to_html(false))
 
 func apply_settings(new_level: int, file_enabled: bool, overlay_enabled: bool) -> void:
     print("[", mod_id, "] Logger.apply_settings(level=", new_level, ", file=", file_enabled, ", overlay=", overlay_enabled, ")")
@@ -77,7 +99,7 @@ func attach_to_mcm_config(config: ConfigFile, category: String = "Logging", base
 
     config.set_value("Dropdown", "log_level", {
         "name" = "Log Level",
-        "tooltip" = "Minimum severity to log. Debug is verbose; Error logs only failures.",
+        "tooltip" = "Minimum severity to log. Debug is verbose; Error logs only failures. Success messages share the Info threshold.",
         "default" = 1,
         "value" = 1,
         "options" = ["Debug", "Info", "Warn", "Error", "Off"],
@@ -107,40 +129,19 @@ func apply_from_config(config: ConfigFile) -> void:
     var overlay_enabled: bool = bool(config.get_value("Bool", "log_to_overlay", {"value": false})["value"])
     apply_settings(lvl, file_enabled, overlay_enabled)
 
-func _write(lvl: int, msg: String, color: String) -> void:
+func _write(lvl: int, label: String, msg: String, color: Color) -> void:
     if lvl < level:
         return
-    var prefix: String = ["DEBUG", "INFO", "WARN", "ERROR"][lvl]
-    var line := "[%s] [%s] %s" % [_timestamp(), prefix, msg]
+    var line := "[%s] [%s] %s" % [_timestamp(), label, msg]
     print("[", mod_id, "] ", line)
     if to_file:
         _write_file(line)
     if to_overlay:
-        _send_to_game_messages(lvl, line)
-
-func _send_to_game_messages(lvl: int, text: String) -> void:
-    # Uses RTV's Loader.Message system so logs match vanilla notification style.
-    # Color by level: DEBUG=gray, INFO=white, WARN=orange, ERROR=red.
-    var loader = get_node_or_null("/root/Loader")
-    if loader == null or !loader.has_method("Message"):
-        _append_overlay(text, _color_name_for_level(lvl))
-        return
-    var color: Color
-    match lvl:
-        Level.DEBUG: color = Color.GRAY
-        Level.INFO: color = Color.WHITE
-        Level.WARN: color = Color.ORANGE
-        Level.ERROR: color = Color.RED
-        _: color = Color.WHITE
-    loader.Message(text, color)
-
-func _color_name_for_level(lvl: int) -> String:
-    match lvl:
-        Level.DEBUG: return "gray"
-        Level.INFO: return "white"
-        Level.WARN: return "orange"
-        Level.ERROR: return "red"
-    return "white"
+        var loader = get_node_or_null("/root/Loader")
+        if loader != null and loader.has_method("Message"):
+            loader.Message(line, color)
+        else:
+            _append_overlay(line, "#" + color.to_html(false))
 
 func _timestamp() -> String:
     var t := Time.get_time_dict_from_system()

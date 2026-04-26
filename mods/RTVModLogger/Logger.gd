@@ -38,9 +38,9 @@ var _overlay_messages: Array = []
 var _file: FileAccess = null
 
 func _init() -> void:
-    mod_id = "PunisherGuarantee"
-    mod_display_name = "Punisher Guarantee"
-    log_filename = "punisher_guarantee.log"
+    mod_id = "RTVModLogger"
+    mod_display_name = "RTV Mod Logger"
+    log_filename = "rtv_mod_logger.log"
 
 func _ready() -> void:
     name = mod_id + "Log"

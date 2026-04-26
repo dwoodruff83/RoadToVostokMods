@@ -1,14 +1,22 @@
 # ModLogger — single-file logging library for Road to Vostok mods
 
+> Distributed as part of [RTVModLogger](README.md) (the demo mod). Copy
+> `Logger.gd` into your own mod to use it standalone.
+
 `Logger.gd` is a drop-in reusable logging framework. Copy the file into your
 mod, edit three lines, autoload it, and you get:
 
-- Four log levels: **Debug / Info / Warn / Error** (plus **Off**)
+- Four log levels: **Debug / Info / Warn / Error** (plus **Off**), each
+  filterable via the user's MCM settings
+- A **`success()`** method — same severity as INFO but rendered in green to
+  match vanilla "Cat Fed" / "Boss Killed" notifications
+- A **`notify()`** method — always-show user-facing messages that bypass the
+  log-level filter and overlay toggle. Use for events the player must see.
 - Three output targets, all toggleable at runtime:
   - **Console** — Godot stdout → `%APPDATA%\Road to Vostok\logs\godot.log`
   - **File** — `user://MCM/{mod_id}/{log_filename}` by default
   - **In-game overlay** — routed through RTV's `Loader.Message` so lines match
-    vanilla notifications, color-coded by level
+    vanilla notifications, color-coded
 - An **MCM integration helper** — one call adds a "Logging" category with
   Level / File / Overlay controls to *your mod's* MCM page
 
@@ -52,6 +60,30 @@ mod, edit three lines, autoload it, and you get:
        else:
            print("[MyMod] [", lvl.to_upper(), "] ", msg)
    ```
+
+## The five log calls + `notify()`
+
+| Method | Color | Severity | Filtered by level? | Filtered by overlay toggle? |
+|--------|-------|----------|---|---|
+| `debug(msg)` | gray | DEBUG | yes | yes |
+| `info(msg)` | white | INFO | yes | yes |
+| `success(msg)` | green | INFO | yes | yes |
+| `warn(msg)` | orange | WARN | yes | yes |
+| `error(msg)` | red | ERROR | yes | yes |
+| `notify(msg, color)` | configurable | n/a | **no** | **no** |
+
+`debug` / `info` / `success` / `warn` / `error` are **developer logs** — they
+respect the user's MCM-configured threshold and overlay toggle. Use them for
+anything you'd write to a log file.
+
+`notify(msg, color)` is a **user-facing notification** — it always shows
+regardless of logger settings. Use it for messages the player must see (boss
+spawned, save loaded, mod activated). Defaults to white; pass any `Color`.
+
+```gdscript
+_log.success("Mod activated")               # green, like "Cat Fed"
+_log.notify("Boss spawned!", Color.RED)     # always shows, even if logger off
+```
 
 ## Log levels and when to use each
 
@@ -106,6 +138,30 @@ _log("error", "Failed to load shelter save: %s (code %d)" % [path, err])
 _log("error", "Could not open Character.tres for writing")
 _log("error", "Override script missing at %s" % path)
 _log("error", "Could not load %s" % EVENTS_PATH)
+```
+
+### `_log.success(...)` — positive outcomes, vanilla style
+
+Use when something the user cares about *worked*. Green to match the game's
+own "Cat Fed", "Boss Killed", "Task Completed" notifications. Filtered by the
+INFO threshold (so it shows whenever info-level chatter is on).
+
+```gdscript
+_log.success("Mod activated")
+_log.success("Settings saved")
+_log.success("Save migrated to v2")
+```
+
+### `_log.notify(msg, color)` — always-show user notifications
+
+Bypasses both the level filter and the overlay toggle. Use sparingly, for
+things the player needs to see no matter their logger settings. The color
+argument is a Godot `Color`; defaults to white.
+
+```gdscript
+_log.notify("Boss spawned near base!", Color.RED)
+_log.notify("Mod ready — press F12 to test", Color.CYAN)
+_log.notify("Save loaded successfully", Color.GREEN)
 ```
 
 ## MCM integration
@@ -196,8 +252,9 @@ With Log Level = Debug, File = On, Overlay = On:
   [MyMod] [15:52:10] [WARN] Unexpected null slot
   ```
 - **File** (`user://MCM/MyMod/my_mod.log`): same content, persisted
-- **Overlay** (game's notification area): each line fades in/out, white
-  for INFO, gray for DEBUG, orange for WARN, red for ERROR
+- **Overlay** (game's notification area): each line fades in/out — gray for
+  DEBUG, white for INFO, **green for SUCCESS**, orange for WARN, red for
+  ERROR. `notify()` calls always show in whatever color you pass.
 
 ## Keeping copies in sync across mods
 
@@ -352,7 +409,7 @@ if FileAccess.file_exists(FILE_PATH + "/config.ini"):
   ```
 
 **The logger autoload isn't found at `/root/MyModLog`:**
-- VostokMods sometimes places autoloads elsewhere in the tree. Use the
+- Some loaders place autoloads elsewhere in the tree. Use the
   dual lookup shown in the Quick Start example:
   ```gdscript
   _log_node = get_node_or_null("/root/MyModLog")
