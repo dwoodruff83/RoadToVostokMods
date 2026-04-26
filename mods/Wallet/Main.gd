@@ -12,7 +12,7 @@ const ITEM_PATHS := [
 
 func _ready() -> void:
     name = "Wallet"
-    _log("info", "Wallet mod loaded")
+    _log("debug", "Wallet mod loaded")
     _inject_database()
     _register_with_loot_master()
     _override_item_value()
@@ -27,7 +27,7 @@ func _override_item_value() -> void:
         _log("error", "Could not load ItemOverride.gd")
         return
     override.take_over_path("res://Scripts/Item.gd")
-    _log("info", "Item.gd overridden — wallet cash now counted in inventory totals")
+    _log("debug", "Item.gd overridden — wallet cash now counted in inventory totals")
 
 # Appends our ItemData resources to res://Loot/LT_Master.tres so the vanilla
 # LootContainer + Trader fill loops include wallets. Each ItemData's own
@@ -47,7 +47,7 @@ func _register_with_loot_master() -> void:
         if not lt.items.has(item):
             lt.items.append(item)
             added += 1
-    _log("info", "LT_Master registered %d wallet items (pool size now %d)" % [added, lt.items.size()])
+    _log("debug", "LT_Master registered %d wallet items (pool size now %d)" % [added, lt.items.size()])
 
 func _unhandled_input(event: InputEvent) -> void:
     # Debug: F9 prints the stash totals to the logger (and overlay if enabled).
@@ -79,10 +79,10 @@ func _inject_database() -> void:
         registry.register("Wallet", preload("res://mods/Wallet/Wallet.tscn"))
         registry.register("Ammo_Tin", preload("res://mods/Wallet/Ammo_Tin.tscn"))
         registry.register("Money_Case", preload("res://mods/Wallet/Money_Case.tscn"))
-        _log("info", "Wallet items registered with ModItemRegistry")
+        _log("debug", "Wallet items registered with ModItemRegistry")
         return
 
-    _log("warn", "RTVModItemRegistry not installed — using legacy in-place injection (incompatible with sibling Database-extending mods)")
+    _log("debug", "RTVModItemRegistry not installed — using legacy in-place injection (incompatible with sibling Database-extending mods)")
     _inject_database_legacy()
 
 
@@ -103,7 +103,7 @@ func _inject_database_legacy() -> void:
     if db:
         db.set_script(inject)
         var test = db.get("Wallet")
-        _log("info", "Database injected (legacy) — Wallet resolves to: %s" % str(test))
+        _log("debug", "Database injected (legacy) — Wallet resolves to: %s" % str(test))
     else:
         _log("warn", "Database autoload not found; items may not resolve until next load")
 
@@ -171,7 +171,7 @@ func pay(amount: int) -> int:
         var take: int = min(int(slot.amount), amount - taken)
         slot.amount = int(slot.amount) - take
         taken += take
-    _log("info", "Paid %d ₽ (across %d wallets)" % [taken, wallets.size()])
+    _log("success", "Paid %d ₽ (across %d wallets)" % [taken, wallets.size()])
     return taken
 
 # Distributes `amount` ₽ across wallets, fullest first (concentrates cash).
@@ -192,7 +192,7 @@ func receive(amount: int) -> int:
         var add: int = min(room, amount - deposited)
         slot.amount = int(slot.amount) + add
         deposited += add
-    _log("info", "Received %d ₽ (across %d wallets)" % [deposited, wallets.size()])
+    _log("success", "Received %d ₽ (across %d wallets)" % [deposited, wallets.size()])
     return deposited
 
 func _is_wallet(slot) -> bool:

@@ -26,7 +26,7 @@ func _ready() -> void:
     print("[CatAutoFeed] Main._ready, log_node=", _log_node)
     _inject_database()
     _inject_loot_table()
-    _log("info", "CatAutoFeed loaded, threshold=%d, check every %ds" % [int(_threshold()), int(CHECK_INTERVAL)])
+    _log("debug", "CatAutoFeed loaded, threshold=%d, check every %ds" % [int(_threshold()), int(CHECK_INTERVAL)])
 
 func _inject_loot_table() -> void:
     # Add Cat_Bowl to LT_Master.items so it spawns naturally in civilian loot
@@ -54,7 +54,7 @@ func _inject_loot_table() -> void:
             _log("debug", "Cat_Bowl already in LT_Master, skipping inject")
             return
     lt_master.items.append(bowl_data)
-    _log("info", "Injected Cat_Bowl into LT_Master (rarity=%d, %d items total)" % [int(bowl_data.rarity), lt_master.items.size()])
+    _log("debug", "Injected Cat_Bowl into LT_Master (rarity=%d, %d items total)" % [int(bowl_data.rarity), lt_master.items.size()])
 
 func _inject_database() -> void:
     # Prefer RTVModItemRegistry's coordinated registration if installed —
@@ -71,13 +71,13 @@ func _inject_database() -> void:
         var bowl_scene = preload("res://mods/CatAutoFeed/Cat_Bowl.tscn")
         var ok: bool = registry.register("Cat_Bowl", bowl_scene)
         if ok:
-            _log("info", "Cat_Bowl registered with ModItemRegistry")
+            _log("debug", "Cat_Bowl registered with ModItemRegistry")
         else:
             _log("warn", "ModItemRegistry rejected Cat_Bowl registration; falling back to legacy")
             _inject_database_legacy()
         return
 
-    _log("warn", "RTVModItemRegistry not installed — using legacy in-place injection (incompatible with sibling Database-extending mods)")
+    _log("debug", "RTVModItemRegistry not installed — using legacy in-place injection (incompatible with sibling Database-extending mods)")
     _inject_database_legacy()
 
 
@@ -98,7 +98,7 @@ func _inject_database_legacy() -> void:
     if db:
         db.set_script(inject)
         var test = db.get("Cat_Bowl")
-        _log("info", "Database script replaced (legacy), Cat_Bowl resolves to: %s" % str(test))
+        _log("debug", "Database script replaced (legacy), Cat_Bowl resolves to: %s" % str(test))
     else:
         _log("warn", "Database autoload not found; injection may be incomplete")
 
@@ -176,9 +176,9 @@ func _try_auto_feed() -> void:
 
     if !_hunger_warned:
         _hunger_warned = true
-        _log("info", "Cat hunger below threshold (%d%% < %d%%)" % [int(gameData.cat), int(_threshold())])
-        if _show_warning():
-            Loader.Message("Cat is hungry (%d%%)" % int(gameData.cat), Color.ORANGE)
+        _log("debug", "Cat hunger below threshold (%d%% < %d%%)" % [int(gameData.cat), int(_threshold())])
+        if _show_warning() and _log_node:
+            _log_node.notify("Cat is hungry (%d%%)" % int(gameData.cat), Color.ORANGE)
 
     if current_map == shelter_name:
         _log("debug", "In cat's shelter (%s), deferring to vanilla feeder" % shelter_name)
@@ -217,7 +217,7 @@ func _find_cat_shelter() -> String:
     for shelter_name in SHELTERS:
         if _shelter_has_catbox(shelter_name):
             _cached_cat_shelter = shelter_name
-            _log("info", "Cat shelter detected: %s" % shelter_name)
+            _log("debug", "Cat shelter detected: %s" % shelter_name)
             return shelter_name
     return ""
 
@@ -273,10 +273,10 @@ func _feed_from_shelter(shelter: ShelterSave, path: String, shelter_name: String
     # message via _bowl_empty_warned so we don't spam every 5s tick; reset by
     # _on_fed_from_bowl when the player refills.
     if !fallback:
-        _log("info", "Cat hungry but bowl is empty (shelter fallback disabled)")
-        if _notify() and !_bowl_empty_warned:
+        _log("debug", "Cat hungry but bowl is empty (shelter fallback disabled)")
+        if _notify() and !_bowl_empty_warned and _log_node:
             _bowl_empty_warned = true
-            Loader.Message("Cat hungry — fill the bowl in " + shelter_name, Color.ORANGE)
+            _log_node.notify("Cat hungry — fill the bowl in " + shelter_name, Color.ORANGE)
         return false
 
     # PASS 2: top-level shelter items (raw food sitting on the floor).
@@ -310,8 +310,8 @@ func _feed_from_shelter(shelter: ShelterSave, path: String, shelter_name: String
                 return true
 
     _log("warn", "No food available in %s" % shelter_name)
-    if _notify():
-        Loader.Message("Cat still hungry — no food in " + shelter_name, Color.ORANGE)
+    if _notify() and _log_node:
+        _log_node.notify("Cat still hungry — no food in " + shelter_name, Color.ORANGE)
     return false
 
 func _slot_storage_total(slot_data: SlotData) -> int:
@@ -345,9 +345,10 @@ func _save_shelter(shelter: ShelterSave, path: String) -> bool:
 func _on_fed(label: String) -> void:
     gameData.cat = 100.0
     _persist_cat_value()
-    _log("info", "Fed: %s" % label)
-    if _notify():
-        Loader.Message("Cat Auto-Fed: " + label, Color.GREEN)
+    if _notify() and _log_node:
+        _log_node.notify("Cat Auto-Fed: " + label, Color.GREEN)
+    else:
+        _log("success", "Auto-fed: " + label)
 
 # Bowl-sourced feeds get a distinct prefix in the message so the player can
 # tell at a glance whether their bowl-prep paid off vs the cat raiding the
@@ -360,12 +361,13 @@ func _on_fed_from_bowl(food_name: String, bowl_name: String, bowl_now_empty: boo
     # will warn fresh, and a refill resets the empty-bowl alert.
     _hunger_warned = false
     _bowl_empty_warned = false
-    var emptied_marker: String = " — bowl empty" if bowl_now_empty else ""
-    _log("info", "Fed from bowl: %s%s" % [food_name, emptied_marker])
-    if _notify():
-        Loader.Message("Cat ate from bowl: " + food_name, Color.GREEN)
-    if bowl_now_empty and _show_warning():
-        Loader.Message(bowl_name + " is empty — refill it for the cat", Color.ORANGE)
+    if _notify() and _log_node:
+        _log_node.notify("Cat ate from bowl: " + food_name, Color.GREEN)
+    else:
+        var emptied_marker: String = " — bowl empty" if bowl_now_empty else ""
+        _log("success", "Fed from bowl: %s%s" % [food_name, emptied_marker])
+    if bowl_now_empty and _show_warning() and _log_node:
+        _log_node.notify(bowl_name + " is empty — refill it for the cat", Color.ORANGE)
 
 func _persist_cat_value() -> void:
     var path := "user://Character.tres"

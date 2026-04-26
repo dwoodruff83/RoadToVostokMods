@@ -350,7 +350,7 @@ func _on_take(item_data) -> void:
         bowl.add_food(item_data)
         if interface_ != null and interface_.has_method("PlayError"):
             interface_.PlayError()
-        Loader.Message("Inventory full — make space to take food out", Color.ORANGE)
+        _notify_player("Inventory full — make space to take food out", Color.ORANGE)
     elif interface_ != null and interface_.has_method("UpdateStats"):
         interface_.UpdateStats(false)
     _refresh()
@@ -364,7 +364,7 @@ func _on_add(item_data) -> void:
     if bowl.is_full():
         if interface_.has_method("PlayError"):
             interface_.PlayError()
-        Loader.Message("Bowl is full (%d/%d)" % [bowl.total_servings(), bowl.capacity()], Color.ORANGE)
+        _notify_player("Bowl is full (%d/%d)" % [bowl.total_servings(), bowl.capacity()], Color.ORANGE)
         return
     if not _decrement_inventory(item_data):
         if interface_.has_method("PlayError"):
@@ -464,3 +464,18 @@ func _input(event: InputEvent) -> void:
     if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
         _on_close()
         get_viewport().set_input_as_handled()
+
+
+# Route player-facing messages through the CatAutoFeed Logger so they hit the
+# log file in addition to the in-game overlay. Falls back to Loader.Message
+# if the Logger autoload isn't reachable (e.g., during edge-case load order).
+func _notify_player(msg: String, color: Color) -> void:
+    var log_node = get_node_or_null("/root/CatAutoFeedLog")
+    if log_node == null:
+        log_node = get_tree().root.find_child("CatAutoFeedLog", true, false)
+    if log_node and log_node.has_method("notify"):
+        log_node.notify(msg, color)
+    else:
+        var loader = get_node_or_null("/root/Loader")
+        if loader and loader.has_method("Message"):
+            loader.Message(msg, color)

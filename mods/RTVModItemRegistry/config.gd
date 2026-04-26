@@ -1,13 +1,16 @@
 extends Node
 
-# Minimal MCM config for RTVModItemRegistry. The registry has no user-tunable
-# behavior of its own — it's a runtime coordination mod. This config exists
-# only to expose the standard Logging category so users can adjust verbosity
-# / file output / overlay output without touching their game files.
+# MCM config for RTVModItemRegistry. The registry has no user-tunable
+# *behavior*, so the bulk of this is the standard Logging category plus a
+# small Demo category with a self-check stub registration and a hotkey
+# that lists/verifies everything currently in the registry.
 
 const MOD_ID := "RTVModItemRegistry"
 const MOD_NAME := "RTV Mod Item Registry"
 const FILE_PATH := "user://MCM/RTVModItemRegistry"
+
+var demo_self_register := true
+var test_hotkey_keycode: int = KEY_F11
 
 var _mcm_helpers = null
 
@@ -19,9 +22,31 @@ func _ready() -> void:
 
     var config := ConfigFile.new()
 
+    config.set_value("Category", "Demo", { "menu_pos": 1 })
+
+    config.set_value("Bool", "demo_self_register", {
+        "name" = "Demo Self-Register",
+        "tooltip" = "When ON (default), registers a synthetic stub item (_RegistryDemo_StubItem) at mod load so the registry has something to verify even without consumer mods installed. Safe to leave on — the stub is invisible to gameplay.",
+        "default" = true,
+        "value" = true,
+        "category" = "Demo",
+        "menu_pos" = 1,
+    })
+
+    config.set_value("Keycode", "test_hotkey", {
+        "name" = "Test Hotkey",
+        "tooltip" = "Press this key in-game to fire the registry self-check: lists registered items, calls Database.get(name) for each, logs pass/fail.",
+        "default" = KEY_F11,
+        "default_type" = "Key",
+        "value" = KEY_F11,
+        "type" = "Key",
+        "category" = "Demo",
+        "menu_pos" = 2,
+    })
+
     var logger_for_schema = _resolve_logger()
     if logger_for_schema:
-        logger_for_schema.attach_to_mcm_config(config, "Logging", 1)
+        logger_for_schema.attach_to_mcm_config(config, "Logging", 10)
 
     _merge_schema(config, FILE_PATH + "/config.ini")
 
@@ -36,7 +61,7 @@ func _ready() -> void:
         MOD_ID,
         MOD_NAME,
         FILE_PATH,
-        "Coordinates mod-added items into the vanilla Database. No user settings — only the standard logger controls.",
+        "Coordinates mod-added items into the vanilla Database. Demo toggle for self-check + standard logger controls.",
         { "config.ini" = _apply }
     )
 
@@ -78,6 +103,9 @@ func _apply(config: ConfigFile) -> void:
     var err := fresh.load(FILE_PATH + "/config.ini")
     if err == OK:
         config = fresh
+
+    demo_self_register = config.get_value("Bool", "demo_self_register", {"value": true})["value"]
+    test_hotkey_keycode = int(config.get_value("Keycode", "test_hotkey", {"value": KEY_F11})["value"])
 
     var logger = _resolve_logger()
     if logger:

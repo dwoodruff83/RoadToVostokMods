@@ -9,18 +9,18 @@ var _log_node: Node = null
 func _ready() -> void:
     name = "PunisherGuarantee"
 
-    _log("info", "Startup")
+    _log("debug", "Startup")
 
     var cfg = _config()
     if cfg and !cfg.enabled:
-        _log("info", "Disabled via config; skipping all patches")
+        _log("debug", "Disabled via config; skipping all patches")
         return
 
     _bump_event()
     _override_police()
 
     set_process_unhandled_input(true)
-    _log("info", "Ready")
+    _log("debug", "Ready")
 
 func _log(lvl: String, msg: String) -> void:
     if _log_node == null or !is_instance_valid(_log_node):
@@ -49,7 +49,7 @@ func _bump_event() -> void:
         if cfg and cfg.bypass_day_gate:
             event.day = 0
         event.instant = true
-        _log("info", "Boosted '" + event.name + "' to 100% (day>=" + str(event.day) + ")")
+        _log("debug", "Boosted '" + event.name + "' to 100% (day>=" + str(event.day) + ")")
 
 func _override_police() -> void:
     var cfg = _config()
@@ -61,7 +61,7 @@ func _override_police() -> void:
         _log("error", "Override script missing at " + POLICE_OVERRIDE)
         return
     script.take_over_path(ORIGINAL_POLICE)
-    _log("info", "Police.gd overridden (forcing Boss mode)")
+    _log("debug", "Police.gd overridden (forcing Boss mode)")
 
 func _unhandled_input(event: InputEvent) -> void:
     var cfg = _config()
@@ -75,15 +75,18 @@ func _force_spawn_now() -> void:
     var spawner = _find_ai_spawner()
     if spawner == null:
         _log("warn", "Hotkey pressed but no AISpawner in this scene")
-        Loader.Message("PunisherGuarantee: no AISpawner in this scene", Color.ORANGE)
+        if _log_node:
+            _log_node.notify("PunisherGuarantee: no AISpawner in this scene", Color.ORANGE)
         return
 
     var gameData = preload("res://Resources/GameData.tres")
     var spawn_pos: Vector3 = gameData.playerPosition + Vector3(randf_range(-6, 6), 0, randf_range(-6, 6))
 
     spawner.SpawnBoss(spawn_pos)
-    _log("info", "Hotkey spawn at " + str(spawn_pos))
-    Loader.Message("Punisher: spawned near player", Color.RED)
+    if _log_node:
+        _log_node.notify("Punisher: spawned near player", Color.RED)
+    else:
+        _log("info", "Hotkey spawn at " + str(spawn_pos))
 
 func _find_ai_spawner() -> Node:
     for n in get_tree().get_nodes_in_group("AI"):

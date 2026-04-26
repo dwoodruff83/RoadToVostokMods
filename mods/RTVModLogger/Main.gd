@@ -12,7 +12,7 @@ var _ready_announced := false
 
 func _ready() -> void:
     name = "RTVModLogger"
-    _log("info", "RTVModLogger demo loaded")
+    _log("debug", "RTVModLogger demo loaded")
     set_process_unhandled_input(true)
 
     # Defer the welcome notify by one frame so Loader is ready.

@@ -35,6 +35,7 @@ extends Node
 
 const INJECT_SCRIPT_PATH := "res://mods/RTVModItemRegistry/DatabaseInject.gd"
 const VANILLA_DATABASE_PATH := "res://Scripts/Database.gd"
+const DEMO_STUB_NAME := "_RegistryDemo_StubItem"
 
 var _db: Node = null
 var _ready_done := false
@@ -44,10 +45,12 @@ var _log_node: Node = null
 func _ready() -> void:
     name = "ModItemRegistry"
     _log_node = _resolve_log_node()
-    _log("info", "RTVModItemRegistry loading (priority=-50)")
+    _log("debug", "RTVModItemRegistry loading (priority=-50)")
     _inject_database()
+    _maybe_register_demo_stub()
+    set_process_unhandled_input(true)
     _ready_done = true
-    _log("info", "Registry online at %s; %d items currently registered" % [str(get_path()), registered_items().size()])
+    _log("debug", "Registry online at %s; %d items currently registered" % [str(get_path()), registered_items().size()])
 
 
 # --- Public API ---
@@ -83,6 +86,74 @@ func registered_items() -> Array:
     return _db.registered_items()
 
 
+# --- Demo / self-check ---
+
+# Construct a tiny PackedScene at runtime (just a single Node, no mesh, no
+# script, no behavior) and register it under DEMO_STUB_NAME. This lets the
+# self-check verify the full registration path even without consumer mods
+# installed. The stub never appears in loot, traders, or inventory — it's
+# only ever returned by Database.get(DEMO_STUB_NAME) when explicitly asked.
+func _maybe_register_demo_stub() -> void:
+    var cfg = _config()
+    if cfg == null or not cfg.demo_self_register:
+        return
+    var stub := PackedScene.new()
+    var node := Node.new()
+    node.name = DEMO_STUB_NAME
+    stub.pack(node)
+    register(DEMO_STUB_NAME, stub)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+    if !(event is InputEventKey) or !event.pressed or event.echo:
+        return
+    var cfg = _config()
+    if cfg == null:
+        return
+    if event.keycode != cfg.test_hotkey_keycode:
+        return
+    run_self_check()
+
+
+# Public: list every registered item, call Database.get(name) on each, and
+# log a per-item pass/fail plus a summary line. Bound to the configured
+# Test Hotkey, but also callable directly from other mods or the debugger.
+func run_self_check() -> void:
+    var names: Array = registered_items()
+    _log("info", "=== Registry self-check (%d item%s) ===" % [names.size(), "" if names.size() == 1 else "s"])
+
+    if names.is_empty():
+        _log("warn", "No items registered. Install a consumer mod (CatAutoFeed, Wallet, etc.) or enable Demo Self-Register.")
+        return
+
+    var passed := 0
+    var failed := 0
+    for n in names:
+        var resolved = _db.get(n) if _db else null
+        if resolved != null:
+            _log("info", "  PASS  %s -> %s" % [n, str(resolved)])
+            passed += 1
+        else:
+            _log("error", "  FAIL  %s -> null (not resolvable via Database.get)" % n)
+            failed += 1
+
+    if failed == 0:
+        _log("info", "Self-check PASSED (%d/%d resolved)" % [passed, names.size()])
+        if _log_node and _log_node.has_method("notify"):
+            _log_node.notify("Registry self-check PASSED (%d items)" % passed, Color.GREEN)
+    else:
+        _log("error", "Self-check FAILED (%d ok, %d broken)" % [passed, failed])
+        if _log_node and _log_node.has_method("notify"):
+            _log_node.notify("Registry self-check FAILED (%d/%d broken)" % [failed, names.size()], Color.RED)
+
+
+func _config():
+    var n = get_node_or_null("/root/RTVModItemRegistryConfig")
+    if n == null:
+        n = get_tree().root.find_child("RTVModItemRegistryConfig", true, false)
+    return n
+
+
 # --- Database injection (runs once on _ready) ---
 
 func _inject_database() -> void:
@@ -103,7 +174,7 @@ func _inject_database() -> void:
     # Replace the script on the live instance so .get() and our register()
     # method both work immediately, not just after the next load().
     _db.set_script(inject)
-    _log("info", "Database extended; registry methods live")
+    _log("debug", "Database extended; registry methods live")
 
 
 # --- Logger plumbing (mirrors RTVModLogger pattern) ---
