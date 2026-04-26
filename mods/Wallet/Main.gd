@@ -76,11 +76,13 @@ func _inject_database() -> void:
     if registry == null:
         registry = get_tree().root.find_child("ModItemRegistry", true, false)
     if registry and registry.has_method("register"):
-        registry.register("Wallet", preload("res://mods/Wallet/Wallet.tscn"))
-        registry.register("Ammo_Tin", preload("res://mods/Wallet/Ammo_Tin.tscn"))
-        registry.register("Money_Case", preload("res://mods/Wallet/Money_Case.tscn"))
-        _log("debug", "Wallet items registered with ModItemRegistry")
-        return
+        var ok_w: bool = registry.register("Wallet", preload("res://mods/Wallet/Wallet.tscn"))
+        var ok_t: bool = registry.register("Ammo_Tin", preload("res://mods/Wallet/Ammo_Tin.tscn"))
+        var ok_c: bool = registry.register("Money_Case", preload("res://mods/Wallet/Money_Case.tscn"))
+        if ok_w and ok_t and ok_c:
+            _log("debug", "Wallet items registered with ModItemRegistry")
+            return
+        _log("warn", "ModItemRegistry rejected one or more Wallet items (Wallet=%s Ammo_Tin=%s Money_Case=%s); falling back to legacy" % [ok_w, ok_t, ok_c])
 
     _log("debug", "RTVModItemRegistry not installed — using legacy in-place injection (incompatible with sibling Database-extending mods)")
     _inject_database_legacy()

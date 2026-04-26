@@ -40,6 +40,7 @@ const DEMO_STUB_NAME := "_RegistryDemo_StubItem"
 var _db: Node = null
 var _ready_done := false
 var _log_node: Node = null
+var _pending: Array = []  # entries queued by consumers calling register() before our _ready completes
 
 
 func _ready() -> void:
@@ -47,6 +48,7 @@ func _ready() -> void:
     _log_node = _resolve_log_node()
     _log("debug", "RTVModItemRegistry loading (priority=-50)")
     _inject_database()
+    _flush_pending()
     _maybe_register_demo_stub()
     set_process_unhandled_input(true)
     _ready_done = true
@@ -57,21 +59,56 @@ func _ready() -> void:
 
 # Register a mod item under its `file` field name. The PackedScene becomes
 # resolvable via Database.get(file_name) the same way vanilla items are.
-# Returns true on success, false if the registry isn't ready or args are bad.
-func register(file_name: String, scene: PackedScene) -> bool:
+#
+# overwrite=true: allow replacing another mod's item already registered under
+#   the same name. Default false rejects collisions and returns false.
+# force=true: allow shadowing a vanilla Database const of the same name.
+#   Default false rejects shadowing and returns false. Use sparingly — vanilla
+#   items are usually sacred.
+#
+# If called BEFORE the registry's _ready completes (e.g., from a consumer mod
+# that loads at lower priority), the call is queued and flushed after the
+# registry finishes injection. Returns true to signal "we'll honor this."
+func register(file_name: String, scene: PackedScene, overwrite: bool = false, force: bool = false) -> bool:
+    # Pre-injection: queue for deferred flush.
     if _db == null or not _db.has_method("register"):
-        _log("warn", "register('%s') called before injection complete" % file_name)
-        return false
-    if file_name == "":
-        _log("warn", "register() called with empty file_name")
-        return false
-    if scene == null:
-        _log("warn", "register('%s') called with null scene" % file_name)
-        return false
-    var ok: bool = _db.register(file_name, scene)
+        if file_name == "":
+            _log("warn", "register() called with empty file_name")
+            return false
+        if scene == null:
+            _log("warn", "register('%s') called with null scene" % file_name)
+            return false
+        _pending.append({
+            "file_name": file_name,
+            "scene": scene,
+            "overwrite": overwrite,
+            "force": force,
+        })
+        _log("debug", "Deferred register('%s') until injection completes" % file_name)
+        return true
+
+    var ok: bool = _db.register(file_name, scene, overwrite, force)
     if ok:
-        _log("debug", "Registered item: %s" % file_name)
+        _log("debug", "Registered item: %s (overwrite=%s, force=%s)" % [file_name, overwrite, force])
     return ok
+
+
+# Drain anything queued by consumers that called register() before our _ready.
+func _flush_pending() -> void:
+    if _pending.is_empty():
+        return
+    if _db == null or not _db.has_method("register"):
+        _log("error", "Injection failed; %d deferred registration(s) cannot be flushed" % _pending.size())
+        _pending.clear()
+        return
+    _log("info", "Flushing %d deferred registration(s)" % _pending.size())
+    for entry in _pending:
+        var ok: bool = _db.register(entry.file_name, entry.scene, entry.overwrite, entry.force)
+        if ok:
+            _log("debug", "Flushed deferred register: %s" % entry.file_name)
+        else:
+            _log("warn", "Deferred register failed: %s" % entry.file_name)
+    _pending.clear()
 
 
 func is_registered(file_name: String) -> bool:
@@ -80,10 +117,14 @@ func is_registered(file_name: String) -> bool:
     return _db.is_registered(file_name)
 
 
-func registered_items() -> Array:
+func registered_items() -> Array[String]:
     if _db == null or not _db.has_method("registered_items"):
-        return []
-    return _db.registered_items()
+        return [] as Array[String]
+    var raw = _db.registered_items()
+    var arr: Array[String] = []
+    for x in raw:
+        arr.append(String(x))
+    return arr
 
 
 # --- Demo / self-check ---
@@ -174,6 +215,13 @@ func _inject_database() -> void:
     # Replace the script on the live instance so .get() and our register()
     # method both work immediately, not just after the next load().
     _db.set_script(inject)
+
+    # Plumb the registry's logger into DatabaseInject so its rejection
+    # warnings (collision / vanilla shadow) reach the user's MCM-configured
+    # outputs instead of just push_warning to the engine console.
+    if _log_node != null and _log_node.has_method("warn") and _db.has_method("set_log_callback"):
+        _db.set_log_callback(Callable(_log_node, "warn"))
+
     _log("debug", "Database extended; registry methods live")
 
 
