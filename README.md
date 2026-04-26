@@ -307,18 +307,19 @@ Other: `lean_L`, `lean_R`, `weapon_low`, `weapon_high`, `place`, `decor`, `ragdo
 
 ## Mod Loaders
 
-### VostokMods (Primary)
-- **Repo:** https://github.com/Ryhon0/VostokMods
-- **Wiki:** Has guides for decompilation, asset replacement, class overriding, autoloads, publishing
-- Works by injecting `Injector.pck` via Steam launch options: `--main-pack Injector.pck`
-- Mods packaged as `.VMZ` files (renamed ZIPs) in a `mods` folder
+### Metro Mod Loader (Primary — what we develop and test against)
+- **ModWorkshop:** https://modworkshop.net/mod/55623
+- **Repo:** https://github.com/ametrocavich/vostok-mod-loader (published as "Metro Mod Loader" by `metro` / `ametrocavich`)
+- **Currently installed locally:** v2.0.0 ("MetroModloaderUI", March 2026 release). Newer 3.x versions exist with a different install mechanism (bundle `modloader.gd` inside a PCK and use `[autoload_prepend]` in `override.cfg`).
+- **How v2.0.0 installs:** drops `override.cfg` next to `RTV.exe` (autoloads `user://modloader.gd`) and `modloader.gd` into `%APPDATA%\Road to Vostok\`. No Steam launch options needed.
+- **Features:** pre-game launcher window with mod list and per-mod toggles; conflict detection (writes `modloader_conflicts.txt` to user data); built-in ModWorkshop integration for downloads/updates; `.vmz` mounting via `vmz_mount_cache/`.
 
-### vostok-mod-loader (Alternative)
-- **Repo:** https://github.com/ametrocavich/vostok-mod-loader
-- Launcher UI with load-priority system
-- Two-pass loading (restart-required mods prefixed with `!`)
-- Crash recovery (auto-resets after 2 consecutive crashes)
-- Compatible with VostokMods `.VMZ` format
+### VostokMods (Alternative)
+- **ModWorkshop:** https://modworkshop.net/mod/49779
+- **Repo:** https://github.com/Ryhon0/VostokMods (by `Ryhon`)
+- **Wiki:** has guides for decompilation, asset replacement, class overriding, autoloads, publishing — useful reference even if you use Metro
+- Works by injecting `Injector.pck` via Steam launch options: `--main-pack Injector.pck`
+- Mods packaged as `.VMZ` files (renamed ZIPs) — the same format Metro uses, so any of our mods will load under either loader.
 
 ### Mod Configuration Menu (MCM)
 - By DoinkOink (v2.6.3)
@@ -439,23 +440,268 @@ func _process(delta):
 | Day & Night MCM | day&night_MCM | 0.0.2 | Day/night cycle settings |
 | Faction Warfare | road-to-vostok-enemy-ai | 1.2.3 | Enhanced enemy AI + spawning |
 
-## Prerequisites & Tools
+## Prerequisites & External Tools
 
-### Installed
-- [x] **GDRE Tools v2.5.0-beta.5** — `F:\RoadToVostokMods\tools\GDRE_tools\gdre_tools.exe`
-- [x] **Git** — Already installed
-- [x] **VostokMods loader** — Already installed
-- [x] **Decompiled game source** — `F:\RoadToVostokMods\reference\RTV_decompiled\` (176 scripts)
+### At-a-glance checklist
 
-### Still Needed
-- [ ] **Godot Editor 4.6.x** — Must match game version. Download from https://godotengine.org/download
-- [ ] **VS Code + Godot GDScript extension** — For editing GDScript with syntax highlighting/autocomplete
+| Tool | Required? | Status | Purpose |
+|------|-----------|--------|---------|
+| Python 3.11+ | required | installed (3.13.1) | runs version_tracker, save_backup, sync_logger |
+| Git | required | installed | RTV_history snapshot repo + general workflow |
+| Godot Editor 4.6.x | required | installed (4.6.2) | edit/build mods, run them from source |
+| GDRE Tools | required | installed (v2.5.0-beta.5) | decompile RTV.pck into readable GDScript |
+| Metro Mod Loader | required | installed (v2.0.0) | actually loads `.vmz` mods at game start |
+| DepotDownloader | optional | installed | grab specific historical RTV builds from Steam (for backfilling old snapshots) |
+| VS Code + GDScript extension | recommended | check IDE | syntax highlighting + autocomplete |
+
+### Python 3.11+
+
+Required for all workspace utilities (`snapshot.bat`, `analyze_mods.bat`, `changelog.bat`, `tools/save_backup.py`, `tools/sync_logger.py`). Python 3.11+ specifically because the tracker scripts use `tomllib`.
+
+- **Get it:** https://www.python.org/downloads/ — install the latest 3.13.x
+- **Verify:** `python --version` should report 3.11 or newer
+- **Note:** Make sure to check "Add python.exe to PATH" during the installer
+
+### Git
+
+Required by the version tracker (its history repo lives in git) and for general workflow.
+
+- **Get it:** https://git-scm.com/download/win
+- **Verify:** `git --version`
+- Already installed and configured.
+
+### Godot Editor 4.6.x
+
+Must match the game's engine version exactly. The game ships with Godot 4.6.1; we have 4.6.2 installed which is binary-compatible for modding purposes.
+
+- **Get it:** https://godotengine.org/download/archive (look for 4.6.x stable)
+- **Installed at:** `F:\RoadToVostokMods\tools\Godot\Godot_v4.6.2-stable_win64.exe`
+- **Console version** (useful for stdout when debugging GDScript): `Godot_v4.6.2-stable_win64_console.exe`
+- **Usage:** Open the editor and import a mod's project (or the decompiled `RTV_decompiled/project.godot`) to edit/run from source.
+
+### GDRE Tools
+
+Godot Reverse Engineering Tools — decompiles `.pck` files back to readable GDScript.
+
+- **Source:** https://github.com/bruvzg/gdsdecomp
+- **Installed at:** `F:\RoadToVostokMods\tools\GDRE_tools\gdre_tools.exe`
+- **GUI usage:** Launch `gdre_tools.exe`, point it at the game's PCK, choose "Recover Project."
+- **CLI usage** (for re-decompiling after a game patch):
+  ```bash
+  # List files in PCK
+  gdre_tools.exe --headless --list-files="C:\Program Files (x86)\Steam\steamapps\common\Road to Vostok\RTV.pck"
+
+  # Recover scripts only (fast, ~30K lines of GDScript)
+  gdre_tools.exe --headless --recover="C:\Program Files (x86)\Steam\steamapps\common\Road to Vostok\RTV.pck" --output="F:\RoadToVostokMods\reference\RTV_decompiled" --scripts-only
+
+  # Full recovery (everything — large, ~5GB)
+  gdre_tools.exe --headless --recover="...\RTV.pck" --output="output\dir"
+  ```
+
+### DepotDownloader
+
+Steam tool for downloading specific app/depot builds — useful for **backfilling historical RTV versions** when we want to add older snapshots to the version tracker history.
+
+- **Source:** https://github.com/SteamRE/DepotDownloader
+- **Installed at:** `F:\RoadToVostokMods\tools\DepotDownloader\DepotDownloader.exe`
+- **Auth:** Requires Steam credentials (or anonymous for free apps); RTV is paid so we'd use our own login.
+- **Example usage** (download a specific build of RTV):
+  ```bash
+  DepotDownloader.exe -app 1963610 -depot 1963611 -manifest <manifest_id> -username <steam_user>
+  ```
+  Manifest IDs come from SteamDB or Steam's `appmanifest_*.acf` `buildid` field. Output goes to a `depots/` subfolder by default.
+- **When to use:** Only if we want to snapshot a game version older than our most recent decompile. Day-to-day modding doesn't need it.
+
+### Metro Mod Loader
+
+The actual mod loader that runs at game launch. We have v2.0.0 installed.
+
+- **ModWorkshop:** https://modworkshop.net/mod/55623
+- **Source:** https://github.com/ametrocavich/vostok-mod-loader (published as "Metro Mod Loader")
+- **Setup (v2.0.0):** drop `override.cfg` next to `C:\Program Files (x86)\Steam\steamapps\common\Road to Vostok\RTV.exe` and `modloader.gd` into `%APPDATA%\Road to Vostok\`. No Steam launch options. Mod `.vmz` files go into `<game>\mods\`.
+- **Verifying which version is installed:** look at the size of `%APPDATA%\Road to Vostok\modloader.gd` — v2.0.0 is exactly 67,141 bytes (MD5 `61bbf6edda9e23310cbe39cadb1ca5d3`). Newer 3.x versions are ~500KB and live at `res://modloader.gd` (bundled in a PCK) instead of `user://`.
+- See the "Mod Loaders" section above for the VostokMods alternative.
+
+### VS Code + Godot GDScript extension (recommended)
+
+Not strictly required, but invaluable for editing GDScript.
+
+- **Get VS Code:** https://code.visualstudio.com/
+- **Extension:** search "godot-tools" in VS Code's extensions panel, or:
+  https://marketplace.visualstudio.com/items?itemName=geequlim.godot-tools
+- **Setup:** Open the editor settings in Godot → Editor Settings → Network → Language Server. Enable "Use Language Server" and note the port (default 6008). VS Code's extension connects to this for autocomplete/hover.
+
+### Workspace utilities (already in `tools/`)
+
+These are local helper scripts, not external tools:
+
+- **`tools/save_backup.py`** — backs up `%APPDATA%\Road to Vostok\` save files to `save_backups/`. Subcommands: `backup`, `list`, `restore`, `delete`.
+- **`tools/sync_logger.py`** — syncs `shared/Logger.gd` (canonical) into each mod's `Logger.gd`, preserving the mod's identity values. Run before building if you've updated the shared logger.
+- **`tools/modworkshop.py`** (`modworkshop.bat`) — read-only client for the public ModWorkshop API. Browse, search, and inspect mods on https://modworkshop.net without leaving the terminal. See "ModWorkshop Browse & Publish" below.
+- **`tools/publish.py`** (`publish.bat`) — one-shot mod publish workflow: bumps the version in `mod.txt`, runs the mod's `build.py` to zip a `.vmz` and install it to the game folder, then opens the browser at the right ModWorkshop page so the file can be uploaded by hand. See "ModWorkshop Browse & Publish" below.
 
 ## Community Resources
 
-- **VostokMods Wiki** — Primary modding documentation (on GitHub)
-- **ModWorkshop** — https://modworkshop.net/mod/49779
+- **VostokMods Wiki** — https://github.com/Ryhon0/VostokMods/wiki — best general modding reference even though we use Metro to load
+- **Metro Mod Loader on ModWorkshop** — https://modworkshop.net/mod/55623 (the loader we use)
+- **VostokMods on ModWorkshop** — https://modworkshop.net/mod/49779 (alternative loader)
 - **Godot Modding Wiki** — https://wiki.godotmodding.com (general Godot modding, covers GML framework)
+
+## Version Tracking & Mod Impact Analysis
+
+The `rtv-mod-impact-tracker` tool keeps a git history of decompiled scripts and tells us which of our mods will break on each game patch. It lives in its own repo at `F:\rtv-mod-impact-tracker\` and is driven from this workspace via `mod_tracker.toml` and the `snapshot.bat` / `analyze_mods.bat` wrappers.
+
+For the tool's own documentation (install, full CLI reference, contribution notes) see the [tracker repo's README](../rtv-mod-impact-tracker/README.md).
+
+### How it works
+
+1. **`snapshot.bat`** copies `reference/RTV_decompiled/` into `reference/RTV_history/` (a git repo), commits it, and tags it `game-v<version>-build<buildid>`. Excludes `mods/`, `.godot/`, and `gdre_export.log`.
+2. **`analyze_mods.bat`** walks `mods/`, parses each mod's `take_over_path()` calls (string-literal *and* `const`-referenced paths) plus `mod.txt` autoloads, then diffs the overridden files between two snapshot tags and classifies each mod:
+   - 🟢 **safe** — mod's overrides aren't touched by the patch
+   - 🟡 **review** — overridden file changed in body only (signatures stable, override likely still works)
+   - 🔴 **broken** — overridden file deleted, or function signatures / `class_name` / `extends` declarations changed
+3. **`changelog.bat`** walks consecutive snapshot tags and emits a Markdown changelog of game-side changes: added/deleted/renamed files plus per-modified-`.gd`-file breakdowns of added/removed functions and signature changes.
+4. **`fetch_version.bat`** downloads a specific historical Steam build via DepotDownloader, decompiles it with GDRE_Tools, and snapshots it — all in one shot. Manifest registry lives at `manifests.json` (workspace root). Subcommands: `list`, `add`, `bootstrap`, `fetch`, `backfill`.
+
+The git repo *is* the diff engine — VS Code's built-in git diff browser works directly against `reference/RTV_history/`.
+
+### Per-patch workflow
+
+When a new game version drops:
+
+```bash
+# 1. Refresh decompile (currently manual via GDRE; auto-CLI wiring deferred).
+#    See "GDRE Tools Usage" section below for commands.
+#    Refresh F:\RoadToVostokMods\reference\RTV_decompiled\ from the new RTV.pck.
+
+# 2. Capture a new snapshot (auto-detects version + Steam buildid)
+snapshot.bat
+
+# 3. See what changed and what it broke
+analyze_mods.bat --from game-v0.1.0.0-build22674175 --to HEAD --output diff_reports/v0.1.0.0_to_next.html
+
+# 4. (Optional) Generate a Markdown changelog of game-side changes
+changelog.bat --output diff_reports/CHANGELOG.md
+```
+
+### Useful commands
+
+```bash
+# List all snapshots
+analyze_mods.bat --list-tags
+
+# Compare any two refs (no --from defaults to "second-most-recent tag → most-recent")
+analyze_mods.bat --from <tagA> --to <tagB>
+
+# Dry-run a snapshot to preview what would happen
+snapshot.bat --dry-run
+
+# Override version detection (e.g. when re-snapshotting an older decompile)
+snapshot.bat --label 0.1.0.0 --build 22674175
+
+# Generate a changelog for everything since a given snapshot
+changelog.bat --since game-v0.1.0.0-build22674175 --output CHANGELOG.md
+```
+
+### Configuration
+
+`mod_tracker.toml` at the workspace root tells the tool where things are:
+
+```toml
+[paths]
+decompiled = "reference/RTV_decompiled"
+history    = "reference/RTV_history"
+mods       = "mods"
+
+[steam]
+app_id = 1963610   # Road to Vostok full game
+
+[snapshot]
+exclude_toplevel = ["mods", ".godot", "gdre_export.log"]
+```
+
+The tool finds this file by walking up from the current working directory.
+
+### Detection rules
+
+- **Game version**: parsed from `RTV_decompiled/project.godot` (`config/version=...`)
+- **Steam build id**: parsed from `C:\Program Files (x86)\Steam\steamapps\appmanifest_1963610.acf` (`buildid` field)
+- **Mod overrides**: regex on `take_over_path("res://...")` literal calls + `take_over_path(IDENT)` where `IDENT` is a same-file `const IDENT := "res://..."`
+- **Signature change**: function name + arg list (whitespace-normalized), plus `extends` and `class_name` lines
+
+### Known gaps
+
+- **GDRE auto-decompile** isn't wired into `snapshot.py` yet. The CLI commands are documented in the GDRE Tools Usage section below — wire them up when this becomes annoying.
+- **Migration suggestions** for broken mods aren't generated automatically. The analyzer reports *what* changed, not *how* to adapt.
+
+## ModWorkshop Browse & Publish
+
+Two workspace tools for working with [ModWorkshop](https://modworkshop.net), the primary host for Road to Vostok mods.
+
+### `modworkshop.bat` — browse the catalog
+
+Read-only client for the public ModWorkshop API at https://api.modworkshop.net. Stdlib-only Python, no dependencies. Defaults all queries to the Road to Vostok game section (`game_id=864`).
+
+```bash
+# Find a game's id (only needed once for new games)
+modworkshop.bat find-game vostok
+# id   name            mods  short_name
+# 864  Road to Vostok  329   roadtovostok
+
+# Top RTV mods by downloads
+modworkshop.bat top --limit 10
+
+# Most recent uploads/updates
+modworkshop.bat browse --sort latest --limit 20
+modworkshop.bat browse --sort popular --limit 10
+modworkshop.bat browse --sort likes   --limit 10
+
+# Search by name
+modworkshop.bat search "mod loader"
+
+# Full info on a single mod (author, version, downloads, tags, repo URL...)
+modworkshop.bat info 55623
+
+# Version history (each .vmz upload, with size + downloads per file)
+modworkshop.bat files 55623
+
+# Target a different game (Payday 2 = 1, etc.)
+modworkshop.bat --game 1 top --limit 5
+```
+
+### `publish.bat` — build, install, and open ModWorkshop
+
+Drives a mod's existing `build.py` to produce a `.vmz`, copies it into the game's `mods/` folder, then opens the browser to the right ModWorkshop page so you can drop the `.vmz` into the upload form.
+
+```bash
+# Build and install only (skip browser)
+publish.bat CatAutoFeed --no-open
+
+# Bump version, build, install, and open the upload/edit page
+publish.bat CatAutoFeed --version 0.4.0
+
+# Build and open browser, but don't install to the game
+publish.bat CatAutoFeed --no-install
+
+# Preview what would be done
+publish.bat CatAutoFeed --version 0.4.0 --dry-run
+```
+
+**Per-mod ModWorkshop id (`.publish` file).** After publishing a mod for the first time, write its ModWorkshop id into `mods/<ModName>/.publish` as a single integer line:
+
+```
+56123
+```
+
+Subsequent `publish.bat <ModName>` runs will then open `https://modworkshop.net/mod/56123/edit` directly. If the file is absent, the generic `https://modworkshop.net/upload` page is opened instead.
+
+### Why the upload step is still manual
+
+ModWorkshop's API spec at https://api.modworkshop.net documents `POST /games/{game_id}/mods` (create) and `POST /mods/{mod_id}/files` (upload), but the docs explicitly state:
+
+> At the moment, the API only supports GET requests. More support will come in the future, but will require the use of API keys.
+
+So `publish.bat` does everything up to and including "browser open on the correct page with the freshly-built `.vmz` ready to drag in." The final click is yours. When the API gains write support and starts issuing keys, `publish.py` is the right place to wire it up.
 
 ## GDRE Tools Usage
 
@@ -483,18 +729,48 @@ gdre_tools.exe --headless --pck-create="dir" --pck-version=3 --pck-engine-versio
 ## Project Structure
 
 ```
-F:\RoadToVostokMods\
+F:\RoadToVostokMods\                   # this workspace
 ├── README.md                          # This file
+├── CLAUDE.md                          # Quick reference for Claude
+├── mod_tracker.toml                   # Config consumed by rtv-mod-impact-tracker
+├── snapshot.bat                       # Wrapper -> F:\rtv-mod-impact-tracker\snapshot.py
+├── analyze_mods.bat                   # Wrapper -> F:\rtv-mod-impact-tracker\analyze_mods.py
+├── changelog.bat                      # Wrapper -> F:\rtv-mod-impact-tracker\changelog.py
+├── fetch_version.bat                  # Wrapper -> F:\rtv-mod-impact-tracker\fetch_version.py
+├── modworkshop.bat                    # Wrapper -> tools\modworkshop.py (browse the API)
+├── publish.bat                        # Wrapper -> tools\publish.py (build + install + open ModWorkshop)
+├── manifests.json                     # Steam manifest registry (consumed by fetch_version)
 ├── tools/
+│   ├── modworkshop.py                 # ModWorkshop API client (read-only)
+│   ├── publish.py                     # Mod publish workflow (build/install/open)
+│   ├── save_backup.py                 # Backup/restore RTV save files
+│   ├── sync_logger.py                 # Sync shared/Logger.gd into each mod
 │   └── GDRE_tools/                    # Godot RE Tools v2.5.0-beta.5
 │       ├── gdre_tools.exe
 │       ├── gdre_tools.pck
 │       └── GodotMonoDecompNativeAOT.dll
 ├── reference/
-│   └── RTV_decompiled/                # Decompiled game source
-│       ├── project.godot              # Game project file
-│       ├── gdre_export.log            # Decompilation log
-│       └── Scripts/                   # 176 GDScript files (30,153 lines)
-├── mods/                              # Our mod projects (empty, ready to go)
+│   ├── RTV_decompiled/                # Working copy of decompiled game source
+│   │   ├── project.godot              # Game project file
+│   │   ├── gdre_export.log            # Decompilation log
+│   │   └── Scripts/                   # 176 GDScript files (30,153 lines)
+│   └── RTV_history/                   # Git repo: one commit per game version
+│       └── (tagged as game-v<ver>-build<buildid>)
+├── mods/                              # Our mod projects
+│   ├── CatAutoFeed/
+│   ├── PunisherGuarantee/
+│   ├── RTVModLogger/                  # Demo + reusable logging library (Logger.gd + LOGGER.md)
+│   └── Wallet/
+├── diff_reports/                      # HTML output from analyze_mods.bat (optional)
 └── notes/                             # Learning notes, ideas
+
+F:\rtv-mod-impact-tracker\             # standalone tool repo (separate)
+├── README.md                          # Tool documentation
+├── LICENSE                            # MIT
+├── snapshot.py                        # Capture decompile, tag the commit
+├── analyze_mods.py                    # Diff two tags, classify mod impact (HTML w/ inline diffs)
+├── changelog.py                       # Markdown changelog across snapshot tags
+├── fetch_version.py                   # Pull historical Steam builds, decompile, snapshot
+└── examples/
+    └── road-to-vostok.toml            # Template config
 ```
