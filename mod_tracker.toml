@@ -1,0 +1,10 @@
+[paths]
+decompiled = "reference/RTV_decompiled"
+history    = "reference/RTV_history"
+mods       = "mods"
+
+[steam]
+app_id = 1963610
+
+[snapshot]
+exclude_toplevel = ["mods", ".godot", "gdre_export.log"]
