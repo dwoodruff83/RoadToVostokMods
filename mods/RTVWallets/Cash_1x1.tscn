@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://8mmhrfnerax8"]
+
+[ext_resource type="Material" uid="uid://bigofhlj5i476" path="res://UI/Effects/MT_Item.tres" id="1"]
+[ext_resource type="Texture2D" uid="uid://dpx5h2mlpirwp" path="res://mods/RTVWallets/assets/icons/Euro50_Stack.png" id="2"]
+
+[node name="Cash" type="Sprite2D" unique_id=816624135]
+material = ExtResource("1")
+position = Vector2(32, 32)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2")

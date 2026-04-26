@@ -25,7 +25,22 @@ func _ready() -> void:
     _log_node = _resolve_log_node()
     _inject_database()
     _inject_loot_table()
+    _apply_gunsmith_gate()
     _log("debug", "CatAutoFeed loaded, threshold=%d, check every %ds" % [int(_threshold()), int(CHECK_INTERVAL)])
+
+
+# Toggle Cat_Bowl.tres `gunsmith` flag at mod load based on the MCM setting.
+# The Trader's FillTraderBucket runs once per trader spawn and reads the flag
+# from the shared resource at that moment, so changes here apply on the
+# player's next visit to the Gunsmith. Reload required for changes to take
+# effect mid-session because already-spawned traders have their bucket fixed.
+func _apply_gunsmith_gate() -> void:
+    var bowl_data = load("res://mods/CatAutoFeed/Cat_Bowl.tres")
+    if bowl_data == null:
+        _log("warn", "Cat_Bowl.tres failed to load; cannot apply Gunsmith gate")
+        return
+    bowl_data.gunsmith = _gunsmith_enabled()
+    _log("debug", "Cat_Bowl.gunsmith = %s" % bool(bowl_data.gunsmith))
 
 func _inject_loot_table() -> void:
     # Add Cat_Bowl to LT_Master.items so it spawns naturally in civilian loot
@@ -58,7 +73,7 @@ func _inject_loot_table() -> void:
 func _inject_database() -> void:
     # Prefer RTVModItemRegistry's coordinated registration if installed —
     # this lets CatAutoFeed coexist with other mods that add new items
-    # (e.g. Wallet). Fall back to legacy direct injection in single-mod
+    # (e.g. RTV Wallets). Fall back to legacy direct injection in single-mod
     # setups so the bowl still works without the registry.
     # get_node_or_null sometimes misses cross-mod autoloads even when they
     # ARE in the tree (autoload-from-another-mod timing); fall back to
@@ -123,11 +138,39 @@ func _process(delta: float) -> void:
     if _was_in_menu:
         _was_in_menu = false
         _check_timer = STARTUP_DELAY
+
+    # Per-frame mental buff while the player is in the cat's shelter.
+    # Runs separately from the auto-feed tick so the gain is smooth, like
+    # the vanilla fire buff in Character.Mental().
+    _maybe_buff_mental_from_cat(delta)
+
     _check_timer -= delta
     if _check_timer > 0.0:
         return
     _check_timer = CHECK_INTERVAL
     _try_auto_feed()
+
+
+# Raises mental at the same rate as the vanilla fire buff (delta / 4.0)
+# whenever the player is in the cat's shelter and the cat is alive. Skips
+# when the mod is disabled, the cat company toggle is off, the cat isn't
+# rescued / is dead, or the player is in a menu / settings / mid-transition
+# (mirrors the gates on _try_auto_feed). No log output — vanilla's fire
+# buff is silent and players see the gain through the mental HUD readout.
+func _maybe_buff_mental_from_cat(delta: float) -> void:
+    if !_enabled() or !_cat_company_enabled():
+        return
+    if gameData.settings or gameData.transition or gameData.isDead:
+        return
+    if !gameData.catFound or gameData.catDead:
+        return
+    var current_map := _current_map_name()
+    if current_map == "":
+        return
+    var cat_shelter := _find_cat_shelter()
+    if cat_shelter == "" or current_map != cat_shelter:
+        return
+    gameData.mental += delta / 4.0
 
 func _try_auto_feed() -> void:
     if !_enabled():
@@ -259,12 +302,18 @@ func _feed_from_shelter(shelter: ShelterSave, path: String, shelter_name: String
                 if sd.amount <= 0:
                     inner.remove_at(j)
                 _sync_item_amount(itemSave.slotData)
-                # Detect "this was the last bite in the bowl" to give the
-                # player a heads-up that they need to refill it.
-                var bowl_now_empty := _slot_storage_total(itemSave.slotData) == 0
+                # Suppress the "is empty" warning when other bowls in the
+                # same shelter still hold food — otherwise a multi-bowl
+                # setup spams "Bowl A is empty" the moment Bowl A drains
+                # even though the cat is fine. Only fire the warning when
+                # THIS bowl just hit zero AND no sibling bowl has cat food.
+                var bowls_empty: bool = (
+                    _slot_storage_total(itemSave.slotData) == 0
+                    and not _other_bowls_have_food(shelter, itemSave, foods)
+                )
                 if !_save_shelter(shelter, path):
                     return false
-                _on_fed_from_bowl(food_name, bowl_name, bowl_now_empty)
+                _on_fed_from_bowl(food_name, bowl_name, bowls_empty)
                 return true
 
     # If shelter fallback is disabled (default), stop here — bowl is the
@@ -321,6 +370,26 @@ func _slot_storage_total(slot_data: SlotData) -> int:
         if sd != null:
             total += int(sd.amount)
     return total
+
+# Does any container in `shelter.items` other than `exclude` hold cat-edible
+# food in its nested storage? Used to suppress the "bowl is empty" warning
+# when multiple bowls coexist and the cat just drained the first one — there
+# might still be food in another bowl, so the player doesn't need to panic.
+func _other_bowls_have_food(shelter: ShelterSave, exclude, foods: Array) -> bool:
+    if shelter == null or shelter.items == null:
+        return false
+    for itemSave in shelter.items:
+        if itemSave == null or itemSave == exclude or itemSave.slotData == null:
+            continue
+        var inner = itemSave.slotData.storage
+        if inner == null:
+            continue
+        for sd in inner:
+            if sd == null or sd.itemData == null:
+                continue
+            if sd.itemData.file in foods and int(sd.amount) > 0:
+                return true
+    return false
 
 # Items that use slotData.storage as the source of truth for "how much is
 # inside" (Cat Bowl) need slotData.amount kept in sync so the inventory badge
@@ -425,6 +494,14 @@ func _shelter_fallback() -> bool:
 func _loot_enabled() -> bool:
     var cfg = _config()
     return cfg.bowl_in_loot if cfg else true
+
+func _gunsmith_enabled() -> bool:
+    var cfg = _config()
+    return cfg.bowl_at_gunsmith if cfg else false
+
+func _cat_company_enabled() -> bool:
+    var cfg = _config()
+    return cfg.cat_company_buff if cfg else true
 
 func _food_names() -> Array:
     return DEFAULT_FOOD

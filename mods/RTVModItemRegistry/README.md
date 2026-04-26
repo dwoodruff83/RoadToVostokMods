@@ -17,12 +17,25 @@ the same `Database.get(name)` path the vanilla game already uses, so loot
 spawners, traders, drop/pickup, and shelter saves all see them as normal
 items.
 
+## Who should install this?
+
+- **Players running 2+ item-adding mods together** (e.g. CatAutoFeed + RTV Wallets)
+  — install this so the mods coexist cleanly. Without it, the mod that loads
+  last silently overwrites the others' Database entries, and their items
+  vanish from loot, traders, and pickups.
+- **Players running 0 or 1 item-adding mod** — you can skip this. Single-mod
+  setups work via each consumer mod's legacy fallback. Installing the registry
+  doesn't hurt, but it gains you nothing.
+- **Mod developers building a new item-adding mod** — see [REGISTRY.md](REGISTRY.md)
+  for the integration guide. Hooking into the `register()` API is ~5 lines of
+  code and makes your mod a good citizen in any future mod pack.
+
 ## Installation
 
 1. Drop `RTVModItemRegistry.vmz` into the game's `mods/` folder.
 2. Ensure a compatible mod loader is installed (e.g. [Metro Mod Loader](https://modworkshop.net/mod/55623)).
 3. **Recommended:** also install [Mod Configuration Menu (MCM)](https://modworkshop.net/mod/53713) — the registry runs without it, but settings can only be tweaked in-game when MCM is present.
-4. Install any consumer mods that use the registry (CatAutoFeed, Wallet, etc.). They pick it up automatically via soft dependency.
+4. Install any consumer mods that use the registry (CatAutoFeed, RTV Wallets, etc.). They pick it up automatically via soft dependency.
 
 ## For mod authors
 
@@ -57,7 +70,7 @@ This is a Godot engine reality, not something the registry can patch around: `se
 
 **Practical impact:**
 - Vanilla items continue to work (they're resolved on a parent script).
-- Consumer mods that fall back to legacy injection (CatAutoFeed, Wallet, etc.) still get their items in — the cost is that they're back to last-loader-wins between each other.
+- Consumer mods that fall back to legacy injection (CatAutoFeed, RTV Wallets, etc.) still get their items in — the cost is that they're back to last-loader-wins between each other.
 
 **The mitigation is social, not technical:** RTVModItemRegistry only protects mods that opt in. We're inviting other item-mod authors to integrate via the `register()` API. If you maintain such a mod, see [REGISTRY.md](REGISTRY.md) — integration is ~5 lines of code.
 

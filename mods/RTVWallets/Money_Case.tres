@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://mods/RTVWallets/assets/icons/Money_Case.png" id="1"]
+[ext_resource type="Script" path="res://Scripts/ItemData.gd" id="2"]
+[ext_resource type="PackedScene" path="res://mods/RTVWallets/Money_Case_3x2.tscn" id="3"]
+[ext_resource type="Resource" path="res://mods/RTVWallets/Cash.tres" id="4"]
+
+[resource]
+script = ExtResource("2")
+file = "Money_Case"
+name = "Money Case"
+inventory = "Money Case"
+rotated = "Money Case"
+equipment = "Money Case"
+display = "Money Case"
+type = "Misc"
+subtype = "Magazine"
+weight = 1.2
+value = 2500
+rarity = 2
+icon = ExtResource("1")
+tetris = ExtResource("3")
+size = Vector2(3, 2)
+stackable = false
+showAmount = true
+defaultAmount = 0
+maxAmount = 10000
+compatible = [ExtResource("4")]
+industrial = true
+military = true

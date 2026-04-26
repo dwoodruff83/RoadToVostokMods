@@ -8,7 +8,7 @@
 **Recommended sequence:** publish FIFTH (last) — only if at all. This mod is a small,
 focused tweak that the author is unlikely to publish in the near term; this file exists
 so the workflow is ready in case that changes. Lower priority than the four "core"
-publishables (RTVModItemRegistry, RTVModLogger, CatAutoFeed, Wallet).
+publishables (RTVModItemRegistry, RTVModLogger, CatAutoFeed, RTV Wallets).
 
 ## TL;DR pitch
 

@@ -1,0 +1,9 @@
+[mod]
+name="RTV Wallets"
+id="RTVWallets"
+version="0.2.0"
+
+[autoload]
+RTVWalletsLog="res://mods/RTVWallets/Logger.gd"
+RTVWalletsConfig="res://mods/RTVWallets/config.gd"
+RTVWallets="res://mods/RTVWallets/Main.gd"

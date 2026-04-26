@@ -759,8 +759,9 @@ F:\RoadToVostokMods\                   # this workspace
 ├── mods/                              # Our mod projects
 │   ├── CatAutoFeed/
 │   ├── PunisherGuarantee/
+│   ├── RTVModItemRegistry/            # Coordination shim for multiple item-adding mods (REGISTRY.md)
 │   ├── RTVModLogger/                  # Demo + reusable logging library (Logger.gd + LOGGER.md)
-│   └── Wallet/
+│   └── RTVWallets/
 ├── diff_reports/                      # HTML output from analyze_mods.bat (optional)
 └── notes/                             # Learning notes, ideas
 

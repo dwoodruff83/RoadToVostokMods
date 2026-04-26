@@ -10,6 +10,8 @@ var show_notification := true
 var show_hunger_warning := true
 var allow_shelter_fallback := false
 var bowl_in_loot := true
+var bowl_at_gunsmith := false
+var cat_company_buff := true
 
 var _mcm_helpers = null
 
@@ -76,6 +78,24 @@ func _ready() -> void:
         "value" = true,
         "category" = "General",
         "menu_pos" = 6,
+    })
+
+    config.set_value("Bool", "bowl_at_gunsmith", {
+        "name" = "Bowl at Gunsmith",
+        "tooltip" = "When ON, the Gunsmith trader stocks Cat Food Bowl in his random supply. The Gunsmith only unlocks at day 10 in vanilla, so this is a late-game purchase path for players who haven't found a bowl in loot. Default OFF — bowls remain loot-only by default. Reload the game after toggling for the change to take effect.",
+        "default" = false,
+        "value" = false,
+        "category" = "General",
+        "menu_pos" = 7,
+    })
+
+    config.set_value("Bool", "cat_company_buff", {
+        "name" = "Cat Company Mental Buff",
+        "tooltip" = "When ON (default), being in the same shelter as your cat slowly raises mental, the same way sitting near a fire does. Requires the cat to be alive and rescued. Vanilla shelter doesn't normally restore mental — this is the cat's contribution.",
+        "default" = true,
+        "value" = true,
+        "category" = "General",
+        "menu_pos" = 8,
     })
 
     var logger_for_schema = get_node_or_null("/root/CatAutoFeedLog")
@@ -146,6 +166,8 @@ func _apply(config: ConfigFile) -> void:
     show_hunger_warning = config.get_value("Bool", "show_hunger_warning", {"value": true})["value"]
     allow_shelter_fallback = config.get_value("Bool", "allow_shelter_fallback", {"value": false})["value"]
     bowl_in_loot = config.get_value("Bool", "bowl_in_loot", {"value": true})["value"]
+    bowl_at_gunsmith = config.get_value("Bool", "bowl_at_gunsmith", {"value": false})["value"]
+    cat_company_buff = config.get_value("Bool", "cat_company_buff", {"value": true})["value"]
 
     var logger = get_node_or_null("/root/CatAutoFeedLog")
     if logger == null:

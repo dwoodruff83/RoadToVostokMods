@@ -5,7 +5,7 @@
 
 ## Status
 
-**Recommended sequence:** publish FIRST among our four mods. Other mods (CatAutoFeed, Wallet)
+**Recommended sequence:** publish FIRST among our four mods. Other mods (CatAutoFeed, RTV Wallets)
 should declare a soft dependency on this one once it's live, so it benefits from being up
 before they go up.
 
@@ -116,7 +116,7 @@ Link to `REGISTRY.md` (the integration guide) prominently.
   - [x] Deferred-register queue for consumer mods at priority < -50
   - [x] `registered_items()` typed as `Array[String]` matching docs
   - [x] DatabaseInject routes warns through registry's logger via `set_log_callback`
-  - [x] Wallet checks register() return values + falls back on rejection
+  - [x] RTV Wallets checks register() return values + falls back on rejection
 - [x] Test stub mods generated:
   - `mods/RegistryTest/` — auto-runs 6 safe API tests on game start (clean register, collision reject/accept, vanilla shadow reject, empty/null rejection); F8 re-runs
   - `mods/RegistryTest_Hostile/` — destructive sibling that fights the registry; install separately to verify behavior under attack
@@ -133,7 +133,7 @@ Link to `REGISTRY.md` (the integration guide) prominently.
 - [ ] **Post-publish:** write assigned mod id into `mods/RTVModItemRegistry/.publish` AND
       add `[updates]\nmodworkshop=<id>` to `mod.txt`, then rebuild + re-upload so the
       shipped `.vmz` is update-aware (see "Update flow" section at the end of this file)
-- [ ] After publish: update CatAutoFeed and Wallet ModWorkshop descriptions to declare the registry as a soft dependency
+- [ ] After publish: update CatAutoFeed and RTV Wallets ModWorkshop descriptions to declare the registry as a soft dependency
 - [ ] After publish: send the outreach DMs below (post-publish so the URL works)
 
 ## Outreach DM drafts (post-publish)

@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://mods/RTVWallets/assets/icons/Leather_Wallet.png" id="1"]
+[ext_resource type="Script" path="res://Scripts/ItemData.gd" id="2"]
+[ext_resource type="PackedScene" path="res://mods/RTVWallets/Leather_Wallet_1x1.tscn" id="3"]
+[ext_resource type="Resource" path="res://mods/RTVWallets/Cash.tres" id="4"]
+
+[resource]
+script = ExtResource("2")
+file = "Leather_Wallet"
+name = "Wallet"
+inventory = "Wallet"
+rotated = "Wallet"
+equipment = "Wallet"
+display = "Wallet"
+type = "Misc"
+subtype = "Magazine"
+weight = 0.15
+value = 100
+rarity = 0
+icon = ExtResource("1")
+tetris = ExtResource("3")
+size = Vector2(1, 1)
+stackable = false
+showAmount = true
+defaultAmount = 0
+maxAmount = 1000
+compatible = [ExtResource("4")]
+civilian = true
+industrial = true
+doctor = true

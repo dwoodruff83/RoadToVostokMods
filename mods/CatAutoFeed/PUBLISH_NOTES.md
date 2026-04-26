@@ -139,7 +139,7 @@ without the back-to-base pilgrimage every 40 minutes.
 - **[Mod Configuration Menu (MCM)](https://modworkshop.net/mod/53713)** — for
   in-game settings. The mod runs without it but you can't tweak toggles.
 - **[RTV Mod Item Registry](https://modworkshop.net/mod/PENDING)** — coordinates
-  with other Database-extending mods (e.g. Wallet) so they coexist cleanly.
+  with other Database-extending mods (e.g. RTV Wallets) so they coexist cleanly.
   Without it, the mod falls back to legacy direct injection (works fine in
   single-mod setups; conflicts with siblings if multiple Database-extenders
   are installed).

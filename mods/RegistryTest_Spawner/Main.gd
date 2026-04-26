@@ -17,11 +17,11 @@ const SPAWN_HOTKEY := KEY_F5
 
 # (registered name on the registry, .tres path for direct loading)
 const TEST_ITEMS := [
-    ["Cat_Bowl",   "res://mods/CatAutoFeed/Cat_Bowl.tres"],
-    ["Wallet",     "res://mods/Wallet/Wallet.tres"],
-    ["Ammo_Tin",   "res://mods/Wallet/Ammo_Tin.tres"],
-    ["Money_Case", "res://mods/Wallet/Money_Case.tres"],
-    ["Cash",       "res://mods/Wallet/Cash.tres"],
+    ["Cat_Bowl",       "res://mods/CatAutoFeed/Cat_Bowl.tres"],
+    ["Leather_Wallet", "res://mods/RTVWallets/Leather_Wallet.tres"],
+    ["Ammo_Tin",       "res://mods/RTVWallets/Ammo_Tin.tres"],
+    ["Money_Case",     "res://mods/RTVWallets/Money_Case.tres"],
+    ["Cash",           "res://mods/RTVWallets/Cash.tres"],
 ]
 
 

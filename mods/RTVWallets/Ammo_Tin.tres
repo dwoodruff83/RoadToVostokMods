@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://mods/RTVWallets/assets/icons/Ammo_Tin.png" id="1"]
+[ext_resource type="Script" path="res://Scripts/ItemData.gd" id="2"]
+[ext_resource type="PackedScene" path="res://mods/RTVWallets/Ammo_Tin_2x2.tscn" id="3"]
+[ext_resource type="Resource" path="res://mods/RTVWallets/Cash.tres" id="4"]
+
+[resource]
+script = ExtResource("2")
+file = "Ammo_Tin"
+name = "Ammo Tin"
+inventory = "Ammo Tin"
+rotated = "Ammo Tin"
+equipment = "Ammo Tin"
+display = "Ammo Tin"
+type = "Misc"
+subtype = "Magazine"
+weight = 0.5
+value = 500
+rarity = 1
+icon = ExtResource("1")
+tetris = ExtResource("3")
+size = Vector2(2, 2)
+stackable = false
+showAmount = true
+defaultAmount = 0
+maxAmount = 5000
+compatible = [ExtResource("4")]
+industrial = true
+military = true
+gunsmith = true

@@ -5,7 +5,7 @@ extends Node
 #
 # Why this exists
 # ---------------
-# Multiple mods adding new items (e.g., CatAutoFeed's Cat Food Bowl, Wallet's
+# Multiple mods adding new items (e.g., CatAutoFeed's Cat Food Bowl, RTV Wallets'
 # wallet tiers) each independently call `take_over_path("res://Scripts/
 # Database.gd")` and `set_script(extension)` on the running `/root/Database`
 # autoload. This is last-loader-wins — only one mod's items survive.
@@ -164,7 +164,7 @@ func run_self_check() -> void:
     _log("info", "=== Registry self-check (%d item%s) ===" % [names.size(), "" if names.size() == 1 else "s"])
 
     if names.is_empty():
-        _log("warn", "No items registered. Install a consumer mod (CatAutoFeed, Wallet, etc.) or enable Demo Self-Register.")
+        _log("warn", "No items registered. Install a consumer mod (CatAutoFeed, RTV Wallets, etc.) or enable Demo Self-Register.")
         return
 
     var passed := 0

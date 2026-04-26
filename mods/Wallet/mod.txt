@@ -1,9 +1,0 @@
-[mod]
-name="Wallet"
-id="Wallet"
-version="0.2.0"
-
-[autoload]
-WalletLog="res://mods/Wallet/Logger.gd"
-WalletConfig="res://mods/Wallet/config.gd"
-Wallet="res://mods/Wallet/Main.gd"

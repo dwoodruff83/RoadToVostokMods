@@ -108,7 +108,7 @@ Use for one-shot events a user or developer would want a timeline of. Fires
 once per event, not on every tick.
 
 ```gdscript
-_log("info", "Wallet mod loaded")
+_log("info", "RTV Wallets mod loaded")
 _log("info", "Registered %d wallet tiers" % count)
 _log("info", "Cat shelter detected: %s" % shelter_name)
 _log("info", "Player bought M4A1 for 2500 coins")
@@ -122,7 +122,7 @@ how it's supposed to go, but I'm handling it."
 
 ```gdscript
 _log("warn", "No food available in %s" % shelter_name)
-_log("warn", "Wallet shelter save missing: %s" % path)
+_log("warn", "RTV Wallets shelter save missing: %s" % path)
 _log("warn", "deposit called with negative amount %d" % amount)
 _log("warn", "Hotkey pressed but no AISpawner in this scene")
 _log("warn", "Save file locked for writing, retry in 1s")

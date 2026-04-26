@@ -138,7 +138,7 @@ Full reference: see LOGGER.md inside the mod's folder.
 - [ ] **Post-publish:** write assigned mod id into `mods/RTVModLogger/.publish` AND add
       `[updates]\nmodworkshop=<id>` to `mod.txt`, then rebuild + re-upload so the shipped
       `.vmz` is update-aware (see "Update flow" section below)
-- [ ] Once supported, point CatAutoFeed and Wallet to declare this as an *optional*
+- [ ] Once supported, point CatAutoFeed and RTV Wallets to declare this as an *optional*
       dependency (they each ship their own copy of Logger.gd, but reference is friendly)
 
 ## Update flow (Metro Mod Loader)

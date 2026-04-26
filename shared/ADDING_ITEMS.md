@@ -450,7 +450,7 @@ testing don't cost you a real run.
 ## Reference implementations
 
 - **CatAutoFeed / Cat Food Bowl** — single 2×2 decor/storage item, uses the full pattern above
-- **Wallet / Wallet + Ammo Tin + Money Case** — multiple item variants sharing a tier schema
+- **RTV Wallets / Wallet + Ammo Tin + Money Case** — multiple item variants sharing a tier schema
 
 ## License note
 

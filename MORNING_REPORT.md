@@ -22,11 +22,11 @@ Five parallel audit agents (Sonnet) reviewed the bundle for code quality, doc co
 
 | Issue | Status |
 |---|---|
-| **Wallet capacity contradiction:** CHANGELOG.md said 5,000/25,000/150,000 ₽; code + README + .tres files all say 1,000/5,000/10,000 ₽. CHANGELOG was the wrong one. | ✅ Fixed CHANGELOG to match authoritative values |
+| **RTV Wallets capacity contradiction:** CHANGELOG.md said 5,000/25,000/150,000 ₽; code + README + .tres files all say 1,000/5,000/10,000 ₽. CHANGELOG was the wrong one. | ✅ Fixed CHANGELOG to match authoritative values |
 | Three stray `print()` debug calls in CatAutoFeed (`Main.gd`, `BowlPickup.gd`, `config.gd`) that bypassed the logger and would spam every user's console forever | ✅ Removed/converted to `_log("debug", ...)` |
-| Stale `# TODO:` comment in `Wallet/Main.gd:21` shipping in the .vmz | ✅ Removed |
-| Wallet's fallback log message claimed *"RTVModItemRegistry not installed"* even when registry was installed but rejected an item | ✅ Corrected — now properly returns after the warn message instead of falling through to the absent-registry branch |
-| Wallet/README.md missing a Compatibility section (every other mod has one) | ✅ Added — covers MCM optional, Wallet & Cash conflict warning, **uninstall warning** about cash loss |
+| Stale `# TODO:` comment in `RTVWallets/Main.gd:21` shipping in the .vmz | ✅ Removed |
+| RTV Wallets' fallback log message claimed *"RTVModItemRegistry not installed"* even when registry was installed but rejected an item | ✅ Corrected — now properly returns after the warn message instead of falling through to the absent-registry branch |
+| RTVWallets/README.md missing a Compatibility section (every other mod has one) | ✅ Added — covers MCM optional, Wallet & Cash conflict warning, **uninstall warning** about cash loss |
 | RTVModItemRegistry README missing a Credits section | ✅ Added (parallel to other mods' DoinkOink/MCM mention) |
 
 ### 🟡 P2 — Consistency / polish
@@ -35,8 +35,8 @@ Five parallel audit agents (Sonnet) reviewed the bundle for code quality, doc co
 |---|---|
 | CatAutoFeed CHANGELOG 0.3.0 used 🟢 / 🟠 emoji bullets — only place in any of 5 CHANGELOGs | ✅ Converted to plain "Green"/"Orange" text |
 | RTVModLogger welcome message *"RTVModLogger ready — press your Test Hotkey..."* defaulted ON; confused non-dev users who saw "Test Hotkey" with no context. | ✅ Default flipped to OFF; tooltip updated to explain when to enable. |
-| Wallet's F9 stash report hotkey was hardcoded + undocumented + not configurable (PunisherGuarantee F10 had configurable Keycode pattern; Wallet didn't follow it) | ✅ Wallet now has "Stash Report Hotkey" Keycode in MCM (default F9), documented in README's Configuration table |
-| Wallet's `_interface()` had no null-check on `current_scene` — would crash if called on main menu | ✅ Added null guard |
+| RTV Wallets' F9 stash report hotkey was hardcoded + undocumented + not configurable (PunisherGuarantee F10 had configurable Keycode pattern; RTV Wallets didn't follow it) | ✅ RTV Wallets now has "Stash Report Hotkey" Keycode in MCM (default F9), documented in README's Configuration table |
+| RTV Wallets' `_interface()` had no null-check on `current_scene` — would crash if called on main menu | ✅ Added null guard |
 
 ### Build outputs
 
@@ -46,7 +46,7 @@ All five `.vmz` files rebuilt with the fixes and reinstalled to game's mods fold
 RTVModItemRegistry.vmz   v1.0.0    18,565 bytes
 RTVModLogger.vmz         v1.0.0    16,635 bytes
 CatAutoFeed.vmz          v0.3.0   263,788 bytes
-Wallet.vmz               v0.2.0   28,995,020 bytes (~28 MB; 3D models)
+RTVWallets.vmz           v0.2.0   28,995,020 bytes (~28 MB; 3D models)
 PunisherGuarantee.vmz    v0.1.0     9,474 bytes
 ```
 
@@ -60,14 +60,14 @@ These are all "should we do X" judgment calls, not bugs. None block publish.
 
 Currently:
 - CatAutoFeed: **0.3.0** — feature-complete per the publish notes
-- Wallet: **0.2.0** — feature-complete per the publish notes (cash trader integration is "in development")
+- RTV Wallets: **0.2.0** — feature-complete per the publish notes (cash trader integration is "in development")
 - PunisherGuarantee: **0.1.0**
 
 The publish-readiness audit recommended bumping all three to **1.0.0** before public release. Rationale: shipping a "0.x" first version signals "unstable, expect breakage" to potential users. If the feature set is genuinely final for v1, bump.
 
 **My recommendation:**
 - **CatAutoFeed → 1.0.0** ✅ (feature-complete, well-tested with 3 patches of game updates)
-- **Wallet → 1.0.0 OR stay at 0.2.0** ⚠️ — Wallet's PUBLISH_NOTES says "Trader Buy/Sell with cash — in development." If that's launch-day must-have, stay 0.x and label as Beta on ModWorkshop. If thou'rt OK shipping without it (since wallets are usable as inventory containers and lootable items right now), bump to 1.0.0.
+- **RTV Wallets → 1.0.0 OR stay at 0.2.0** ⚠️ — RTV Wallets' PUBLISH_NOTES says "Trader Buy/Sell with cash — in development." If that's launch-day must-have, stay 0.x and label as Beta on ModWorkshop. If thou'rt OK shipping without it (since wallets are usable as inventory containers and lootable items right now), bump to 1.0.0.
 - **PunisherGuarantee → 1.0.0** ✅ (small mod, all features work, just hasn't been published yet — no PUBLISH_NOTES.md but the README is ready).
 
 When thou decidest, the version bump is one command per mod:
@@ -115,9 +115,9 @@ When thou'rt back at the game, this is the only remaining must-pass before RTVMo
 
 - **Logger sync is bulletproof.** All five `Logger.gd` copies are byte-identical except the `_init()` identity block — `tools/sync_logger.py` is doing its job.
 - **MCM integration pattern is uniform** across all five mods, including the schema-migration helper.
-- **Soft-dep pattern** (try registry → fall back to legacy injection) is consistent in CatAutoFeed and Wallet now (after this morning's fix).
+- **Soft-dep pattern** (try registry → fall back to legacy injection) is consistent in CatAutoFeed and RTV Wallets now (after this morning's fix).
 - **All five LICENSE files** are byte-identical MIT with the right copyright holder/year.
-- **NOTICES.txt cross-references match perfectly** with README "3D Models" sections in CatAutoFeed and Wallet — every Sketchfab model is properly attributed.
+- **NOTICES.txt cross-references match perfectly** with README "3D Models" sections in CatAutoFeed and RTV Wallets — every Sketchfab model is properly attributed.
 - **PUBLISH_NOTES.md files** are detailed, actionable, and capture competitive landscape per mod.
 - **Build pipeline ships docs in .vmz** for all five mods (mod.txt + README + CHANGELOG + LICENSE + LOGGER.md/REGISTRY.md/NOTICES.txt as applicable).
 - **Five tagline blockquotes** are tight and value-forward — no need to touch.
@@ -138,10 +138,10 @@ When thou'rt back at the game, this is the only remaining must-pass before RTVMo
 
 1. Decide on the three open questions above (version bumps, repo visibility, registry MCM rename)
 2. Run Test #4 (save/load round-trip) to seal RTVModItemRegistry 1.0
-3. Capture screenshots for RTVModItemRegistry, Wallet, PunisherGuarantee (the three mods missing them per the audit). The other two have screenshots already.
+3. Capture screenshots for RTVModItemRegistry, RTV Wallets, PunisherGuarantee (the three mods missing them per the audit). The other two have screenshots already.
 4. If the registry MCM rename is approved, apply it (5-min change)
 5. First publish: RTVModItemRegistry → ModWorkshop → grab assigned mod ID → paste into `mods/RTVModItemRegistry/.publish` → send the two outreach DMs (already drafted in PUBLISH_NOTES.md)
-6. After registry has a public URL, replace `PENDING` placeholders in CatAutoFeed/Wallet/PunisherGuarantee READMEs/CHANGELOG (where they reference the registry)
+6. After registry has a public URL, replace `PENDING` placeholders in CatAutoFeed/RTVWallets/PunisherGuarantee READMEs/CHANGELOG (where they reference the registry)
 
 ---
 

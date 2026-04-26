@@ -31,7 +31,7 @@ shadowing; added deferred-register queue; tightened typing.
 - **Logger plumbing:** DatabaseInject now routes its rejection warnings
   through the registry's logger (`set_log_callback`), so they reach
   MCM-configured file/overlay outputs instead of just the engine console.
-- **Wallet integration fixed:** the consumer mod now checks each
+- **RTV Wallets integration fixed:** the consumer mod now checks each
   `register()` return value and falls back to legacy injection if the
   registry rejected any item.
 

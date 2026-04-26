@@ -8,7 +8,7 @@ those three identity values.
 
 Usage:
     python tools/sync_logger.py                # sync all mods
-    python tools/sync_logger.py Wallet         # sync one mod
+    python tools/sync_logger.py RTVWallets     # sync one mod
     python tools/sync_logger.py --check        # dry run, show what would change
 """
 

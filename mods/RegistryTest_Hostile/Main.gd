@@ -13,7 +13,7 @@ extends Node
 #    after another mod calls take_over_path on the resource path).
 # 2. What happens to items registered before the hostile mod loaded — do
 #    they still resolve via Database.get(name)?
-# 3. What CatAutoFeed and Wallet do when their fallback path detects the
+# 3. What CatAutoFeed and RTV Wallets do when their fallback path detects the
 #    registry has been compromised.
 #
 # After install, launch the game and check:

@@ -8,6 +8,24 @@ YYYY-MM-DD.
 First public release. Feature set frozen at 0.3.0; this entry captures the
 pre-publish polish pass.
 
+- **Cat company mental buff.** Being in the same shelter as your cat now
+  raises mental at the same rate as sitting near a fire (`delta / 4.0`).
+  Vanilla shelter doesn't normally restore mental — this is the cat's
+  contribution. Gated on the cat being alive and rescued; bails on menu /
+  settings / scene transitions (mirrors the auto-feed gates). Toggleable
+  via the new "Cat Company Mental Buff" MCM entry, default ON.
+- **Optional Cat Bowl sale at the Gunsmith.** New MCM toggle "Bowl at
+  Gunsmith" (default OFF) routes the bowl into the Gunsmith trader's
+  random-supply bucket. The Gunsmith only unlocks at day 10 in vanilla,
+  so when enabled this gives players a guaranteed late-game purchase
+  path if they haven't found a bowl in loot. Default off keeps bowls
+  loot-only out of the box. Implementation toggles `Cat_Bowl.tres
+  gunsmith` flag at mod load — reload after changing the toggle.
+- **Multi-bowl-aware empty warning.** Players with multiple Cat Food
+  Bowls in the same shelter no longer get a false "Bowl is empty —
+  refill it for the cat" alert when one bowl drains while siblings
+  still have food. The warning fires only when THIS bowl just hit zero
+  AND no other bowl in the shelter holds cat food.
 - **Soft-dependency on RTV Mod Item Registry.** When the registry is
   installed (recommended), `Cat_Bowl` is registered cooperatively so the
   mod coexists cleanly with other item-adding mods. Falls back to legacy
