@@ -9,9 +9,9 @@ Three placeable wallet items.
 
 - **Three lootable inventory items** registered via Database injection
   (`take_over_path` + live-instance `set_script`):
-  - **Wallet** (1×1, Common, 5,000 ₽ capacity)
-  - **Ammo Tin** (2×2, Rare, 25,000 ₽)
-  - **Money Case** (3×2, Legendary, 150,000 ₽)
+  - **Wallet** (1×1, Common, 1,000 ₽ capacity)
+  - **Ammo Tin** (2×2, Rare, 5,000 ₽)
+  - **Money Case** (3×2, Legendary, 10,000 ₽)
 - **3D world scenes** — RigidBody3D with `WalletPickup.gd` script. Auto-fits
   an axis-aligned BoxShape3D collision to the merged AABB of every
   MeshInstance3D under the pickup, so wallets with multiple parts (body +

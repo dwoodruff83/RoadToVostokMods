@@ -23,7 +23,6 @@ var _log_node: Node = null
 func _ready() -> void:
     name = "CatAutoFeed"
     _log_node = _resolve_log_node()
-    print("[CatAutoFeed] Main._ready, log_node=", _log_node)
     _inject_database()
     _inject_loot_table()
     _log("debug", "CatAutoFeed loaded, threshold=%d, check every %ds" % [int(_threshold()), int(CHECK_INTERVAL)])

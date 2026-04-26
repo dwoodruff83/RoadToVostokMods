@@ -121,10 +121,14 @@ Link to `REGISTRY.md` (the integration guide) prominently.
   - `mods/RegistryTest/` — auto-runs 6 safe API tests on game start (clean register, collision reject/accept, vanilla shadow reject, empty/null rejection); F8 re-runs
   - `mods/RegistryTest_Hostile/` — destructive sibling that fights the registry; install separately to verify behavior under attack
   - `mods/RegistryTest_Early/` — priority=-100 mod that calls register() before registry's _ready; verifies deferred queue
-- [ ] **Test #1 (must-pass before 1.0.0 public)**: install RegistryTest alongside RTVModItemRegistry on a clean save. Expected: 6/6 PASS notification on game start, F8 re-runs cleanly.
-- [ ] **Test #2 (must-pass before 1.0.0 public)**: install RegistryTest_Early alongside RTVModItemRegistry. Expected: green "Early item resolves post-flush: True" notification.
-- [ ] **Test #3 (must-pass before 1.0.0 public)**: install RegistryTest_Hostile + RTVModItemRegistry + CatAutoFeed. Expected: hostile script clobbers /root/Database; observe whether CatAutoFeed's bowl still resolves and what console warnings fire. **Document the failure mode for the README** if the registry can't survive — this is the limitation to communicate to other modders.
-- [ ] **Test #4 (must-pass before 1.0.0 public)**: save a game with a registered item in inventory; quit; restart; load the save. Expected: item still resolves via Database.get(). If not, document that registry items are session-scoped and consumer mods must re-register on every game start (which they already do via _ready).
+- [x] **Test #1 (PASSED 2026-04-25)**: 6/6 API tests green on game start. `RegistryTest` confirms collision rejection, overwrite-opt-in, vanilla-shadow rejection, empty/null rejection, and clean register all work.
+- [x] **Test #2 (PASSED 2026-04-25)**: `RegistryTest_Early` at priority=-100 confirmed green "Early item resolves: true (waited 0 frame(s))". The mod loader's priority-strict ordering means early-load consumers must use `call_deferred` or poll-and-retry. The registry's deferred-register *queue* is defensive code that doesn't fire under realistic priorities, but the early-load *pattern* (poll until registry appears, then register) works cleanly.
+- [x] **Test #3 (PARTIAL 2026-04-25)**: `RegistryTest_Hostile` clobber test landed in the "partial degradation" outcome:
+  - RegistryTest dropped from 6/6 to 5/6 (T4 vanilla shadow rejection failed because `_vanilla_consts` got reset by `set_script`).
+  - `RegistryTest_Spawner` reported `Resolve: 0/5 | Spawn: 4/5` — `Database.get()` returns null for every item registered before the hostile clobber. `_registered` dict was wiped by `set_script` re-initializing instance vars.
+  - **Diagnosis:** Godot's `set_script` resets all instance variables to their script-defined defaults. Inherited methods still work, but state is lost. This is engine behavior, not a registry bug.
+  - **Mitigation:** documented in README and REGISTRY.md as a known limitation. The fix is social — evangelize cooperating-mod adoption (DMs to domfrags + metro queued). No code change is realistic without arms-racing.
+- [ ] **Test #4 (still must-pass before 1.0.0 public)**: save a game with a registered item in inventory; quit; restart; load the save. Expected: item still resolves via Database.get(). The registered items are session-scoped (consumer mods re-register on every `_ready`), so this should pass naturally as long as the chaos lineup isn't installed.
 - [ ] First publish via web form (API write not yet enabled)
 - [ ] **Post-publish:** write assigned mod id into `mods/RTVModItemRegistry/.publish` AND
       add `[updates]\nmodworkshop=<id>` to `mod.txt`, then rebuild + re-upload so the

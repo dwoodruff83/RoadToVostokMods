@@ -11,4 +11,4 @@ func _ready() -> void:
         ActivateLights()
         var pg = get_node_or_null("/root/PunisherGuarantee")
         if pg and pg.has_method("_log"):
-            pg._log("Police van forced to Boss mode")
+            pg._log("info", "Police van forced to Boss mode")

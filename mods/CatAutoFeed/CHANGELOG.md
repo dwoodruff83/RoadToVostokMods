@@ -3,6 +3,25 @@
 All notable changes to the Cat Auto Feed mod are documented here. Dates are
 YYYY-MM-DD.
 
+## 1.0.0 — 2026-04-26
+
+First public release. Feature set frozen at 0.3.0; this entry captures the
+pre-publish polish pass.
+
+- **Soft-dependency on RTV Mod Item Registry.** When the registry is
+  installed (recommended), `Cat_Bowl` is registered cooperatively so the
+  mod coexists cleanly with other item-adding mods. Falls back to legacy
+  direct Database injection in single-mod setups.
+- **Logger 6/6 API coverage.** All status messages now route through the
+  shared logger (`debug` / `info` / `success` / `warn` / `error` /
+  `notify`) so users can tune verbosity and output channels per-mod via
+  MCM. No raw `print()` calls remain in shipped code.
+- **Quiet boot.** Demoted load-time diagnostics from `info` to `debug` so
+  the in-game overlay stays clean at the default log level.
+- **Clean uninstall path documented** in README under Compatibility.
+- **`.vmz` now bundles** README, CHANGELOG, NOTICES, LICENSE so anyone
+  who unzips the package gets the full context.
+
 ## 0.3.0 — 2026-04-25
 
 Bowl capacity, fallback toggle, loot integration, item-tier tuning, and
@@ -27,13 +46,13 @@ clearer messaging.
     the tooltip and routes the bowl into the legendary loot bucket.
   - `value` set to `750 €` — middle of the Legendary-civilian band.
 - **Bowl-aware messages:**
-  - 🟢 `Cat ate from bowl: <food>` when the bowl was the source
-  - 🟠 `<bowl name> is empty — refill it for the cat` when the cat just took
-    the last serving
-  - 🟠 `Cat hungry — fill the bowl in <Shelter>` when bowl-only mode is active
-    and the bowl is empty (now throttled to fire once per hunger cycle)
-  - 🟠 `Inventory full — make space to take food out` when a Take fails
-  - 🟠 `Bowl is full (N/10)` when an Add is rejected at capacity
+  - Green `Cat ate from bowl: <food>` when the bowl was the source
+  - Orange `<bowl name> is empty — refill it for the cat` when the cat just
+    took the last serving
+  - Orange `Cat hungry — fill the bowl in <Shelter>` when bowl-only mode is
+    active and the bowl is empty (now throttled to fire once per hunger cycle)
+  - Orange `Inventory full — make space to take food out` when a Take fails
+  - Orange `Bowl is full (N/10)` when an Add is rejected at capacity
   - Shelter-source feeds now suffix the source: `(<Shelter> floor)` or
     `(<Shelter> / <container>)`
 - **Defensive bug fixes:**

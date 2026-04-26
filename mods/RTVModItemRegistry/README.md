@@ -47,7 +47,19 @@ messages.
 - **Loads with priority `-50`** so it sits between MCM (`-100`) and consumer
   mods (default `0`).
 - **Soft dependency:** consumer mods check `get_node_or_null("/root/ModItemRegistry")`. If absent, they're expected to fall back to legacy in-place injection (which works fine in single-mod setups).
-- **Conflicts with mods that DON'T use the registry**: if any other mod still does its own `take_over_path` on `Scripts/Database.gd`, that mod will clobber the registry's extension on whatever order they load. This mod is only useful when consumer mods cooperatively call `register()`.
+- **Cooperating mods coexist cleanly.** Verified in testing — multiple consumers calling `register()` all keep their items.
+
+## Known limitation: non-cooperating siblings can still clobber
+
+If you install a mod that does its own `take_over_path("res://Scripts/Database.gd")` alongside RTVModItemRegistry — i.e., a mod that's *not* aware of the registry's `register()` API — that mod's `set_script()` call will reset the registry's internal state, and **every item registered before that point becomes unresolvable** (`Database.get()` returns `null`).
+
+This is a Godot engine reality, not something the registry can patch around: `set_script` re-initializes a node's instance variables to the new script's defaults. We can't detect or undo that without arms-racing the very mods we're trying to coexist with.
+
+**Practical impact:**
+- Vanilla items continue to work (they're resolved on a parent script).
+- Consumer mods that fall back to legacy injection (CatAutoFeed, Wallet, etc.) still get their items in — the cost is that they're back to last-loader-wins between each other.
+
+**The mitigation is social, not technical:** RTVModItemRegistry only protects mods that opt in. We're inviting other item-mod authors to integrate via the `register()` API. If you maintain such a mod, see [REGISTRY.md](REGISTRY.md) — integration is ~5 lines of code.
 
 ## How it works
 
@@ -60,9 +72,13 @@ messages.
 
 `DatabaseInject.gd` keeps a `Dictionary[String, PackedScene]` of registered items. The override of `_get(property)` checks the dictionary before letting Godot's default lookup find vanilla consts. Registered items shadow vanilla consts of the same name; vanilla consts continue to work unmodified for everything else.
 
+## Credits
+
+Built for the Road to Vostok modding ecosystem. In-game diagnostic configuration via the [Mod Configuration Menu](https://modworkshop.net/mod/53713) by DoinkOink. Logging output via [RTV Mod Logger](https://modworkshop.net/mod/PENDING).
+
 ## License
 
-[MIT](LICENSE) (mod code only).
+[MIT](LICENSE) — mod code only. Embed `Logger.gd` and the registry's API patterns freely.
 
 ## Source & Issues
 

@@ -8,6 +8,7 @@ const ITEM_PATHS := [
     "res://mods/Wallet/Wallet.tres",
     "res://mods/Wallet/Ammo_Tin.tres",
     "res://mods/Wallet/Money_Case.tres",
+    "res://mods/Wallet/Cash.tres",
 ]
 
 func _ready() -> void:
@@ -17,7 +18,6 @@ func _ready() -> void:
     _register_with_loot_master()
     _override_item_value()
     set_process_unhandled_input(true)
-    # TODO: hook trader open so Buy/Sell use the active wallet's balance.
 
 # Swaps res://Scripts/Item.gd with our subclass so inventory/container/supply
 # totals include wallet cash via the overridden Value() method.
@@ -50,10 +50,21 @@ func _register_with_loot_master() -> void:
     _log("debug", "LT_Master registered %d wallet items (pool size now %d)" % [added, lt.items.size()])
 
 func _unhandled_input(event: InputEvent) -> void:
-    # Debug: F9 prints the stash totals to the logger (and overlay if enabled).
-    if event is InputEventKey and event.pressed and !event.echo:
-        if event.keycode == KEY_F9:
-            _dump_stash()
+    # Stash Report hotkey: prints every wallet you're carrying + its balance
+    # to the logger (and overlay if enabled). Default F9, configurable in MCM.
+    if !(event is InputEventKey) or !event.pressed or event.echo:
+        return
+    var cfg = _config()
+    var key: int = cfg.stash_report_keycode if cfg else KEY_F9
+    if event.keycode == key:
+        _dump_stash()
+
+
+func _config():
+    var n = get_node_or_null("/root/WalletConfig")
+    if n == null:
+        n = get_tree().root.find_child("WalletConfig", true, false)
+    return n
 
 func _dump_stash() -> void:
     var wallets := find_wallets()
@@ -79,10 +90,13 @@ func _inject_database() -> void:
         var ok_w: bool = registry.register("Wallet", preload("res://mods/Wallet/Wallet.tscn"))
         var ok_t: bool = registry.register("Ammo_Tin", preload("res://mods/Wallet/Ammo_Tin.tscn"))
         var ok_c: bool = registry.register("Money_Case", preload("res://mods/Wallet/Money_Case.tscn"))
-        if ok_w and ok_t and ok_c:
+        var ok_cash: bool = registry.register("Cash", preload("res://mods/Wallet/Cash.tscn"))
+        if ok_w and ok_t and ok_c and ok_cash:
             _log("debug", "Wallet items registered with ModItemRegistry")
             return
-        _log("warn", "ModItemRegistry rejected one or more Wallet items (Wallet=%s Ammo_Tin=%s Money_Case=%s); falling back to legacy" % [ok_w, ok_t, ok_c])
+        _log("warn", "ModItemRegistry rejected one or more Wallet items (Wallet=%s Ammo_Tin=%s Money_Case=%s Cash=%s); falling back to legacy" % [ok_w, ok_t, ok_c, ok_cash])
+        _inject_database_legacy()
+        return
 
     _log("debug", "RTVModItemRegistry not installed — using legacy in-place injection (incompatible with sibling Database-extending mods)")
     _inject_database_legacy()
@@ -223,12 +237,10 @@ func _equipped_rig_slot():
     return null
 
 func _interface():
-    return get_tree().current_scene.get_node_or_null("/root/Map/Core/UI/Interface")
-
-# --- Config access ---
-
-func _config():
-    return get_node_or_null("/root/WalletConfig")
+    var scene = get_tree().current_scene
+    if scene == null:
+        return null
+    return scene.get_node_or_null("/root/Map/Core/UI/Interface")
 
 func _log(lvl: String, msg: String) -> void:
     if _log_node == null or !is_instance_valid(_log_node):

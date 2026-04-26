@@ -2,8 +2,8 @@ extends Node
 
 # MCM config for RTVModItemRegistry. The registry has no user-tunable
 # *behavior*, so the bulk of this is the standard Logging category plus a
-# small Demo category with a self-check stub registration and a hotkey
-# that lists/verifies everything currently in the registry.
+# small Diagnostics category with a self-check stub registration and a
+# hotkey that lists/verifies everything currently in the registry.
 
 const MOD_ID := "RTVModItemRegistry"
 const MOD_NAME := "RTV Mod Item Registry"
@@ -22,25 +22,25 @@ func _ready() -> void:
 
     var config := ConfigFile.new()
 
-    config.set_value("Category", "Demo", { "menu_pos": 1 })
+    config.set_value("Category", "Diagnostics", { "menu_pos": 1 })
 
     config.set_value("Bool", "demo_self_register", {
-        "name" = "Demo Self-Register",
-        "tooltip" = "When ON (default), registers a synthetic stub item (_RegistryDemo_StubItem) at mod load so the registry has something to verify even without consumer mods installed. Safe to leave on — the stub is invisible to gameplay.",
+        "name" = "Enable Diagnostic Test Item",
+        "tooltip" = "When ON (default), the registry adds a hidden stub item to itself at startup. This lets the self-check hotkey verify the registry is working even when no other item-adding mods are installed. The stub is invisible to gameplay — it never appears in loot, traders, or inventory.",
         "default" = true,
         "value" = true,
-        "category" = "Demo",
+        "category" = "Diagnostics",
         "menu_pos" = 1,
     })
 
     config.set_value("Keycode", "test_hotkey", {
-        "name" = "Test Hotkey",
-        "tooltip" = "Press this key in-game to fire the registry self-check: lists registered items, calls Database.get(name) for each, logs pass/fail.",
+        "name" = "Self-Check Hotkey",
+        "tooltip" = "Press in-game to verify every item registered with this library is reachable. Useful when troubleshooting why an item-adding mod isn't showing items in your game. Output goes to the in-game log overlay (if enabled in Logging) and the Godot console.",
         "default" = KEY_F11,
         "default_type" = "Key",
         "value" = KEY_F11,
         "type" = "Key",
-        "category" = "Demo",
+        "category" = "Diagnostics",
         "menu_pos" = 2,
     })
 
@@ -61,7 +61,7 @@ func _ready() -> void:
         MOD_ID,
         MOD_NAME,
         FILE_PATH,
-        "Coordinates mod-added items into the vanilla Database. Demo toggle for self-check + standard logger controls.",
+        "Library mod that lets multiple item-adding mods coexist without crashing. Settings here are diagnostic-only — install other mods that depend on this one to see their items.",
         { "config.ini" = _apply }
     )
 

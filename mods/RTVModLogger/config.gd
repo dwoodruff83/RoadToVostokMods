@@ -9,7 +9,7 @@ const MOD_NAME := "RTV Mod Logger"
 const FILE_PATH := "user://MCM/RTVModLogger"
 
 # Demo settings exposed to the user.
-var welcome_on_start := true
+var welcome_on_start := false
 var test_hotkey_keycode := KEY_F12
 var test_action := "Test All"
 
@@ -36,9 +36,9 @@ func _ready() -> void:
 
     config.set_value("Bool", "welcome_on_start", {
         "name" = "Welcome on Game Start",
-        "tooltip" = "Show a one-time notification when the mod loads, reminding you of the test hotkey.",
-        "default" = true,
-        "value" = true,
+        "tooltip" = "Show a one-time notification when the mod loads, reminding you of the test hotkey. Default OFF — turn on if you're actively using this mod's demo and want a reminder of the hotkey.",
+        "default" = false,
+        "value" = false,
         "category" = "Demo",
         "menu_pos" = 1,
     })

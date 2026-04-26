@@ -150,6 +150,6 @@ func _apply(config: ConfigFile) -> void:
     var logger = get_node_or_null("/root/CatAutoFeedLog")
     if logger == null:
         logger = get_tree().root.find_child("CatAutoFeedLog", true, false)
-    print("[CatAutoFeed] Config._apply threshold=", feed_threshold, " enabled=", enabled, " show_notif=", show_notification, " show_warn=", show_hunger_warning, " logger=", logger)
     if logger:
+        logger.debug("Config applied: threshold=%d enabled=%s show_notif=%s show_warn=%s" % [int(feed_threshold), enabled, show_notification, show_hunger_warning])
         logger.apply_from_config(config)

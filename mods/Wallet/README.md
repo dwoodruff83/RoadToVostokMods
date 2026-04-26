@@ -32,11 +32,19 @@ Find a wallet on a bandit, keep your rubles in it, spend at traders. Die with it
 |---|---|---|
 | Enable Wallet | On | Master toggle. |
 | Notify On Transfer | On | On-screen message when cash moves to/from a wallet. |
+| Stash Report Hotkey | F9 | Press in-game to log every wallet you're carrying with its balance. Useful for a quick "what's my total cash" answer when split across tiers. |
 | Enable: Wallet | On | Registers the common-tier Wallet. |
 | Enable: Ammo Tin | On | Registers the rare-tier Ammo Tin. |
 | Enable: Money Case | On | Registers the legendary-tier Money Case. |
 
 Plus the standard Logger category (level, file output, overlay output). See [the RTV Mod Logger reference](../RTVModLogger/LOGGER.md) for details.
+
+## Compatibility
+
+- **Recommended:** install [RTVModItemRegistry](https://modworkshop.net/mod/PENDING) so Wallet's items coexist cleanly with other mods that add items. Without it, Wallet falls back to direct Database injection — works in single-mod setups, but the last item-adding mod loaded wins.
+- **MCM is optional.** The mod runs with sensible defaults if MCM is absent — only required for in-game tier toggles.
+- **Conflicts with other "cash economy" mods** (e.g. *Wallet & Cash*). Pick one or the other; both replace the same Trader Buy/Sell flow.
+- **Uninstalling drops wallets and cash.** Save files reference wallet items via `res://mods/Wallet/<Tier>.tres`. If you remove the .vmz, the game silently strips wallets (and any cash they hold) from saves on next load. To migrate, withdraw cash from all wallets and drop the empty wallets before uninstalling.
 
 ## Credits
 

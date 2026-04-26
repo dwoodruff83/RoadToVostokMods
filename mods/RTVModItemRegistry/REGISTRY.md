@@ -174,7 +174,8 @@ genuinely need to swap an item, do it through your own coordination layer.
 - **Mods that don't use the registry.** If `Mod A` uses the registry and
   `Mod B` does its own `take_over_path` on `Scripts/Database.gd`, Mod B
   will clobber Mod A's items. The registry only coordinates between
-  cooperating mods.
+  cooperating mods. **See "Failure mode under non-cooperating siblings"
+  below for the exact behavior we observed in testing.**
 - **Adding items to other vanilla resources** (e.g. `LT_Master.items`,
   loot tables, trader supply). For loot, you append to `LT_Master.items`
   directly — see CatAutoFeed's `_inject_loot_table` for a working pattern.
@@ -189,3 +190,44 @@ get_node("/root/ModItemRegistry").registered_items()
 ```
 
 …returns the full list of registered file names.
+
+## Failure mode under non-cooperating siblings
+
+**Tested behavior.** When a sibling mod calls
+`take_over_path("res://Scripts/Database.gd")` and `set_script(...)` on
+`/root/Database` AFTER the registry has done so, Godot's `set_script`
+re-initializes the live Node's instance variables to the new script's
+defaults. For our `DatabaseInject` script that means:
+
+- `_registered: Dictionary = {}` is reset to empty
+- `_vanilla_consts: Dictionary = {}` is reset to empty
+- `_log_callback: Callable = Callable()` is reset
+
+The inherited methods still exist (because Godot's
+`extends "res://Scripts/Database.gd"` resolves to `DatabaseInject` after
+the registry's earlier take-over, so any sibling mod's script is
+implicitly `DatabaseInject`-derived). But every item registered before
+the clobber is **lost**, and `Database.get(name)` returns `null` for
+those names.
+
+**What this means in practice:**
+
+- Vanilla items continue to work (the parent `Database.gd` const lookup
+  is unaffected).
+- Items registered AFTER the clobber are stored on the new instance dict
+  and can be looked up — but only until the next clobber.
+- Consumer mods that fall back to legacy in-place injection when
+  `register()` returns `false` will still get their items in. The cost
+  is that they no longer coexist with each other; they're back to the
+  original last-loader-wins problem.
+
+**Why we don't programmatically detect or recover from this.** Detecting
+script swap on `/root/Database` would require polling or monkey-patching
+`set_script`, both of which arms-race against the very mods we're trying
+to coexist with. The intended mitigation is **social, not technical**:
+ship the registry early, evangelize to other item-mod authors, and make
+the register-cooperatively-or-fall-back-to-legacy pattern the norm.
+
+If you maintain an item-adding mod and want to avoid this failure mode
+entirely, integrate with the registry's `register()` API — or DM the
+author and we'll help.

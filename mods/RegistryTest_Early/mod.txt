@@ -1,0 +1,8 @@
+[mod]
+name="Registry Test (Early Loader)"
+id="RegistryTest_Early"
+version="0.1.0"
+priority=-100
+
+[autoload]
+RegistryTest_Early="res://mods/RegistryTest_Early/Main.gd"

@@ -7,3 +7,4 @@ extends "res://Scripts/Database.gd"
 const Wallet = preload("res://mods/Wallet/Wallet.tscn")
 const Ammo_Tin = preload("res://mods/Wallet/Ammo_Tin.tscn")
 const Money_Case = preload("res://mods/Wallet/Money_Case.tscn")
+const Cash = preload("res://mods/Wallet/Cash.tscn")

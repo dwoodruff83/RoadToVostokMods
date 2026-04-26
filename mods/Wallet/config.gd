@@ -9,6 +9,7 @@ const WALLETS := preload("res://mods/Wallet/wallets.gd")
 var enabled := true
 var notify_on_transfer := true
 var tier_enabled: Dictionary = {}
+var stash_report_keycode := KEY_F9
 
 var _mcm_helpers = null
 
@@ -38,6 +39,17 @@ func _ready() -> void:
         "value" = true,
         "category" = "General",
         "menu_pos" = 2,
+    })
+
+    config.set_value("Keycode", "stash_report_hotkey", {
+        "name" = "Stash Report Hotkey",
+        "tooltip" = "Press this key in-game to log every wallet you're carrying with its balance — useful when you've split cash across tiers and want a quick total.",
+        "default" = KEY_F9,
+        "default_type" = "Key",
+        "value" = KEY_F9,
+        "type" = "Key",
+        "category" = "General",
+        "menu_pos" = 3,
     })
 
     var pos := 10
@@ -110,6 +122,7 @@ func _apply(config: ConfigFile) -> void:
 
     enabled = config.get_value("Bool", "enabled", {"value": true})["value"]
     notify_on_transfer = config.get_value("Bool", "notify_on_transfer", {"value": true})["value"]
+    stash_report_keycode = int(config.get_value("Keycode", "stash_report_hotkey", {"value": KEY_F9})["value"])
     tier_enabled.clear()
     for tier in WALLETS.TIERS:
         var entry = config.get_value("Bool", "tier_" + tier.id, {"value": true})

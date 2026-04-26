@@ -177,7 +177,6 @@ func _open_panel() -> void:
     root.add_child(canvas)
     var panel = panel_script.new()
     canvas.add_child(panel)
-    print("[BowlPickup] panel mounted under ", canvas.get_path())
     panel.open(self)
 
 # --- Mesh / collision setup (unchanged from previous revision) ---
