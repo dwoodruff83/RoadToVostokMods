@@ -22,6 +22,7 @@ MOD_FILES = [
     "Main.gd",
     "config.gd",
     "wallets.gd",
+    "ItemOverride.gd",
     "Logger.gd",
     "WalletPickup.gd",
     "DatabaseInject.gd",

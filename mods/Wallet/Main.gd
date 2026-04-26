@@ -15,8 +15,19 @@ func _ready() -> void:
     _log("info", "Wallet mod loaded")
     _inject_database()
     _register_with_loot_master()
+    _override_item_value()
     set_process_unhandled_input(true)
     # TODO: hook trader open so Buy/Sell use the active wallet's balance.
+
+# Swaps res://Scripts/Item.gd with our subclass so inventory/container/supply
+# totals include wallet cash via the overridden Value() method.
+func _override_item_value() -> void:
+    var override = load("res://mods/Wallet/ItemOverride.gd")
+    if override == null:
+        _log("error", "Could not load ItemOverride.gd")
+        return
+    override.take_over_path("res://Scripts/Item.gd")
+    _log("info", "Item.gd overridden — wallet cash now counted in inventory totals")
 
 # Appends our ItemData resources to res://Loot/LT_Master.tres so the vanilla
 # LootContainer + Trader fill loops include wallets. Each ItemData's own
