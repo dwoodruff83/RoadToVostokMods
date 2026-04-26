@@ -1,0 +1,10 @@
+[mod]
+name="RTV Mod Item Registry"
+id="RTVModItemRegistry"
+version="0.1.0"
+priority=-50
+
+[autoload]
+RTVModItemRegistryLog="res://mods/RTVModItemRegistry/Logger.gd"
+RTVModItemRegistryConfig="res://mods/RTVModItemRegistry/config.gd"
+ModItemRegistry="res://mods/RTVModItemRegistry/Main.gd"
