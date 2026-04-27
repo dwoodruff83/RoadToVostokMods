@@ -11,3 +11,6 @@ CatAutoFeed="res://mods/CatAutoFeed/Main.gd"
 [registry]
 ; Opts into Metro's registry API so Cat_Bowl is added to Database / LT_Master
 ; via lib.register() instead of take_over_path (Metro v3.x and later).
+
+[updates]
+modworkshop=56407
