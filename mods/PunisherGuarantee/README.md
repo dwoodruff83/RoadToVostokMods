@@ -30,7 +30,7 @@ The vanilla Punisher event is gated three ways: a 10% possibility roll, a day-5 
 | Enable Spawn Hotkey | On | Press the configured key to spawn a Punisher near you. |
 | Spawn Hotkey | F10 | Key to press for the on-demand spawn. |
 
-Plus the standard Logger category (level, file output, overlay output). See [the RTV Mod Logger reference](../RTVModLogger/LOGGER.md) for details.
+Plus the standard Logger category (level, file output, overlay output). See [the RTV Mod Logger reference](https://github.com/dwoodruff83/RoadToVostokMods/blob/main/mods/RTVModLogger/LOGGER.md) for details.
 
 ## Compatibility
 
@@ -44,7 +44,7 @@ Built for the Road to Vostok modding ecosystem. In-game configuration via the [M
 
 ## License
 
-[MIT](LICENSE)
+[MIT](https://github.com/dwoodruff83/RoadToVostokMods/blob/main/mods/PunisherGuarantee/LICENSE)
 
 ## Source & Issues
 
