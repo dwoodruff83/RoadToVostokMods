@@ -1,0 +1,15 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: Cat Auto Feed on ModWorkshop
+    url: https://modworkshop.net/mod/56407
+    about: Comments and ratings for the released mod live on its workshop page.
+  - name: RTV Mod Logger on ModWorkshop
+    url: https://modworkshop.net/mod/56406
+    about: Comments and ratings for the released mod live on its workshop page.
+  - name: RTV Wallets on ModWorkshop
+    url: https://modworkshop.net/mod/56408
+    about: Comments and ratings for the released mod live on its workshop page.
+  - name: Road to Vostok Discord
+    url: https://discord.com/invite/roadtovostok
+    about: General modding chat, troubleshooting help, mod-author conversations.
