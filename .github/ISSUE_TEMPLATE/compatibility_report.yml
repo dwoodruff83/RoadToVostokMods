@@ -1,0 +1,90 @@
+name: Compatibility report
+description: Conflict between one of these mods and another mod
+title: "[Compat] "
+labels: [compatibility]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template when one of the mods in this repo conflicts with
+        another mod (anywhere — ModWorkshop, GitHub, or shared in Discord).
+        These reports are useful even when the fix isn't on our side, because
+        they help future users find a known-good config.
+
+  - type: dropdown
+    id: our_mod
+    attributes:
+      label: Mod from this repo
+      options:
+        - Cat Auto Feed
+        - RTV Mod Logger
+        - RTV Wallets
+        - Punisher Guarantee
+    validations:
+      required: true
+
+  - type: input
+    id: their_mod
+    attributes:
+      label: Conflicting mod (name + link)
+      description: Include a ModWorkshop or GitHub URL if you have one.
+      placeholder: e.g. Wallet & Cash by domfrags — https://modworkshop.net/mod/55951
+    validations:
+      required: true
+
+  - type: input
+    id: their_mod_version
+    attributes:
+      label: Conflicting mod version
+      placeholder: e.g. 2.9.1
+    validations:
+      required: false
+
+  - type: dropdown
+    id: conflict_type
+    attributes:
+      label: Conflict type
+      description: Pick the closest description. If multiple apply, pick the most severe.
+      options:
+        - Game crashes on launch
+        - Game crashes during play
+        - Items / scenes don't appear
+        - Double-feed / double-fire (mod runs twice)
+        - Save corruption
+        - UI / overlay broken
+        - Mods load but one silently does nothing
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What goes wrong
+      description: Describe the symptom. If the game crashes, paste the relevant lines from `%APPDATA%\Road to Vostok\modloader_conflicts.txt` or the Godot console output if you have it.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps to make the conflict appear.
+    validations:
+      required: false
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: Workaround (if any)
+      description: e.g. "Disable mod B before loading", "Set load order so X is higher priority", etc.
+    validations:
+      required: false
+
+  - type: input
+    id: loader_version
+    attributes:
+      label: Metro Mod Loader version
+      placeholder: e.g. 3.1.1
+    validations:
+      required: true

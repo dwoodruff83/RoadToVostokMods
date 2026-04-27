@@ -1,0 +1,119 @@
+name: Bug report
+description: Something in one of the mods doesn't work the way it should
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file this. The fields below ask for the
+        info needed to diagnose mod issues — mod version, game version, mod
+        loader version, and what other mods are installed are usually the
+        difference between "fixed in 5 minutes" and "spent a week trying to
+        reproduce."
+
+        Before filing, please check the mod's ModWorkshop comments (links in
+        the issue chooser) to see if anyone else hit the same thing.
+
+  - type: dropdown
+    id: mod
+    attributes:
+      label: Which mod?
+      description: Pick the affected mod. If the issue is in the workspace tooling (build scripts, scaffold, sync_logger, etc.), pick "Workspace tooling".
+      options:
+        - Cat Auto Feed
+        - RTV Mod Logger
+        - RTV Wallets
+        - Punisher Guarantee
+        - Workspace tooling
+        - Multiple / unsure
+    validations:
+      required: true
+
+  - type: input
+    id: mod_version
+    attributes:
+      label: Mod version
+      description: Found in the mod's ModWorkshop page or in the .vmz's mod.txt.
+      placeholder: e.g. 1.1.1
+    validations:
+      required: true
+
+  - type: input
+    id: game_version
+    attributes:
+      label: Game version
+      description: Shown in Road to Vostok's main menu, or via Steam library.
+      placeholder: e.g. 0.1.1.3
+    validations:
+      required: true
+
+  - type: input
+    id: loader_version
+    attributes:
+      label: Metro Mod Loader version
+      description: Shown in the launcher's Mods tab or in the loader's About panel.
+      placeholder: e.g. 3.1.1
+    validations:
+      required: true
+
+  - type: textarea
+    id: other_mods
+    attributes:
+      label: Other installed mods
+      description: List any other RTV mods you have enabled. Most "broken" reports turn out to be conflicts. Even if you think they're unrelated, list them.
+      placeholder: |
+        Wallet & Cash 2.9.1
+        Immortal Cat 1.0.3
+        ...
+    validations:
+      required: false
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: What did you do, in order, that triggered the issue?
+      placeholder: |
+        1. Loaded my Cabin save
+        2. Placed a Cat Food Bowl with 5 servings
+        3. Walked to Area 03
+        4. Waited 10 minutes
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs and screenshots
+      description: |
+        If the affected mod uses RTV Mod Logger (CatAutoFeed, RTVWallets do), the log file lives at
+        `%APPDATA%\Road to Vostok\MCM\<ModId>\<mod_id>.log`. Attach or paste relevant lines.
+
+        Screenshots help a lot for UI / loot / item-state issues — drag images directly into this field.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmations
+      options:
+        - label: I searched existing issues and the mod's ModWorkshop comments
+          required: true
+        - label: I'm running the latest published version of the affected mod
+          required: false

@@ -1,0 +1,61 @@
+name: Feature request
+description: Suggest a new feature, MCM toggle, or behavior change
+title: "[Feature] "
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea. Lead with the *problem* — what's frustrating about
+        playing with the current behavior? Concrete use cases get prioritized
+        over abstract "would be nice if" wishlists.
+
+  - type: dropdown
+    id: mod
+    attributes:
+      label: Which mod?
+      options:
+        - Cat Auto Feed
+        - RTV Mod Logger
+        - RTV Wallets
+        - Punisher Guarantee
+        - Workspace tooling
+        - New mod idea
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / use case
+      description: What player situation is this trying to address? Describe the pain point first.
+      placeholder: |
+        I run a long shelter expedition setup where I leave the cat for 3-4 in-game days.
+        The bowl runs dry after about 2 days, and even with shelter fallback enabled the
+        cat warns repeatedly because raw food in the cabinet ran out.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: What would the mod do differently?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Workarounds you tried, or other shapes the feature could take.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmations
+      options:
+        - label: I searched existing issues for similar requests
+          required: true
