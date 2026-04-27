@@ -4,9 +4,9 @@ Internal workspace doc. Not bundled in the .vmz.
 
 ## Status
 
-**Near-ready.** Trader Buy/Sell with cash is working — currently ironing out edge-case kinks before bumping to 1.0.0 and publishing. Headline feature is functional; the README's claims are accurate.
+**Ready for first publish (1.0.0, 2026-04-26).** Trader Sell-for-€ flow matches vanilla barter (drain → spill → overflow drops via our `Drop()` override). Cash drag-overlay shows €, drops are clean maxAmount chunks, materials dimmed so cash doesn't glow in dim lighting. MCM trimmed to working settings only. README and CHANGELOG match shipping behavior.
 
-**Migrated to Metro v3.x registry (2026-04-26).** Database injection now goes through `Engine.get_meta("RTVModLib").register(SCENES, ...)` instead of the retired RTVModItemRegistry shim. Bumped to v0.3.0 for the migration.
+**Migrated to Metro v3.x registry (2026-04-26).** Database injection goes through `Engine.get_meta("RTVModLib").register(SCENES, ...)` instead of the retired RTVModItemRegistry shim.
 
 ## TL;DR pitch (when ready)
 
@@ -37,19 +37,22 @@ Internal workspace doc. Not bundled in the .vmz.
 
 > **Incompatible with Wallet & Cash by domfrags.** Both mods rewire the trader Buy/Sell flow. Pick one or the other.
 
-## Remaining TODO (publish blockers)
+## Remaining TODO
 
-- [ ] Trader cash integration — wrap up edge-case fixes (working as of 2026-04-26; ironing kinks)
-- [ ] Capture screenshots once trader work is fully settled: tiers in inventory, wallet at trader, money case in military crate
-- [ ] Test side-by-side with Wallet & Cash (#55951) — document exact failure mode
-- [ ] Bump to 1.0.0 + add 1.0.0 CHANGELOG entry
+Done before 1.0.0:
+- [x] Trader cash integration polished (Sell-for-€ button, drain-first, vanilla-barter parity)
+- [x] Screenshots captured (overview, MCM, sell_for_cash, buy, loading, unloading)
+- [x] Bump to 1.0.0 + 1.0.0 CHANGELOG entry
+
+Manual / post-publish:
 - [ ] First publish via ModWorkshop web form
 - [ ] **Post-publish:** write assigned mod id into `mods/RTVWallets/.publish` AND add `[updates]\nmodworkshop=<id>` to `mod.txt`, then rebuild + re-upload so the shipped `.vmz` is update-aware
-- [ ] Post-publish: comment on Wallet & Cash's mod page (friendly, link our mod, frame as "alternative aesthetic, not replacement")
+- [ ] Test side-by-side with Wallet & Cash (#55951) — document exact failure mode
+- [ ] Comment on Wallet & Cash's mod page (friendly, link our mod, frame as "alternative aesthetic, not replacement")
 
 ## MCM settings reference (current)
 
-Six user-visible: Enable Wallets (master), Notify On Transfer, Stash Report Hotkey (Keycode, default F9), Enable: Leather Wallet, Enable: Ammo Tin, Enable: Money Case. Plus the standard Logger category.
+One user-visible setting: **Stash Report Hotkey** (Keycode, default F9). Plus the standard Logger category (Log Level / Log to File / Log to Overlay). Earlier non-functional toggles (master "Enable Wallets", "Notify On Transfer", per-tier enables) removed for 1.0.0 — they never gated runtime code.
 
 ## References
 

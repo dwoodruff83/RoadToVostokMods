@@ -1,7 +1,7 @@
 [mod]
 name="RTV Wallets"
 id="RTVWallets"
-version="0.2.10"
+version="1.0.0"
 
 [autoload]
 RTVWalletsLog="res://mods/RTVWallets/Logger.gd"

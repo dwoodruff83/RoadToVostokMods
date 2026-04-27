@@ -37,12 +37,13 @@ No more returning to base every 40 minutes to drop a can of tuna in the feeder. 
 | Bowl at Gunsmith | **Off** | Lets the Gunsmith trader (day-10 unlock) stock bowls in his random supply. Off by default — bowls are loot-only out of the box. Reload the game after toggling. |
 | Cat Company Mental Buff | On | While in the cat's shelter (cat alive), raise mental at the same rate as a fire. |
 
-Plus the standard Logger category (level, file output, overlay output). See [the RTV Mod Logger reference](../RTVModLogger/LOGGER.md) for details.
+Plus the standard Logger category (level, file output, overlay output). See [the RTV Mod Logger reference](https://github.com/dwoodruff83/RoadToVostokMods/blob/main/mods/RTVModLogger/LOGGER.md) for details.
 
 ## Compatibility
 
 - **Metro Mod Loader v3.0.0+ required.** Cat_Bowl is added via Metro's registry (`lib.register(SCENES, ...)` and `lib.register(LOOT, ...)`), which means it coexists cleanly with any other mod also using the registry — no `take_over_path` collisions.
 - **Incompatible with** other cat-feeding mods (e.g. *Cat Food Shelter*). Remove them before installing to avoid double-feeding.
+- **Likely incompatible with [Put Food Out](https://modworkshop.net/mod/56098)** — both mods touch the cat-feeding loop. Pick one. Untested in combination; if you run both you may get double-feeds or fight over the same hunger ticks.
 - **MCM is optional** — the mod runs with sensible defaults if MCM is absent. It is only required for in-game configuration.
 - **Uninstalling drops bowls and contents.** Save files reference the bowl via `res://mods/CatAutoFeed/Cat_Bowl.tres`. If you remove the .vmz, the game silently strips bowls (and any food they hold) from saves on next load. To migrate, empty all bowls before uninstalling.
 

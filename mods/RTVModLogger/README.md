@@ -4,10 +4,10 @@
 
 > **For mod developers, not players.** This mod has no gameplay effect. If you
 > installed another mod that uses RTV Mod Logger internally (e.g. CatAutoFeed,
-> RTV Wallets, RTV Mod Item Registry), **you don't need to install this** —
-> consumer mods bundle their own copy of `Logger.gd` directly into their `.vmz`.
-> This package exists as a reference + a live demo so modders can see what each
-> log level looks like in-game before integrating.
+> RTV Wallets), **you don't need to install this** — consumer mods bundle
+> their own copy of `Logger.gd` directly into their `.vmz`. This package
+> exists as a reference + a live demo so modders can see what each log level
+> looks like in-game before integrating.
 
 A modder tool. Copy `Logger.gd` into your mod, edit three lines, autoload it — and you get filterable log levels, file output, in-game overlay routed through the vanilla `Loader.Message` system, and an MCM integration helper. Ships with a demo so you can see what each level looks like in-game before integrating.
 

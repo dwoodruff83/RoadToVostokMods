@@ -55,6 +55,15 @@ __MOD_ID__="res://mods/__MOD_ID__/Main.gd"
 """
 
 
+# Appended to mod.txt when --items is set. Opts the mod into Metro Mod
+# Loader v3.x's registry: Metro wraps Database.gd at loader startup so
+# lib.register(lib.Registry.SCENES, ...) calls in Main.gd take effect.
+MOD_TXT_REGISTRY_SUFFIX = """\
+
+[registry]
+"""
+
+
 # Stub Logger.gd: sync_logger.py keeps the three identity vars in _init()
 # and replaces the rest with the canonical body from shared/Logger.gd.
 LOGGER_STUB = """\
@@ -100,8 +109,7 @@ func _log(lvl: String, msg: String) -> void:
 MAIN_GD_ITEMS = """\
 extends Node
 
-# Paths to .tres ItemData resources. Used by the legacy injection fallback
-# and any loot-table integration you wire up.
+# Paths to .tres ItemData resources for any loot-table integration you do.
 const ITEM_PATHS := [
 \t# "res://mods/__MOD_ID__/MyItem.tres",
 ]
@@ -111,36 +119,34 @@ var _log_node: Node = null
 func _ready() -> void:
 \tname = "__MOD_ID__"
 \t_log("debug", "__MOD_NAME__ mod loaded")
-\t_inject_database()
+\t_register_with_metro()
 
-# Prefer RTVModItemRegistry's coordinated registration if installed —
-# this lets __MOD_NAME__ coexist with other Database-extending mods.
-# Falls back to legacy direct injection for single-mod setups.
-func _inject_database() -> void:
-\tvar registry = get_node_or_null("/root/ModItemRegistry")
-\tif registry == null:
-\t\tregistry = get_tree().root.find_child("ModItemRegistry", true, false)
-\tif registry and registry.has_method("register"):
-\t\t# TODO: register each of your items, e.g.:
-\t\t# var ok := registry.register("MyItem", preload("res://mods/__MOD_ID__/MyItem.tscn"))
-\t\t# if not ok: _log("warn", "Registry rejected MyItem; falling back to legacy")
-\t\t_log("debug", "__MOD_NAME__ items registered with ModItemRegistry")
+# Registers each item scene as a SCENES entry via Metro's registry API.
+# Metro v3.x wraps Database.gd at loader startup when [registry] is declared
+# in mod.txt, so Database.get("<name>") resolves to the registered scene.
+# Requires Metro Mod Loader v3.0.0 or later — without it, items will not
+# resolve and the mod will warn at startup.
+func _register_with_metro() -> void:
+\tvar lib = Engine.get_meta("RTVModLib") if Engine.has_meta("RTVModLib") else null
+\tif lib == null:
+\t\t_log("error", "Metro Mod Loader not detected — items will not be registered. Install Metro v3.x or newer.")
 \t\treturn
+\tawait lib.frameworks_ready
 
-\t_log("debug", "RTVModItemRegistry not installed — using legacy in-place injection")
-\t_inject_database_legacy()
-
-# Legacy take_over_path / set_script injection. Used when RTVModItemRegistry
-# is not installed. See mods/CatAutoFeed/Main.gd or mods/RTVWallets/Main.gd
-# for the full canonical pattern; replace this stub with that pattern when
-# ye add your first item.
-func _inject_database_legacy() -> void:
-\tvar inject = load("res://mods/__MOD_ID__/DatabaseInject.gd")
-\tif inject == null:
-\t\t_log("warn", "DatabaseInject.gd failed to load; items will not resolve")
-\t\treturn
-\t# TODO: copy the full take_over_path + set_script pattern from a
-\t# reference mod (CatAutoFeed or RTVWallets).
+\t# TODO: register each item here, e.g.:
+\t# var ok := lib.register(lib.Registry.SCENES, "MyItem", preload("res://mods/__MOD_ID__/MyItem.tscn"))
+\t# if ok:
+\t#\t_log("debug", "MyItem registered with Metro (SCENES)")
+\t# else:
+\t#\t_log("warn", "Metro rejected MyItem SCENES registration (id collision?)")
+\t#
+\t# Optional: also register an item in a loot table so it spawns in the world:
+\t# var item_data = load("res://mods/__MOD_ID__/MyItem.tres")
+\t# lib.register(lib.Registry.LOOT, "__MOD_ID___myitem_master", {
+\t#\t"item": item_data,
+\t#\t"table": "LT_Master",
+\t# })
+\tpass
 
 func _log(lvl: String, msg: String) -> void:
 \tif _log_node == null or !is_instance_valid(_log_node):
@@ -250,14 +256,6 @@ func _resolve_logger():
 \tif n == null:
 \t\tn = get_tree().root.find_child("__MOD_ID__Log", true, false)
 \treturn n
-"""
-
-
-DATABASE_INJECT_GD = """\
-extends "res://Scripts/Database.gd"
-
-# TODO: add a const for each .tscn item this mod registers, e.g.:
-# const MyItem = preload("res://mods/__MOD_ID__/MyItem.tscn")
 """
 
 
@@ -475,6 +473,39 @@ SOFTWARE.
 """
 
 
+# Variant used when --assets is set: includes a carve-out paragraph noting
+# that bundled third-party assets retain their own (typically CC BY 4.0)
+# licenses, with NOTICES.txt as the source of truth for attributions.
+LICENSE_TEXT_WITH_CARVEOUT = """\
+MIT License
+
+Copyright (c) 2026 Daniel Woodruff
+
+This MIT License applies to the mod's source code only (.gd, .tscn, .tres,
+.md, .py, .txt files authored by the copyright holder). Third-party assets
+bundled in this package — see NOTICES.txt — are licensed separately under
+their respective terms (Creative Commons Attribution 4.0 International).
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+"""
+
+
 PUBLISH_NOTES_MD = """\
 # __MOD_NAME__ — publish notes
 
@@ -504,7 +535,7 @@ TODO: one paragraph on the angle to lead with on the mod page.
 |---|---|
 | **Category** | TODO (check the dropdown) |
 | **Tags** | `Add-on (#13)` plus any specific to your mod |
-| **Dependencies** | `Metro Mod Loader (#55623)` required; `MCM (#53713)` recommended |
+| **Dependencies** | __DEPS_LINE__ |
 | **Repo URL** | (set when public) |
 | **License** | MIT |
 
@@ -644,8 +675,8 @@ def main() -> int:
     parser.add_argument("name", help='Display name (e.g. "RTV Wallets")')
     parser.add_argument("--id", help="Folder/autoload id (default: name with spaces stripped)")
     parser.add_argument("--desc", default="TODO: one-line tagline.", help="One-line tagline")
-    parser.add_argument("--assets", action="store_true", help="Create assets/ folder + NOTICES.txt template")
-    parser.add_argument("--items", action="store_true", help="Create DatabaseInject.gd stub + registry-aware Main.gd")
+    parser.add_argument("--assets", action="store_true", help="Create assets/ folder + NOTICES.txt template + LICENSE carve-out")
+    parser.add_argument("--items", action="store_true", help="Use Metro v3.x's [registry] API in mod.txt + a Main.gd that registers items as SCENES")
     parser.add_argument("--dry-run", action="store_true", help="Print what would be created without writing")
     parser.add_argument("--no-sync-logger", action="store_true", help="Skip auto-invoking sync_logger.py")
     args = parser.parse_args()
@@ -662,12 +693,18 @@ def main() -> int:
     from datetime import date
     today = date.today().isoformat()
 
+    if args.items:
+        deps_line = "**`Metro Mod Loader (#55623)` v3.0.0+ required** (uses Metro's `[registry]` API); `MCM (#53713)` recommended"
+    else:
+        deps_line = "`Metro Mod Loader (#55623)` required; `MCM (#53713)` recommended"
+
     repl = {
         "__MOD_ID__": mod_id,
         "__MOD_NAME__": args.name,
         "__DESCRIPTION__": args.desc,
         "__LOG_FILENAME__": log_filename,
         "__TODAY__": today,
+        "__DEPS_LINE__": deps_line,
     }
 
     # Compose build.py with conditional ROOT_FILES / MOD_FILES / asset block.
@@ -675,8 +712,6 @@ def main() -> int:
     if args.assets:
         root_files.insert(-1, "NOTICES.txt")
     mod_files = ["Main.gd", "config.gd", "Logger.gd"]
-    if args.items:
-        mod_files.append("DatabaseInject.gd")
 
     build_repl = dict(repl)
     build_repl["__ROOT_FILES__"] = repr(root_files)
@@ -692,22 +727,23 @@ def main() -> int:
     print(f"  id={mod_id}  log={log_filename}.log  assets={args.assets}  items={args.items}\n")
 
     main_gd = MAIN_GD_ITEMS if args.items else MAIN_GD_BASIC
+    mod_txt_content = render(MOD_TXT, repl)
+    if args.items:
+        mod_txt_content += MOD_TXT_REGISTRY_SUFFIX
+    license_text = LICENSE_TEXT_WITH_CARVEOUT if args.assets else LICENSE_TEXT
 
     files: list[tuple[Path, str]] = [
-        (mod_dir / "mod.txt",                render(MOD_TXT,            repl)),
+        (mod_dir / "mod.txt",                mod_txt_content),
         (mod_dir / "Logger.gd",              render(LOGGER_STUB,        repl)),
         (mod_dir / "Main.gd",                render(main_gd,            repl)),
         (mod_dir / "config.gd",              render(CONFIG_GD,          repl)),
         (mod_dir / "build.py",               render(BUILD_PY,           build_repl)),
         (mod_dir / "README.md",              render(README_MD,          repl)),
         (mod_dir / "CHANGELOG.md",           render(CHANGELOG_MD,       repl)),
-        (mod_dir / "LICENSE",                LICENSE_TEXT),
+        (mod_dir / "LICENSE",                license_text),
         (mod_dir / "PUBLISH_NOTES.md",       render(PUBLISH_NOTES_MD,   repl)),
         (mod_dir / "screenshots" / "README.md", SCREENSHOTS_README),
     ]
-
-    if args.items:
-        files.append((mod_dir / "DatabaseInject.gd", render(DATABASE_INJECT_GD, repl)))
 
     if args.assets:
         underline_repl = dict(repl)
@@ -740,11 +776,12 @@ def main() -> int:
     print(f"  1. Edit mods/{mod_id}/Main.gd and add your startup logic")
     print(f"  2. Edit mods/{mod_id}/config.gd to add MCM toggles for your features")
     if args.items:
-        print(f"  3. Add your .tres / .tscn item files + populate DatabaseInject.gd consts")
-        print(f"  4. Wire up the registry.register() calls in Main.gd._inject_database()")
+        print(f"  3. Add your .tres / .tscn item files under mods/{mod_id}/")
+        print(f"  4. Wire up lib.register(lib.Registry.SCENES, ...) calls in Main.gd._register_with_metro()")
+        print(f"     (Metro v3.0+ required — the [registry] opt-in is already in mod.txt)")
     if args.assets:
         print(f"  5. Drop 3D models / icons into mods/{mod_id}/assets/")
-        print(f"  6. Update NOTICES.txt with attributions for any third-party assets")
+        print(f"  6. Fill in NOTICES.txt with attributions for any third-party assets")
     print(f"  Build & install:  publish.bat {mod_id} --no-open")
     print(f"  When ready to publish: publish.bat {mod_id} --version 1.0.0")
     return 0
