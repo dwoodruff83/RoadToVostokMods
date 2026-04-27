@@ -7,3 +7,6 @@ version="1.0.0"
 RTVModLoggerLog="res://mods/RTVModLogger/Logger.gd"
 RTVModLoggerConfig="res://mods/RTVModLogger/config.gd"
 RTVModLogger="res://mods/RTVModLogger/Main.gd"
+
+[updates]
+modworkshop=56406
