@@ -1,0 +1,24 @@
+name: Enforce main PRs from staging only
+
+# Fails any pull request that targets `main` from a source branch other than
+# `staging`. Combined with branch protection's "Require status checks to pass
+# before merging" rule, this gates the merge button on the GitHub UI.
+#
+# Branch flow:
+#   feature/* -> PR into staging -> (review) -> staging -> PR into main
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  check-source-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify source is staging
+        run: |
+          if [ "${{ github.head_ref }}" != "staging" ]; then
+            echo "::error::PRs to main must come from the 'staging' branch only. Got: '${{ github.head_ref }}'"
+            exit 1
+          fi
+          echo "PR source is 'staging' — OK"
