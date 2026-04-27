@@ -1,14 +1,16 @@
 # RTV Wallets
 
-> Lootable, tradeable wallets that hold cash like a magazine holds rounds.
+> Lootable, tradeable wallets that hold cash like a magazine holds rounds — and cash itself drops in loot, so the world keeps your stash refilling.
 
-Find a wallet on a bandit, keep your rubles in it, spend at traders. Die with it and it is lost — cash doesn't persist through death, only what's in the wallet on your body. Three tiers scale with risk and loot location.
+Find a wallet on a bandit. Find loose cash in a civilian crate. Load the cash into the wallet, spend at traders, lose it all on death — only what's on your body survives. Three wallet tiers scale with risk and loot location.
 
 | Tier | Capacity | Rarity | Where it spawns |
 |------|----------|--------|-----------------|
 | Leather Wallet | 1,000 € | Common | Civilian / industrial loot — sold by Doctor |
 | Ammo Tin | 5,000 € | Rare | Industrial / military loot — sold by Gunsmith |
 | Money Case | 10,000 € | Legendary | Military crates only — not sold by any trader |
+
+**Cash itself** drops separately at Common rarity, weighted 3× in the master loot table so loose stacks turn up regularly in civilian and industrial containers. Drag cash onto a wallet (or empty slot) to load up — same UI as loading magazine rounds.
 
 ## Installation
 
@@ -20,10 +22,11 @@ Find a wallet on a bandit, keep your rubles in it, spend at traders. Die with it
 
 ## Features
 
-- **Wallet-as-magazine model** — each wallet instance has its own cash balance, shown as an ammo-style count on the inventory icon. The wallet *is* the currency.
+- **Cash spawns in loot too** — bare cash stacks drop in civilian and industrial containers at Common rarity (3× weighted so they show up regularly). No grinding traders just to seed your wallets.
+- **Lootable & losable** — wallets and cash are both regular inventory items. Drop them, find them, lose them on death.
+- **Wallet-as-magazine model** — each wallet has its own balance, shown as an ammo-style count on the inventory icon. Load cash like loading rounds.
 - **Three tiers** with different capacities, loot-spawn flags, and trader stocking rules.
 - **Trader Buy/Sell with cash** — at a trader, the active wallet on your body is used for payment.
-- **Lootable & losable** — wallets are regular inventory items that drop on death.
 
 ## Configuration (MCM)
 
