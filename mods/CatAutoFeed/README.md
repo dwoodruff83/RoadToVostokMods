@@ -55,11 +55,11 @@ Built for the Road to Vostok modding ecosystem. In-game configuration via the [M
 
 - **"Cat bowl"** by Justyna.sliwinska — [source](https://skfb.ly/otWXJ) — licensed under [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/).
 
-See [NOTICES.txt](NOTICES.txt) for the verbatim attributions.
+See [NOTICES.txt](https://github.com/dwoodruff83/RoadToVostokMods/blob/main/mods/CatAutoFeed/NOTICES.txt) for the verbatim attributions.
 
 ## License
 
-[MIT](LICENSE) (mod code only — third-party 3D models retain their own CC BY 4.0 license; see NOTICES.txt).
+[MIT](https://github.com/dwoodruff83/RoadToVostokMods/blob/main/mods/CatAutoFeed/LICENSE) (mod code only — third-party 3D models retain their own CC BY 4.0 license; see NOTICES.txt).
 
 ## Source & Issues
 

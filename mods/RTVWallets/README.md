@@ -31,7 +31,7 @@ Find a wallet on a bandit, keep your rubles in it, spend at traders. Die with it
 |---|---|---|
 | Stash Report Hotkey | F9 | Press in-game to log every wallet you're carrying with its balance. Useful for a quick "what's my total cash" answer when split across tiers. |
 
-Plus the standard Logger category (level, file output, overlay output). See [the RTV Mod Logger reference](../RTVModLogger/LOGGER.md) for details.
+Plus the standard Logger category (level, file output, overlay output). See [the RTV Mod Logger reference](https://github.com/dwoodruff83/RoadToVostokMods/blob/main/mods/RTVModLogger/LOGGER.md) for details.
 
 ## Compatibility
 
@@ -51,11 +51,11 @@ Built for the Road to Vostok modding ecosystem. In-game configuration via the [M
 - **"Case with money | Low poly"** by tasha.kosaykina — [source](https://skfb.ly/6SJ7u) — [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/).
 - **"Euro Banknote Stack Tied With Rubber"** by Dakta.Grower.Nzl — [source](https://skfb.ly/pCpXp) — [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/).
 
-See [NOTICES.txt](NOTICES.txt) for the verbatim attributions.
+See [NOTICES.txt](https://github.com/dwoodruff83/RoadToVostokMods/blob/main/mods/RTVWallets/NOTICES.txt) for the verbatim attributions.
 
 ## License
 
-[MIT](LICENSE) (mod code only — third-party 3D models retain their own CC BY 4.0 license; see NOTICES.txt).
+[MIT](https://github.com/dwoodruff83/RoadToVostokMods/blob/main/mods/RTVWallets/LICENSE) (mod code only — third-party 3D models retain their own CC BY 4.0 license; see NOTICES.txt).
 
 ## Source & Issues
 

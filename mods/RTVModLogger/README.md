@@ -24,7 +24,7 @@ A modder tool. Copy `Logger.gd` into your mod, edit three lines, autoload it —
 - **Six log calls** — `debug` (gray), `info` (white), `success` (green), `warn` (orange), `error` (red), and `notify(msg, color)` which always shows regardless of filters.
 - **Three output targets**, each toggleable in MCM — Console, File (`user://MCM/<mod_id>/<filename>.log`), and in-game overlay (via `Loader.Message`).
 - **MCM integration helper** — one call adds Level / File / Overlay controls to your mod's existing MCM page.
-- **Schema-preserving migration** pattern (see [LOGGER.md](LOGGER.md)) — adding new settings between mod versions doesn't lose user values.
+- **Schema-preserving migration** pattern (see [LOGGER.md](https://github.com/dwoodruff83/RoadToVostokMods/blob/main/mods/RTVModLogger/LOGGER.md)) — adding new settings between mod versions doesn't lose user values.
 - **Coexistence** — each mod that uses the library has its own identity, log file, and MCM page. They don't conflict.
 
 ## Configuration (MCM)
@@ -35,7 +35,7 @@ A modder tool. Copy `Logger.gd` into your mod, edit three lines, autoload it —
 | Test Hotkey | F12 | Press in-game to fire the configured test action. |
 | Test Action | Test All | What the hotkey fires: `Test All` runs every level + a notify in sequence; or pick one specific level. |
 
-Plus the standard Logger category (level, file output, overlay output). See [LOGGER.md](LOGGER.md) for details.
+Plus the standard Logger category (level, file output, overlay output). See [LOGGER.md](https://github.com/dwoodruff83/RoadToVostokMods/blob/main/mods/RTVModLogger/LOGGER.md) for details.
 
 ## For modders: using `Logger.gd` in your mod
 
@@ -66,7 +66,7 @@ Plus the standard Logger category (level, file output, overlay output). See [LOG
    _log.notify("Boss spawned!", Color.RED)
    ```
 
-Full reference (MCM integration pattern, schema migration, troubleshooting): [LOGGER.md](LOGGER.md).
+Full reference (MCM integration pattern, schema migration, troubleshooting): [LOGGER.md](https://github.com/dwoodruff83/RoadToVostokMods/blob/main/mods/RTVModLogger/LOGGER.md).
 
 ## Compatibility
 
@@ -79,7 +79,7 @@ Built for the Road to Vostok modding ecosystem. In-game configuration via the [M
 
 ## License
 
-[MIT](LICENSE) — embed `Logger.gd` freely, with or without attribution.
+[MIT](https://github.com/dwoodruff83/RoadToVostokMods/blob/main/mods/RTVModLogger/LICENSE) — embed `Logger.gd` freely, with or without attribution.
 
 ## Source & Issues
 
