@@ -1,8 +1,8 @@
 # Cat Auto Feed
 
-> Automatically feeds your cat from a placed Cat Food Bowl from anywhere on the map.
+> Auto-feeds your cat from a placed bowl, anywhere on the map — with an optional shelter-food fallback so the cat never starves on a forgotten refill.
 
-No more returning to base every 40 minutes to drop a can of tuna in the feeder. The mod ships a 2x2 placeable **Cat Food Bowl** item that auto-feeds the cat when hunger drops below a configurable threshold, regardless of where you are on the map. An opt-in shelter-fallback toggle lets the cat raid raw food in cabinets/fridges if the bowl is empty.
+No more returning to base every 40 minutes to drop a can of tuna in the feeder. A 2x2 placeable **Cat Food Bowl** auto-feeds your cat from anywhere on the map when hunger drops below a configurable threshold. Optional safety net: if the bowl runs dry, the cat raids raw food from cabinets / fridges in its shelter so it doesn't starve.
 
 ## Installation
 
@@ -14,14 +14,14 @@ No more returning to base every 40 minutes to drop a can of tuna in the feeder. 
 
 ## Features
 
+- **Auto-feed from anywhere** — when cat hunger drops below the threshold and you're outside the shelter, the cat eats one serving from its bowl. No more returning to base just to refill.
+- **Opt-in shelter-food fallback (safety net)** — if the bowl runs dry, the cat raids raw food on the floor or in cabinets/fridges in its shelter so it doesn't starve. Toggle on in MCM if you want the safety net; off by default for purist bowl-only play.
+- **Hunger and bowl-empty warnings** — orange on-screen notifications, once per hunger cycle, so you know to refill before it's a problem.
+- **Manual feeding preserved** — when you're inside the cat's shelter, the mod defers to the vanilla CatFeeder. Same UX as before.
 - **Cat Food Bowl item** — 2x2 placeable inventory item with a custom 3D model. Sellable, droppable. Holds up to 10 servings of cat-edible food (Cat Food, Canned Meat, Canned Tuna, Perch).
 - **Bowl management panel** — middle-click a placed bowl to open a custom UI: two-column layout (bowl ↔ inventory), Take/Add buttons, capacity indicator, "Pick up bowl" button (enabled when empty).
 - **Spawns in legendary loot** — the bowl is registered in the master loot table, so it can spawn in civilian containers at Legendary rarity (~1 in 120 containers). Toggleable in MCM. Optionally the Gunsmith trader (unlocks day 10) can also stock bowls — opt-in via MCM, default off so bowls remain loot-only.
 - **Cat company mental buff** — being in the same shelter as your cat slowly raises mental at the same rate as sitting near a fire. Vanilla shelter doesn't normally restore mental — this is the cat's contribution. Cat must be alive and rescued. Toggleable in MCM.
-- **Auto-feed from anywhere** — when cat hunger drops below the threshold and you are outside the shelter, the cat eats one serving from its bowl.
-- **Hunger and bowl-empty warnings** — orange on-screen notifications, once per hunger cycle.
-- **Opt-in shelter fallback** — when off (default), the cat eats *only* from the bowl. When on, it falls back to raw food on the floor or in cabinets/fridges in its shelter.
-- **Manual feeding preserved** — when you are inside the cat's shelter, the mod defers to the vanilla CatFeeder.
 - **Shelter-agnostic** — works with Cabin, Attic, Classroom, Tent, or Bunker.
 
 ## Configuration (MCM)
