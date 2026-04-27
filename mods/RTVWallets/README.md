@@ -17,7 +17,7 @@ Find a wallet on a bandit. Find loose cash in a civilian crate. Load the cash in
 1. Drop `RTVWallets.vmz` into the game's `mods/` folder:
    `...\steamapps\common\Road to Vostok\mods\`
 2. **Required:** [Metro Mod Loader](https://modworkshop.net/mod/55623) v3.0.0 or later. The mod uses Metro's built-in registry API (`[registry]` opt-in in mod.txt) to add wallet items to the game's database — earlier loaders without the registry won't recognise them.
-3. **Recommended:** also install [Mod Configuration Menu (MCM)](https://modworkshop.net/mod/53713) — needed to toggle individual tiers in-game.
+3. **Optional:** install [Mod Configuration Menu (MCM)](https://modworkshop.net/mod/53713) — only used to rebind the Stash Report hotkey (default F9) or tweak Logger output. The mod runs fine without it.
 4. Launch the game.
 
 ## Features
