@@ -39,7 +39,7 @@ Plus the standard Logger category (level, file output, overlay output). See [LOG
 
 ## For modders: using `Logger.gd` in your mod
 
-1. Copy [`Logger.gd`](Logger.gd) into your mod folder.
+1. Copy [`Logger.gd`](https://github.com/dwoodruff83/RoadToVostokMods/blob/main/mods/RTVModLogger/Logger.gd) into your mod folder.
 2. Edit the three identity vars in `_init()`:
 
    ```gdscript
