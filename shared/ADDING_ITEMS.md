@@ -232,7 +232,18 @@ Your new items aren't in that list, so the game doesn't know how to spawn them.
 **The symptom:** dropped item disappears. Log shows
 `File not found: <ItemData.name>`.
 
-### The fix
+> **Recommended (Metro Mod Loader v3.0+):** declare `[registry]` in your
+> `mod.txt` and call `Engine.get_meta("RTVModLib").register(lib.Registry.SCENES, "MyItem", preload(...))`.
+> Metro wraps `Database.gd` once at loader startup before any user mod runs,
+> so multiple item-adding mods coexist without clobbering each other. See
+> Metro's [Registry docs](https://github.com/ametrocavich/vostok-mod-loader/blob/development/docs/wiki/Registry.md)
+> and CatAutoFeed / RTVWallets for working examples.
+>
+> The `take_over_path` + `DatabaseInject.gd` pattern below still works for
+> single-mod setups but is the legacy approach — last loader wins, breaking
+> when multiple item-adding mods are installed together.
+
+### The fix (legacy, single-mod setups)
 
 Create `DatabaseInject.gd` in your mod that extends `Database.gd` and adds
 consts for every item:

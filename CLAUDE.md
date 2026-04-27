@@ -16,10 +16,13 @@ This is a modding workspace for **Road to Vostok**, a survival FPS built in Godo
 | `F:\RoadToVostokMods\reference\RTV_decompiled\Scripts\` | Decompiled game scripts (176 files, 30K lines) |
 | `F:\RoadToVostokMods\reference\RTV_decompiled\project.godot` | Game project config |
 | `F:\RoadToVostokMods\tools\GDRE_tools\gdre_tools.exe` | Godot RE Tools for decompiling |
-| `F:\rtv-mod-impact-tracker\` | Standalone tool repo (MIT, private): snapshot.py + analyze_mods.py + changelog.py + fetch_version.py |
-| `F:\RoadToVostokMods\mod_tracker.toml` | Config consumed by the tool (paths + Steam app id) |
+| `F:\rtv-mod-impact-tracker\` | Standalone tool repo (MIT, private): snapshot.py + analyze_mods.py + changelog.py + fetch_version.py + deps_fetch.py + deps_diff.py + deps_audit.py + deps_changelog.py |
+| `F:\RoadToVostokMods\mod_tracker.toml` | Config consumed by the tool (paths + Steam app id + `[[deps]]` upstreams) |
 | `F:\RoadToVostokMods\manifests.json` | Steam manifest registry consumed by `fetch_version.py` |
-| `F:\RoadToVostokMods\snapshot.bat` / `analyze_mods.bat` / `changelog.bat` / `fetch_version.bat` | Wrappers calling into the tool repo |
+| `F:\RoadToVostokMods\snapshot.bat` / `analyze_mods.bat` / `changelog.bat` / `fetch_version.bat` | Game-tracking wrappers (Steam-sourced) calling into the tool repo |
+| `F:\RoadToVostokMods\deps_fetch.bat` / `deps_diff.bat` / `deps_audit.bat` / `deps_changelog.bat` | Dep-tracking wrappers (Metro Mod Loader + MCM upstreams declared in `[[deps]]`) |
+| `F:\RoadToVostokMods\reference\MetroModLoader_source\` | Local mirror clone of Metro Mod Loader upstream (gitignored, regenerable via `deps_fetch sync`) |
+| `F:\RoadToVostokMods\reference\MCM_source\` | Local mirror clone of MCM upstream (gitignored, regenerable via `deps_fetch sync`) |
 | `F:\RoadToVostokMods\tools\GDRE_tools\` | GDRE Tools v2.5.0-beta.5 (decompiler) |
 | `F:\RoadToVostokMods\tools\Godot\` | Godot Editor 4.6.2 (installed) |
 | `F:\RoadToVostokMods\tools\DepotDownloader\` | Steam depot tool (for backfilling old game builds) |
@@ -27,16 +30,19 @@ This is a modding workspace for **Road to Vostok**, a survival FPS built in Godo
 | `F:\RoadToVostokMods\tools\sync_logger.py` | Sync canonical `shared/Logger.gd` into each mod, preserving identity values |
 | `F:\RoadToVostokMods\tools\modworkshop.py` / `modworkshop.bat` | Read-only ModWorkshop API client (browse, search, info, files) |
 | `F:\RoadToVostokMods\tools\publish.py` / `publish.bat` | One-shot build → install → open ModWorkshop edit/upload page |
+| `F:\RoadToVostokMods\tools\scaffold_mod.py` / `scaffold.bat` | Scaffold a new mod folder with the workspace's standard layout (mod.txt + Logger.gd stub + Main.gd + config.gd + canonical build.py + README/CHANGELOG/LICENSE/PUBLISH_NOTES + screenshots/). Auto-syncs Logger.gd. Optional `--assets` and `--items` flags |
 | `F:\RoadToVostokMods\mods\<ModName>\.publish` | Optional one-line file containing the ModWorkshop mod id; if present, `publish.bat` opens that mod's edit page |
 | `F:\RoadToVostokMods\shared\Logger.gd` | Canonical reusable Logger source (synced into each mod) |
 | `F:\RoadToVostokMods\mods\RTVModLogger\` | Standalone demo + reusable logging library mod (ships `Logger.gd` for other modders) |
 | `F:\RoadToVostokMods\mods\RTVModLogger\LOGGER.md` | Full modder-facing reference for the logger (formerly in `shared/`) |
+| `F:\RoadToVostokMods\mods\RTVModItemRegistry\` | **RETIRED** as of 2026-04-26 — superseded by Metro v3.x's built-in `[registry]` API. Source kept for workspace history; not in publish set. Consumer mods migrated to `Engine.get_meta("RTVModLib").register(...)` |
 | `F:\RoadToVostokMods\reference\RTV_history\` | Git repo of decompiled snapshots, one commit per game version |
 | `F:\RoadToVostokMods\mods\` | Our mod projects |
+| `F:\RoadToVostokMods\docs\archive\` | Historical workspace docs (design plans, retired test mod fixtures). Not bundled into any `.vmz` |
 | `C:\Program Files (x86)\Steam\steamapps\common\Road to Vostok\` | Game install |
 | `C:\Program Files (x86)\Steam\steamapps\common\Road to Vostok\mods\` | Installed mods (.vmz files) |
-| `C:\Program Files (x86)\Steam\steamapps\common\Road to Vostok\override.cfg` | Godot autoload override — points at `user://modloader.gd` (Metro Mod Loader v2.0.0 install) |
-| `%APPDATA%\Road to Vostok\modloader.gd` | Metro Mod Loader v2.0.0 (1699 lines, MD5 `61bbf6edda9e23310cbe39cadb1ca5d3`) — the loader script that mounts our `.vmz` files at game start |
+| `C:\Program Files (x86)\Steam\steamapps\common\Road to Vostok\override.cfg` | Godot autoload override — `[autoload_prepend] ModLoader="*res://modloader.gd"` so the loader runs before vanilla `Loader`/`Database`/`Simulation` autoloads (v3.1.1+) |
+| `C:\Program Files (x86)\Steam\steamapps\common\Road to Vostok\modloader.gd` | Metro Mod Loader v3.1.1 (11843 lines, MD5 `f7ec2261d6cc629043b6db8bb4bc2794`) — mounts `.vmz` files before save scanning. Upgraded from v2.0.0 (was at `%APPDATA%\Road to Vostok\modloader.gd`, md5 `61bbf6edda9e23310cbe39cadb1ca5d3`) which had a save-load race |
 | `%APPDATA%\Road to Vostok\mod_config.cfg` | Metro UI state (per-mod enabled/priority) |
 | `%APPDATA%\Road to Vostok\modloader_conflicts.txt` | Metro's last-run conflict report |
 
@@ -54,9 +60,10 @@ This is a modding workspace for **Road to Vostok**, a survival FPS built in Godo
 - **GDRE Tools v2.5.0-beta.5** (installed at `tools/GDRE_tools/`): Decompile PCK, list files, create PCK
 - **Godot Editor 4.6.2** (installed at `tools/Godot/`): Run/edit mods from source
 - **DepotDownloader** (installed at `tools/DepotDownloader/`): Pull specific historical RTV builds from Steam (only needed for backfilling old snapshots)
-- **rtv-mod-impact-tracker** (`F:\rtv-mod-impact-tracker\`): Standalone repo with four scripts (snapshot, analyze_mods, changelog, fetch_version). Driven from this workspace via `mod_tracker.toml` and four `.bat` wrappers. See README.md "Version Tracking" section.
+- **rtv-mod-impact-tracker** (`F:\rtv-mod-impact-tracker\`): Standalone repo with eight scripts. Game-tracking (Steam-sourced): snapshot, analyze_mods, changelog, fetch_version. Dep-tracking (GitHub upstreams declared in `[[deps]]`): deps_fetch (sync mirror clones), deps_diff (file/signature diff between two upstream tags), deps_audit (flag mods whose call sites touch changed dep APIs), deps_changelog (Markdown release notes between dep tags). Driven from this workspace via `mod_tracker.toml` and eight `.bat` wrappers. See README.md "Version Tracking" section.
 - **ModWorkshop CLI** (`tools/modworkshop.py` → `modworkshop.bat`): Read-only client for the public ModWorkshop API (https://api.modworkshop.net). Subcommands: `find-game`, `browse`, `top`, `search`, `info <mod_id>`, `files <mod_id>`. Defaults to RTV (game_id 864). Stdlib only. See README.md "ModWorkshop Browse & Publish" section.
 - **Publish workflow** (`tools/publish.py` → `publish.bat`): Calls `mods/<ModName>/build.py --version X --install` then opens the browser to the mod's ModWorkshop edit page (if `mods/<ModName>/.publish` contains the integer mod id) or the generic upload page. The actual upload click stays manual — ModWorkshop's API is GET-only at the moment.
+- **Mod scaffold** (`tools/scaffold_mod.py` → `scaffold.bat`): Generates a complete `mods/<MOD_ID>/` folder matching the workspace's standard layout. Drops mod.txt, Logger.gd stub, Main.gd, config.gd, the canonical build.py, README/CHANGELOG/LICENSE/PUBLISH_NOTES.md, and screenshots/README.md, then auto-runs `sync_logger.py` to fill in Logger.gd's body. Two opt-in flags: `--assets` (creates `assets/` folder + NOTICES.txt template + asset bundling in build.py) and `--items` (creates DatabaseInject.gd stub + registry-aware Main.gd injection pattern for mods adding new Database items). Usage: `scaffold.bat "My New Mod"` or `scaffold.bat "My New Mod" --assets --items`.
 - **Shared Logger** (`shared/Logger.gd` → synced into every mod via `tools/sync_logger.py`): Drop-in logging framework providing `debug/info/success/warn/error` (filterable, color-coded) plus `notify(msg, color)` (always-shows). Routes to game's `Loader.Message`. Demo + reuse package lives at `mods/RTVModLogger/`. See `mods/RTVModLogger/LOGGER.md` for the full API.
 - **VS Code + Godot GDScript extension**: Recommended (not required) for syntax highlighting + autocomplete when editing `.gd` files. Connects to a running Godot Editor's language server (default port 6008).
 

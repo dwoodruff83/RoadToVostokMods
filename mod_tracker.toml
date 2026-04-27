@@ -8,3 +8,20 @@ app_id = 1963610
 
 [snapshot]
 exclude_toplevel = ["mods", ".godot", "gdre_export.log"]
+
+# Mod-dependency upstreams tracked via deps_*.py. Each entry is a public git
+# repo with version tags; we keep a pristine clone at `path` and read tags
+# straight from there (no parallel history repo needed).
+[[deps]]
+name           = "metro"
+display_name   = "Metro Mod Loader"
+repo           = "https://github.com/ametrocavich/vostok-mod-loader"
+path           = "reference/MetroModLoader_source"
+modworkshop_id = 55623
+
+[[deps]]
+name           = "mcm"
+display_name   = "Mod Configuration Menu"
+repo           = "https://github.com/DoinkOink/Mod-Configuration-Menu-Road-To-Vostok"
+path           = "reference/MCM_source"
+modworkshop_id = 53713

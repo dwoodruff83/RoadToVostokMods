@@ -23,7 +23,7 @@ slotData = SubResource("Resource_slot")
 collision = NodePath("Collision")
 
 [node name="GLB" parent="." unique_id=1508790177 instance=ExtResource("2")]
-transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0.01, 0)
+transform = Transform3D(1.0, 0, 0, 0, 1.0, 0, 0, 0, 1.0, 0, 0.008, 0)
 
 [node name="Collision" type="CollisionShape3D" parent="." unique_id=569521242]
 shape = SubResource("BoxShape3D_placeholder")

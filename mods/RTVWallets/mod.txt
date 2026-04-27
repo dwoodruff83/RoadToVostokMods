@@ -1,9 +1,13 @@
 [mod]
 name="RTV Wallets"
 id="RTVWallets"
-version="0.2.0"
+version="0.2.10"
 
 [autoload]
 RTVWalletsLog="res://mods/RTVWallets/Logger.gd"
 RTVWalletsConfig="res://mods/RTVWallets/config.gd"
 RTVWallets="res://mods/RTVWallets/Main.gd"
+
+[registry]
+; Opts into Metro's registry API so wallet/cash scenes are added to Database
+; via lib.register() instead of take_over_path (Metro v3.x and later).

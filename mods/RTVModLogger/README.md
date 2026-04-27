@@ -31,7 +31,7 @@ A modder tool. Copy `Logger.gd` into your mod, edit three lines, autoload it —
 
 | Setting | Default | Description |
 |---|---|---|
-| Welcome on Game Start | On | Show the cyan "ready" notification when the mod loads. |
+| Welcome on Game Start | Off | Show the cyan "ready" notification when the mod loads. Default off — turn on if you're actively using the demo and want a hotkey reminder. |
 | Test Hotkey | F12 | Press in-game to fire the configured test action. |
 | Test Action | Test All | What the hotkey fires: `Test All` runs every level + a notify in sequence; or pick one specific level. |
 

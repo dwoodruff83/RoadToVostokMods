@@ -310,8 +310,8 @@ Other: `lean_L`, `lean_R`, `weapon_low`, `weapon_high`, `place`, `decor`, `ragdo
 ### Metro Mod Loader (Primary — what we develop and test against)
 - **ModWorkshop:** https://modworkshop.net/mod/55623
 - **Repo:** https://github.com/ametrocavich/vostok-mod-loader (published as "Metro Mod Loader" by `metro` / `ametrocavich`)
-- **Currently installed locally:** v2.0.0 ("MetroModloaderUI", March 2026 release). Newer 3.x versions exist with a different install mechanism (bundle `modloader.gd` inside a PCK and use `[autoload_prepend]` in `override.cfg`).
-- **How v2.0.0 installs:** drops `override.cfg` next to `RTV.exe` (autoloads `user://modloader.gd`) and `modloader.gd` into `%APPDATA%\Road to Vostok\`. No Steam launch options needed.
+- **Currently installed locally:** v3.1.1 (April 2026). Mods built in this workspace require Metro v3.0+ (they use the `[registry]` opt-in and `Engine.get_meta("RTVModLib").register(...)` API introduced in 3.0).
+- **How v3.1.1 installs:** `modloader.gd` lives at `res://modloader.gd` (bundled in the game install, e.g. `C:\Program Files (x86)\Steam\steamapps\common\Road to Vostok\modloader.gd`) and is wired in via `override.cfg`'s `[autoload_prepend] ModLoader="*res://modloader.gd"`. No Steam launch options needed. Mod `.vmz` files go in `<game>\mods\`.
 - **Features:** pre-game launcher window with mod list and per-mod toggles; conflict detection (writes `modloader_conflicts.txt` to user data); built-in ModWorkshop integration for downloads/updates; `.vmz` mounting via `vmz_mount_cache/`.
 
 ### VostokMods (Alternative)
@@ -450,7 +450,7 @@ func _process(delta):
 | Git | required | installed | RTV_history snapshot repo + general workflow |
 | Godot Editor 4.6.x | required | installed (4.6.2) | edit/build mods, run them from source |
 | GDRE Tools | required | installed (v2.5.0-beta.5) | decompile RTV.pck into readable GDScript |
-| Metro Mod Loader | required | installed (v2.0.0) | actually loads `.vmz` mods at game start |
+| Metro Mod Loader | required | installed (v3.1.1) | actually loads `.vmz` mods at game start |
 | DepotDownloader | optional | installed | grab specific historical RTV builds from Steam (for backfilling old snapshots) |
 | VS Code + GDScript extension | recommended | check IDE | syntax highlighting + autocomplete |
 
@@ -514,12 +514,13 @@ Steam tool for downloading specific app/depot builds — useful for **backfillin
 
 ### Metro Mod Loader
 
-The actual mod loader that runs at game launch. We have v2.0.0 installed.
+The actual mod loader that runs at game launch. We have v3.1.1 installed.
 
 - **ModWorkshop:** https://modworkshop.net/mod/55623
 - **Source:** https://github.com/ametrocavich/vostok-mod-loader (published as "Metro Mod Loader")
-- **Setup (v2.0.0):** drop `override.cfg` next to `C:\Program Files (x86)\Steam\steamapps\common\Road to Vostok\RTV.exe` and `modloader.gd` into `%APPDATA%\Road to Vostok\`. No Steam launch options. Mod `.vmz` files go into `<game>\mods\`.
-- **Verifying which version is installed:** look at the size of `%APPDATA%\Road to Vostok\modloader.gd` — v2.0.0 is exactly 67,141 bytes (MD5 `61bbf6edda9e23310cbe39cadb1ca5d3`). Newer 3.x versions are ~500KB and live at `res://modloader.gd` (bundled in a PCK) instead of `user://`.
+- **Setup (v3.1.1):** install via the loader's bundled installer (or copy `modloader.gd` to `C:\Program Files (x86)\Steam\steamapps\common\Road to Vostok\modloader.gd` and drop `override.cfg` in the same directory with `[autoload_prepend] ModLoader="*res://modloader.gd"`). Mod `.vmz` files go into `<game>\mods\`. No Steam launch options needed.
+- **Mods built in this workspace require Metro v3.0+.** They use the `[registry]` opt-in in `mod.txt` and call `Engine.get_meta("RTVModLib").register(SCENES, ...)` for cooperative item registration. Earlier loader versions don't expose that API.
+- **Verifying which version is installed:** v3.x lives at `res://modloader.gd` (in the game install directory, ~500KB). The older v2.0.0 lived at `%APPDATA%\Road to Vostok\modloader.gd` (67,141 bytes) and is no longer compatible with mods built here.
 - See the "Mod Loaders" section above for the VostokMods alternative.
 
 ### VS Code + Godot GDScript extension (recommended)
@@ -551,7 +552,7 @@ These are local helper scripts, not external tools:
 
 The `rtv-mod-impact-tracker` tool keeps a git history of decompiled scripts and tells us which of our mods will break on each game patch. It lives in its own repo at `F:\rtv-mod-impact-tracker\` and is driven from this workspace via `mod_tracker.toml` and the `snapshot.bat` / `analyze_mods.bat` wrappers.
 
-For the tool's own documentation (install, full CLI reference, contribution notes) see the [tracker repo's README](../rtv-mod-impact-tracker/README.md).
+For the tool's own documentation (install, full CLI reference, contribution notes) see the tracker's own repo — it's a separate clone at `F:\rtv-mod-impact-tracker\` on this workspace and is not bundled here. Public link TBD if/when that repo is opened.
 
 ### How it works
 
@@ -733,37 +734,41 @@ F:\RoadToVostokMods\                   # this workspace
 ├── README.md                          # This file
 ├── CLAUDE.md                          # Quick reference for Claude
 ├── mod_tracker.toml                   # Config consumed by rtv-mod-impact-tracker
-├── snapshot.bat                       # Wrapper -> F:\rtv-mod-impact-tracker\snapshot.py
-├── analyze_mods.bat                   # Wrapper -> F:\rtv-mod-impact-tracker\analyze_mods.py
-├── changelog.bat                      # Wrapper -> F:\rtv-mod-impact-tracker\changelog.py
-├── fetch_version.bat                  # Wrapper -> F:\rtv-mod-impact-tracker\fetch_version.py
-├── modworkshop.bat                    # Wrapper -> tools\modworkshop.py (browse the API)
-├── publish.bat                        # Wrapper -> tools\publish.py (build + install + open ModWorkshop)
 ├── manifests.json                     # Steam manifest registry (consumed by fetch_version)
+├── snapshot.bat / analyze_mods.bat / changelog.bat / fetch_version.bat
+│                                      # Wrappers -> F:\rtv-mod-impact-tracker\*.py (game-tracking)
+├── deps_fetch.bat / deps_diff.bat / deps_audit.bat / deps_changelog.bat
+│                                      # Wrappers -> F:\rtv-mod-impact-tracker\deps_*.py (Metro/MCM dep tracking)
+├── publish.bat                        # Wrapper -> tools\publish.py (build + install + open ModWorkshop)
+├── modworkshop.bat                    # Wrapper -> tools\modworkshop.py (browse the API)
+├── scaffold.bat                       # Wrapper -> tools\scaffold_mod.py (scaffold a new mod)
+├── shared/
+│   ├── Logger.gd                      # Canonical Logger source (synced into each mod)
+│   ├── ADDING_ITEMS.md                # Modder guide for adding items to the Database
+│   └── README.md                      # Index of shared/ contents
 ├── tools/
-│   ├── modworkshop.py                 # ModWorkshop API client (read-only)
 │   ├── publish.py                     # Mod publish workflow (build/install/open)
+│   ├── scaffold_mod.py                # Generate a new mod folder from templates
+│   ├── modworkshop.py                 # ModWorkshop API client (read-only)
 │   ├── save_backup.py                 # Backup/restore RTV save files
 │   ├── sync_logger.py                 # Sync shared/Logger.gd into each mod
-│   └── GDRE_tools/                    # Godot RE Tools v2.5.0-beta.5
-│       ├── gdre_tools.exe
-│       ├── gdre_tools.pck
-│       └── GodotMonoDecompNativeAOT.dll
-├── reference/
+│   ├── GDRE_tools/                    # Godot RE Tools v2.5.0-beta.5 (decompiler)
+│   ├── Godot/                         # Godot Editor 4.6.2
+│   └── DepotDownloader/               # Steam depot tool (historical builds)
+├── reference/                         # gitignored
 │   ├── RTV_decompiled/                # Working copy of decompiled game source
-│   │   ├── project.godot              # Game project file
-│   │   ├── gdre_export.log            # Decompilation log
-│   │   └── Scripts/                   # 176 GDScript files (30,153 lines)
-│   └── RTV_history/                   # Git repo: one commit per game version
-│       └── (tagged as game-v<ver>-build<buildid>)
+│   ├── RTV_history/                   # Git repo: one commit per game version
+│   ├── MetroModLoader_source/         # Local mirror clone of Metro upstream
+│   └── MCM_source/                    # Local mirror clone of MCM upstream
 ├── mods/                              # Our mod projects
-│   ├── CatAutoFeed/
-│   ├── PunisherGuarantee/
-│   ├── RTVModItemRegistry/            # Coordination shim for multiple item-adding mods (REGISTRY.md)
+│   ├── CatAutoFeed/                   # Auto-feeds the cat from a placeable bowl
+│   ├── PunisherGuarantee/             # Removes RNG gates on the Punisher boss event
+│   ├── RTVModItemRegistry/            # RETIRED — superseded by Metro v3.x's built-in registry
 │   ├── RTVModLogger/                  # Demo + reusable logging library (Logger.gd + LOGGER.md)
-│   └── RTVWallets/
-├── diff_reports/                      # HTML output from analyze_mods.bat (optional)
-└── notes/                             # Learning notes, ideas
+│   └── RTVWallets/                    # Lootable wallet items that hold cash
+├── docs/
+│   └── archive/                       # Historical workspace docs (design plans, retired test mods)
+└── diff_reports/                      # gitignored — HTML output from analyze_mods.bat
 
 F:\rtv-mod-impact-tracker\             # standalone tool repo (separate)
 ├── README.md                          # Tool documentation

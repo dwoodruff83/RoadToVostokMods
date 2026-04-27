@@ -8,8 +8,10 @@ has its own embedded copy at `mods/<ModName>/<File>.gd`.
 
 | File | Purpose |
 |---|---|
-| `Logger.gd` | Reusable logging framework (debug/info/warn/error, file + overlay output, MCM integration). |
-| `LOGGER.md` | Public guide — what gets published alongside `Logger.gd` when sharing with other modders. |
+| `Logger.gd` | Reusable logging framework (debug/info/success/warn/error/notify, file + overlay output, MCM integration). Synced into each consumer mod's folder via `tools/sync_logger.py`. |
+| `ADDING_ITEMS.md` | End-to-end modder guide for adding new items to the vanilla `Database` (`.tres` schema, world scene construction, inventory sprite, registration). |
+
+> The full Logger API reference (`LOGGER.md`) lives at [`mods/RTVModLogger/LOGGER.md`](../mods/RTVModLogger/LOGGER.md) — colocated with the demo + reusable library mod.
 
 ## Sync workflow
 

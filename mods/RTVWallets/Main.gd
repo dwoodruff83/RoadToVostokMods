@@ -16,11 +16,31 @@ const ITEM_PATHS := [
 func _ready() -> void:
     name = "RTVWallets"
     _log("debug", "RTV Wallets mod loaded")
-    _inject_database()
+    _register_with_metro()
     _register_with_loot_master()
     _override_item_value()
     _override_interface()
     set_process_unhandled_input(true)
+
+
+# Registers each wallet tier as a SCENES entry via Metro's registry API.
+# Metro v3.x wraps Database.gd at loader startup when [registry] is declared
+# in mod.txt, so Database.get("Leather_Wallet") etc. resolves to our scenes.
+func _register_with_metro() -> void:
+    var lib = Engine.get_meta("RTVModLib") if Engine.has_meta("RTVModLib") else null
+    if lib == null:
+        _log("error", "Metro Mod Loader not detected — wallet items will not be registered. Install Metro v3.x or newer.")
+        return
+    await lib.frameworks_ready
+
+    var ok_w: bool = lib.register(lib.Registry.SCENES, "Leather_Wallet", preload("res://mods/RTVWallets/Leather_Wallet.tscn"))
+    var ok_t: bool = lib.register(lib.Registry.SCENES, "Ammo_Tin", preload("res://mods/RTVWallets/Ammo_Tin.tscn"))
+    var ok_c: bool = lib.register(lib.Registry.SCENES, "Money_Case", preload("res://mods/RTVWallets/Money_Case.tscn"))
+    var ok_cash: bool = lib.register(lib.Registry.SCENES, "Cash", preload("res://mods/RTVWallets/Cash.tscn"))
+    if ok_w and ok_t and ok_c and ok_cash:
+        _log("debug", "RTV Wallets items registered with Metro (SCENES)")
+    else:
+        _log("warn", "Metro rejected one or more wallet SCENES registrations (Leather_Wallet=%s Ammo_Tin=%s Money_Case=%s Cash=%s)" % [ok_w, ok_t, ok_c, ok_cash])
 
 # Swaps res://Scripts/Item.gd with our subclass so inventory/container/supply
 # totals include wallet cash via the overridden Value() method.
@@ -94,54 +114,6 @@ func _dump_stash() -> void:
         _log("info", "  %s: %d / %d €" % [slot.itemData.name, int(slot.amount), int(slot.itemData.maxAmount)])
     _log("info", "Total balance: %d €" % total_balance())
     _log("info", "Total free space: %d €" % total_free_capacity())
-
-func _inject_database() -> void:
-    # Prefer RTVModItemRegistry's coordinated registration if installed —
-    # this lets RTV Wallets coexist with other Database-extending mods (e.g.
-    # CatAutoFeed). Fall back to legacy direct injection in single-mod
-    # setups so RTV Wallets still works without the registry.
-    # get_node_or_null sometimes misses cross-mod autoloads even when they
-    # ARE in the tree; fall back to find_child the same way we look up
-    # /root/Database below.
-    var registry = get_node_or_null("/root/ModItemRegistry")
-    if registry == null:
-        registry = get_tree().root.find_child("ModItemRegistry", true, false)
-    if registry and registry.has_method("register"):
-        var ok_w: bool = registry.register("Leather_Wallet", preload("res://mods/RTVWallets/Leather_Wallet.tscn"))
-        var ok_t: bool = registry.register("Ammo_Tin", preload("res://mods/RTVWallets/Ammo_Tin.tscn"))
-        var ok_c: bool = registry.register("Money_Case", preload("res://mods/RTVWallets/Money_Case.tscn"))
-        var ok_cash: bool = registry.register("Cash", preload("res://mods/RTVWallets/Cash.tscn"))
-        if ok_w and ok_t and ok_c and ok_cash:
-            _log("debug", "RTV Wallets items registered with ModItemRegistry")
-            return
-        _log("warn", "ModItemRegistry rejected one or more RTV Wallets items (Leather_Wallet=%s Ammo_Tin=%s Money_Case=%s Cash=%s); falling back to legacy" % [ok_w, ok_t, ok_c, ok_cash])
-        _inject_database_legacy()
-        return
-
-    _log("debug", "RTVModItemRegistry not installed — using legacy in-place injection (incompatible with sibling Database-extending mods)")
-    _inject_database_legacy()
-
-
-# Legacy direct take_over_path / set_script injection. Kept for users who
-# install only RTV Wallets (no registry). Will fight other mods doing the same;
-# install RTVModItemRegistry to coordinate.
-func _inject_database_legacy() -> void:
-    var inject = load("res://mods/RTVWallets/DatabaseInject.gd")
-    if inject == null:
-        _log("error", "Could not load DatabaseInject.gd")
-        return
-    inject.reload()
-    inject.take_over_path("res://Scripts/Database.gd")
-
-    var db = get_node_or_null("/root/Database")
-    if db == null:
-        db = get_tree().root.find_child("Database", true, false)
-    if db:
-        db.set_script(inject)
-        var test = db.get("Leather_Wallet")
-        _log("debug", "Database injected (legacy) — Leather_Wallet resolves to: %s" % str(test))
-    else:
-        _log("warn", "Database autoload not found; items may not resolve until next load")
 
 # --- Stash API: aggregates across every wallet the player is carrying ----------
 #

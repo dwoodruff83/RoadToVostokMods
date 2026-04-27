@@ -1,5 +1,23 @@
 # RTV Mod Item Registry
 
+> **RETIRED — superseded by Metro Mod Loader v3.x's built-in registry.**
+>
+> Metro v3.0.0 added a native `[registry]` opt-in (mod.txt) plus an
+> `Engine.get_meta("RTVModLib").register(SCENES/ITEMS/LOOT/...)` API that
+> covers everything this mod was built to coordinate — and more. There is no
+> reason to install this alongside Metro v3.0+; the in-loader implementation
+> wraps `Database.gd` at startup before any user mod runs and provides a
+> superset of verbs (register / override / patch / remove / revert) across
+> 16 registries.
+>
+> The source is preserved here as workspace history. **Not published to
+> ModWorkshop. Do not depend on this mod for new work — use Metro's registry
+> directly.** See Metro's [Registry docs](https://github.com/ametrocavich/vostok-mod-loader/blob/development/docs/wiki/Registry.md).
+
+---
+
+## Original purpose (historical)
+
 > Lets multiple mods add new items to the vanilla `Database` autoload without
 > clobbering each other.
 
@@ -87,7 +105,7 @@ This is a Godot engine reality, not something the registry can patch around: `se
 
 ## Credits
 
-Built for the Road to Vostok modding ecosystem. In-game diagnostic configuration via the [Mod Configuration Menu](https://modworkshop.net/mod/53713) by DoinkOink. Logging output via [RTV Mod Logger](https://modworkshop.net/mod/PENDING).
+Built for the Road to Vostok modding ecosystem. In-game diagnostic configuration via the [Mod Configuration Menu](https://modworkshop.net/mod/53713) by DoinkOink. Logging output via RTV Mod Logger (sibling workspace mod).
 
 ## License
 

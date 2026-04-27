@@ -8,8 +8,8 @@ No more returning to base every 40 minutes to drop a can of tuna in the feeder. 
 
 1. Drop `CatAutoFeed.vmz` into the game's `mods/` folder:
    `...\steamapps\common\Road to Vostok\mods\`
-2. Ensure a compatible mod loader is installed (e.g. [Metro Mod Loader](https://modworkshop.net/mod/55623), the most popular for Road to Vostok).
-3. **Recommended:** also install Mod Configuration Menu (MCM) — the mod runs without it, but settings can only be tweaked in-game when MCM is present.
+2. **Required:** [Metro Mod Loader](https://modworkshop.net/mod/55623) v3.0.0 or later. The mod uses Metro's built-in registry API (`[registry]` opt-in in mod.txt) to add the Cat Food Bowl to the game's item database — earlier loaders without the registry won't recognise the bowl.
+3. **Recommended:** also install [Mod Configuration Menu (MCM)](https://modworkshop.net/mod/53713) — the mod runs without it, but settings can only be tweaked in-game when MCM is present.
 4. Launch the game. The mod auto-detects the cat's shelter on the first check (it scans each shelter save for the litter-box / cat-carrier item placed when you rescued the cat).
 
 ## Features
@@ -41,6 +41,7 @@ Plus the standard Logger category (level, file output, overlay output). See [the
 
 ## Compatibility
 
+- **Metro Mod Loader v3.0.0+ required.** Cat_Bowl is added via Metro's registry (`lib.register(SCENES, ...)` and `lib.register(LOOT, ...)`), which means it coexists cleanly with any other mod also using the registry — no `take_over_path` collisions.
 - **Incompatible with** other cat-feeding mods (e.g. *Cat Food Shelter*). Remove them before installing to avoid double-feeding.
 - **MCM is optional** — the mod runs with sensible defaults if MCM is absent. It is only required for in-game configuration.
 - **Uninstalling drops bowls and contents.** Save files reference the bowl via `res://mods/CatAutoFeed/Cat_Bowl.tres`. If you remove the .vmz, the game silently strips bowls (and any food they hold) from saves on next load. To migrate, empty all bowls before uninstalling.

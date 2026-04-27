@@ -23,10 +23,46 @@ var _log_node: Node = null
 func _ready() -> void:
     name = "CatAutoFeed"
     _log_node = _resolve_log_node()
-    _inject_database()
-    _inject_loot_table()
+    _register_with_metro()
     _apply_gunsmith_gate()
     _log("debug", "CatAutoFeed loaded, threshold=%d, check every %ds" % [int(_threshold()), int(CHECK_INTERVAL)])
+
+
+# Registers Cat_Bowl as a SCENES entry and adds it to LT_Master via the Metro
+# registry. Metro v3.x's [registry] opt-in (declared in mod.txt) wraps
+# Database.gd at loader startup, so SCENES registrations show up to vanilla
+# code calling Database.get("Cat_Bowl"). Loot registration uses the same
+# subsystem and survives reverts cleanly.
+func _register_with_metro() -> void:
+    var lib = Engine.get_meta("RTVModLib") if Engine.has_meta("RTVModLib") else null
+    if lib == null:
+        _log("error", "Metro Mod Loader not detected — Cat_Bowl will not be registered. Install Metro v3.x or newer.")
+        return
+    await lib.frameworks_ready
+
+    var bowl_scene = preload("res://mods/CatAutoFeed/Cat_Bowl.tscn")
+    var ok_scene: bool = lib.register(lib.Registry.SCENES, "Cat_Bowl", bowl_scene)
+    if ok_scene:
+        _log("debug", "Cat_Bowl registered with Metro (SCENES)")
+    else:
+        _log("warn", "Metro rejected Cat_Bowl SCENES registration (id collision?)")
+
+    if !_loot_enabled():
+        _log("debug", "Loot integration disabled via config")
+        return
+
+    var bowl_data = load("res://mods/CatAutoFeed/Cat_Bowl.tres")
+    if bowl_data == null:
+        _log("warn", "Cat_Bowl.tres failed to load; cannot register in LT_Master")
+        return
+    var ok_loot: bool = lib.register(lib.Registry.LOOT, "catautofeed_bowl_master", {
+        "item": bowl_data,
+        "table": "LT_Master",
+    })
+    if ok_loot:
+        _log("debug", "Cat_Bowl registered in LT_Master (rarity=%d)" % int(bowl_data.rarity))
+    else:
+        _log("warn", "Metro rejected Cat_Bowl LOOT registration in LT_Master")
 
 
 # Toggle Cat_Bowl.tres `gunsmith` flag at mod load based on the MCM setting.
@@ -41,80 +77,6 @@ func _apply_gunsmith_gate() -> void:
         return
     bowl_data.gunsmith = _gunsmith_enabled()
     _log("debug", "Cat_Bowl.gunsmith = %s" % bool(bowl_data.gunsmith))
-
-func _inject_loot_table() -> void:
-    # Add Cat_Bowl to LT_Master.items so it spawns naturally in civilian loot
-    # containers. LT_Master is preloaded by LootContainer/LootSimulation/Trader,
-    # but Resources are shared instances in Godot — mutating .items here is
-    # visible to all three subsystems for the rest of the session.
-    if !_loot_enabled():
-        _log("debug", "Loot integration disabled via config")
-        return
-
-    var lt_master = load("res://Loot/LT_Master.tres")
-    if lt_master == null or lt_master.get("items") == null:
-        _log("warn", "LT_Master.tres failed to load; bowl will not spawn in loot")
-        return
-
-    var bowl_data = load("res://mods/CatAutoFeed/Cat_Bowl.tres")
-    if bowl_data == null:
-        _log("warn", "Cat_Bowl.tres failed to load; cannot inject into loot table")
-        return
-
-    # Idempotent — match by file string in case the resource instance differs
-    # across loads.
-    for existing in lt_master.items:
-        if existing != null and String(existing.file) == String(bowl_data.file):
-            _log("debug", "Cat_Bowl already in LT_Master, skipping inject")
-            return
-    lt_master.items.append(bowl_data)
-    _log("debug", "Injected Cat_Bowl into LT_Master (rarity=%d, %d items total)" % [int(bowl_data.rarity), lt_master.items.size()])
-
-func _inject_database() -> void:
-    # Prefer RTVModItemRegistry's coordinated registration if installed —
-    # this lets CatAutoFeed coexist with other mods that add new items
-    # (e.g. RTV Wallets). Fall back to legacy direct injection in single-mod
-    # setups so the bowl still works without the registry.
-    # get_node_or_null sometimes misses cross-mod autoloads even when they
-    # ARE in the tree (autoload-from-another-mod timing); fall back to
-    # find_child the same way we look up /root/Database below.
-    var registry = get_node_or_null("/root/ModItemRegistry")
-    if registry == null:
-        registry = get_tree().root.find_child("ModItemRegistry", true, false)
-    if registry and registry.has_method("register"):
-        var bowl_scene = preload("res://mods/CatAutoFeed/Cat_Bowl.tscn")
-        var ok: bool = registry.register("Cat_Bowl", bowl_scene)
-        if ok:
-            _log("debug", "Cat_Bowl registered with ModItemRegistry")
-        else:
-            _log("warn", "ModItemRegistry rejected Cat_Bowl registration; falling back to legacy")
-            _inject_database_legacy()
-        return
-
-    _log("debug", "RTVModItemRegistry not installed — using legacy in-place injection (incompatible with sibling Database-extending mods)")
-    _inject_database_legacy()
-
-
-# Legacy direct take_over_path / set_script injection. Kept for users who
-# install only this mod (no registry). Will fight other mods doing the same;
-# install RTVModItemRegistry to coordinate.
-func _inject_database_legacy() -> void:
-    var inject = load("res://mods/CatAutoFeed/DatabaseInject.gd")
-    if inject == null:
-        _log("error", "Could not load DatabaseInject.gd")
-        return
-    inject.reload()
-    inject.take_over_path("res://Scripts/Database.gd")
-
-    var db = get_node_or_null("/root/Database")
-    if db == null:
-        db = get_tree().root.find_child("Database", true, false)
-    if db:
-        db.set_script(inject)
-        var test = db.get("Cat_Bowl")
-        _log("debug", "Database script replaced (legacy), Cat_Bowl resolves to: %s" % str(test))
-    else:
-        _log("warn", "Database autoload not found; injection may be incomplete")
 
 func _resolve_log_node() -> Node:
     var node = get_node_or_null("/root/CatAutoFeedLog")

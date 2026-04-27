@@ -18,7 +18,7 @@ from pathlib import Path
 
 MOD_ID = "CatAutoFeed"
 ROOT_FILES = ["mod.txt", "README.md", "CHANGELOG.md", "NOTICES.txt", "LICENSE"]
-MOD_FILES = ["Main.gd", "config.gd", "Logger.gd", "BowlPickup.gd", "BowlContentsPanel.gd", "DatabaseInject.gd", "Cat_Bowl.tres", "Cat_Bowl_2x2.tscn", "Cat_Bowl.tscn"]
+MOD_FILES = ["Main.gd", "config.gd", "Logger.gd", "BowlPickup.gd", "BowlContentsPanel.gd", "Cat_Bowl.tres", "Cat_Bowl_2x2.tscn", "Cat_Bowl.tscn"]
 ASSET_DIRS = ["assets"]
 GAME_MODS_DIR = Path(r"C:\Program Files (x86)\Steam\steamapps\common\Road to Vostok\mods")
 VERSION_RE = re.compile(r'^(version\s*=\s*)"([^"]+)"', re.MULTILINE)

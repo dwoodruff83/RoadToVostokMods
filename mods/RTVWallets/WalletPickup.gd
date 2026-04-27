@@ -13,6 +13,12 @@ func _ready() -> void:
     if collision and meshes.size() > 0:
         _setup_box_collision_from_combined_aabb(meshes)
 
+    # Sketchfab Euro50 GLB has emissive PBR baked in — looks like a glowing
+    # beacon in RTV's dim shelter/loot lighting. Override the materials with
+    # dimmed copies (emission off, albedo × 0.5) so cash blends in like loot.
+    if _is_cash():
+        _dim_meshes(meshes)
+
     var proxy := MeshInstance3D.new()
     proxy.name = "MeshProxy"
     var proxy_box := BoxMesh.new()
@@ -23,6 +29,27 @@ func _ready() -> void:
     mesh = proxy
 
     super()
+
+func _is_cash() -> bool:
+    return slotData != null and slotData.itemData != null \
+        and String(slotData.itemData.file) == "Cash"
+
+func _dim_meshes(meshes: Array) -> void:
+    for node in meshes:
+        var mi := node as MeshInstance3D
+        if mi == null or mi.mesh == null:
+            continue
+        for i in mi.mesh.get_surface_count():
+            var src := mi.get_active_material(i)
+            if src == null:
+                continue
+            var dim := src.duplicate()
+            if dim is StandardMaterial3D:
+                var sm := dim as StandardMaterial3D
+                sm.emission_enabled = false
+                var a := sm.albedo_color
+                sm.albedo_color = Color(a.r * 0.5, a.g * 0.5, a.b * 0.5, a.a)
+            mi.set_surface_override_material(i, dim)
 
 # Merges AABBs of every MeshInstance3D under this pickup — many GLBs
 # (e.g. wallets) have multiple mesh parts (body + button), and using only

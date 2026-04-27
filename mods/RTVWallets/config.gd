@@ -4,11 +4,6 @@ const MOD_ID := "RTVWallets"
 const MOD_NAME := "RTV Wallets"
 const FILE_PATH := "user://MCM/RTVWallets"
 
-const WALLETS := preload("res://mods/RTVWallets/wallets.gd")
-
-var enabled := true
-var notify_on_transfer := true
-var tier_enabled: Dictionary = {}
 var stash_report_keycode := KEY_F9
 
 var _mcm_helpers = null
@@ -21,25 +16,6 @@ func _ready() -> void:
     var config := ConfigFile.new()
 
     config.set_value("Category", "General", { "menu_pos": 1 })
-    config.set_value("Category", "Tiers",   { "menu_pos": 2 })
-
-    config.set_value("Bool", "enabled", {
-        "name" = "Enable Wallet",
-        "tooltip" = "Master toggle for the RTV Wallets mod.",
-        "default" = true,
-        "value" = true,
-        "category" = "General",
-        "menu_pos" = 1,
-    })
-
-    config.set_value("Bool", "notify_on_transfer", {
-        "name" = "Notify On Transfer",
-        "tooltip" = "Show an on-screen message when cash is moved to or from a wallet.",
-        "default" = true,
-        "value" = true,
-        "category" = "General",
-        "menu_pos" = 2,
-    })
 
     config.set_value("Keycode", "stash_report_hotkey", {
         "name" = "Stash Report Hotkey",
@@ -49,20 +25,8 @@ func _ready() -> void:
         "value" = KEY_F9,
         "type" = "Key",
         "category" = "General",
-        "menu_pos" = 3,
+        "menu_pos" = 1,
     })
-
-    var pos := 10
-    for tier in WALLETS.TIERS:
-        config.set_value("Bool", "tier_" + tier.id, {
-            "name" = "Enable: " + tier.name,
-            "tooltip" = "Register this wallet tier (capacity " + str(tier.capacity) + ").",
-            "default" = true,
-            "value" = true,
-            "category" = "Tiers",
-            "menu_pos" = pos,
-        })
-        pos += 1
 
     var logger = _resolve_logger()
     if logger:
@@ -120,13 +84,7 @@ func _apply(config: ConfigFile) -> void:
     if err == OK:
         config = fresh
 
-    enabled = config.get_value("Bool", "enabled", {"value": true})["value"]
-    notify_on_transfer = config.get_value("Bool", "notify_on_transfer", {"value": true})["value"]
     stash_report_keycode = int(config.get_value("Keycode", "stash_report_hotkey", {"value": KEY_F9})["value"])
-    tier_enabled.clear()
-    for tier in WALLETS.TIERS:
-        var entry = config.get_value("Bool", "tier_" + tier.id, {"value": true})
-        tier_enabled[tier.id] = bool(entry["value"])
 
     var logger = _resolve_logger()
     if logger:

@@ -3,6 +3,27 @@
 All notable changes to the Cat Auto Feed mod are documented here. Dates are
 YYYY-MM-DD.
 
+## 1.1.0 — 2026-04-26
+
+Migrated to Metro Mod Loader v3.x's built-in registry API; dropped the
+RTVModItemRegistry soft-dependency.
+
+- **Cat_Bowl now registered via `lib.register(SCENES, ...)`** in Metro v3.x's
+  registry instead of overriding Database.gd via `take_over_path`. Metro
+  wraps Database.gd at loader startup when any mod declares `[registry]` in
+  mod.txt, so multiple item-adding mods coexist without clobbering each
+  other. Replaces the previous RTVModItemRegistry coordination shim.
+- **Cat_Bowl loot-table inject migrated** from direct `LT_Master.items.append`
+  to `lib.register(LOOT, "catautofeed_bowl_master", {...})`. Idempotent and
+  conflict-checked by Metro.
+- **`DatabaseInject.gd` removed** from the package — Metro owns the Database
+  wrapping now, no per-mod inject script needed.
+- **Soft-dependency on RTVModItemRegistry dropped.** Metro v3.0+ replaces it
+  natively; no third-party coordination library required.
+- **Hard requirement bump:** Metro Mod Loader v3.0.0 or later. Earlier
+  versions won't recognise the `[registry]` opt-in and the bowl won't appear
+  in-game.
+
 ## 1.0.0 — 2026-04-26
 
 First public release. Feature set frozen at 0.3.0; this entry captures the

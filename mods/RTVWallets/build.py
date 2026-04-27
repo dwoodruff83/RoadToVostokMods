@@ -21,12 +21,10 @@ ROOT_FILES = ["mod.txt", "README.md", "CHANGELOG.md", "NOTICES.txt", "LICENSE"]
 MOD_FILES = [
     "Main.gd",
     "config.gd",
-    "wallets.gd",
     "ItemOverride.gd",
     "InterfaceOverride.gd",
     "Logger.gd",
     "WalletPickup.gd",
-    "DatabaseInject.gd",
     "Leather_Wallet.tres",
     "Leather_Wallet_1x1.tscn",
     "Leather_Wallet.tscn",

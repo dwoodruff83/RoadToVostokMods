@@ -3,6 +3,21 @@
 All notable changes to the RTV Wallets mod are documented here. Dates are
 YYYY-MM-DD.
 
+## 0.3.0 — 2026-04-26
+
+Migrated to Metro Mod Loader v3.x's built-in registry API; dropped the
+RTVModItemRegistry soft-dependency.
+
+- **Wallet/Cash scenes registered via `lib.register(SCENES, ...)`** in Metro
+  v3.x's registry instead of overriding Database.gd via `take_over_path`.
+  Metro wraps Database.gd at loader startup when any mod declares
+  `[registry]` in mod.txt, so multiple item-adding mods coexist without
+  clobbering each other.
+- **`DatabaseInject.gd` removed** from the package — Metro owns the Database
+  wrapping now.
+- **Soft-dependency on RTVModItemRegistry dropped.**
+- **Hard requirement bump:** Metro Mod Loader v3.0.0 or later.
+
 ## 0.2.0 — 2026-04-25
 
 Three placeable wallet items.
