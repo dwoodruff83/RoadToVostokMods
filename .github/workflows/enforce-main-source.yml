@@ -15,10 +15,18 @@ jobs:
   check-source-branch:
     runs-on: ubuntu-latest
     steps:
-      - name: Verify source is staging
+      - name: Verify source is staging from this repo
         run: |
+          # Reject fork PRs. Forks can only PR through staging in their own
+          # fork, and that source repo isn't this one — block them. Combined
+          # with the repo's collaborator list controlling who can push to
+          # this repo's staging, this gates main to repo-write-access only.
+          if [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]; then
+            echo "::error::PRs to main must originate from a branch in this repo, not a fork. Source repo: ${{ github.event.pull_request.head.repo.full_name }}"
+            exit 1
+          fi
           if [ "${{ github.head_ref }}" != "staging" ]; then
             echo "::error::PRs to main must come from the 'staging' branch only. Got: '${{ github.head_ref }}'"
             exit 1
           fi
-          echo "PR source is 'staging' — OK"
+          echo "PR source is 'staging' from this repo — OK"

@@ -1,0 +1,50 @@
+name: Create release on tag push
+
+# Monorepo release automation. When a prefixed version tag
+# (<ModId>-vX.Y.Z) is pushed, create a corresponding GitHub Release.
+# Version 0.x.x tags are pre-releases; 1.x.x+ are full releases.
+# Releases are NOT marked --latest because "latest" doesn't make sense
+# across multiple mods in one repo (each mod has its own version cycle).
+# Release notes auto-generated from commit history since the previous tag.
+
+on:
+  push:
+    tags:
+      - '*-v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine release type
+        id: type
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          # Tag shape: <ModId>-v<X.Y.Z>. Extract the version after the LAST '-v'.
+          VERSION="${TAG##*-v}"
+          MAJOR="${VERSION%%.*}"
+          if [ "$MAJOR" = "0" ]; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+            echo "Tag $TAG is 0.x.x — marking as pre-release"
+          else
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+            echo "Tag $TAG is $MAJOR.x.x — marking as full release"
+          fi
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          if [ "${{ steps.type.outputs.prerelease }}" = "true" ]; then
+            gh release create "$TAG" --generate-notes --prerelease --title "$TAG" --latest=false
+          else
+            gh release create "$TAG" --generate-notes --title "$TAG" --latest=false
+          fi
