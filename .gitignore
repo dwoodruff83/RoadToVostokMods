@@ -13,9 +13,10 @@ tools/DepotDownloader/
 # --- Steam-fetched / decompile scratch (regenerated each backfill) ---
 tools/_versions/
 
-# --- ModWorkshop stats history (operational data; regenerable from API) ---
+# --- ModWorkshop stats history + comment archive (operational data; regenerable from API) ---
 tools/mw_stats.csv
 tools/mw_stats_state.json
+tools/mw_comments_archive.json
 
 # --- Mod-impact diff reports (contain decompiled source diffs — keep local only) ---
 diff_reports/*
