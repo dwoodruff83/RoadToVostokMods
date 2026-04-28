@@ -3,6 +3,11 @@
 All notable changes to the RTV Wallets mod are documented here. Dates are
 YYYY-MM-DD.
 
+## 1.0.1 — 2026-04-26
+
+Re-upload to register the ModWorkshop mod id (`modworkshop=56408` in
+`[updates]`). No functional changes from 1.0.0.
+
 ## 1.0.0 — 2026-04-26
 
 First public release. Trader integration polished, MCM trimmed to settings
