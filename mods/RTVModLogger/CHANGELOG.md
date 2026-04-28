@@ -3,6 +3,11 @@
 All notable changes to the RTV Mod Logger are documented here. Dates are
 YYYY-MM-DD.
 
+## 1.0.1 — 2026-04-26
+
+Re-upload to register the ModWorkshop mod id (`modworkshop=56406` in
+`[updates]`). No functional changes from 1.0.0.
+
 ## 1.0.0 — 2026-04-25
 
 First public release. API is stable; embed `Logger.gd` freely.
