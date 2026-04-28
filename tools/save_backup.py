@@ -94,7 +94,16 @@ def resolve_backup(name: str) -> Path:
         sys.exit(f"No backups directory: {BACKUP_ROOT}")
 
     if name == "latest":
-        entries = sorted([p for p in BACKUP_ROOT.iterdir() if p.is_dir()])
+        # Exclude pre-restore-* snapshots: those are auto-created safety nets
+        # written by do_restore() before clobbering the live save folder, not
+        # user-intended backups. They also break a pure name sort (the prefix
+        # sorts after plain "2026-..." timestamps in ASCII), so without this
+        # filter "latest" would pick the most recent pre-restore over the
+        # most recent real backup. Still resolvable by explicit name.
+        entries = sorted(
+            p for p in BACKUP_ROOT.iterdir()
+            if p.is_dir() and not p.name.startswith("pre-restore-")
+        )
         if not entries:
             sys.exit("No backups to restore.")
         return entries[-1]
