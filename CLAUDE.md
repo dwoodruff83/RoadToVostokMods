@@ -35,7 +35,7 @@ This is a modding workspace for **Road to Vostok**, a survival FPS built in Godo
 | `F:\RoadToVostokMods\shared\Logger.gd` | Canonical reusable Logger source (synced into each mod) |
 | `F:\RoadToVostokMods\mods\RTVModLogger\` | Standalone demo + reusable logging library mod (ships `Logger.gd` for other modders) |
 | `F:\RoadToVostokMods\mods\RTVModLogger\LOGGER.md` | Full modder-facing reference for the logger (formerly in `shared/`) |
-| `F:\RoadToVostokMods\mods\RTVModItemRegistry\` | **RETIRED** as of 2026-04-26 — superseded by Metro v3.x's built-in `[registry]` API. Source kept for workspace history; not in publish set. Consumer mods migrated to `Engine.get_meta("RTVModLib").register(...)` |
+| `F:\RoadToVostokMods\docs\archive\RTVModItemRegistry\` | **RETIRED & ARCHIVED** 2026-04-27 — superseded by Metro v3.x's built-in `[registry]` API (verified working). Source kept for workspace history; not in publish set. Consumer mods migrated to `Engine.get_meta("RTVModLib").register(...)` |
 | `F:\RoadToVostokMods\reference\RTV_history\` | Git repo of decompiled snapshots, one commit per game version |
 | `F:\RoadToVostokMods\mods\` | Our mod projects |
 | `F:\RoadToVostokMods\docs\archive\` | Historical workspace docs (design plans, retired test mod fixtures). Not bundled into any `.vmz` |

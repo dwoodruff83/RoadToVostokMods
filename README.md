@@ -763,11 +763,10 @@ F:\RoadToVostokMods\                   # this workspace
 ├── mods/                              # Our mod projects
 │   ├── CatAutoFeed/                   # Auto-feeds the cat from a placeable bowl
 │   ├── PunisherGuarantee/             # Removes RNG gates on the Punisher boss event
-│   ├── RTVModItemRegistry/            # RETIRED — superseded by Metro v3.x's built-in registry
 │   ├── RTVModLogger/                  # Demo + reusable logging library (Logger.gd + LOGGER.md)
 │   └── RTVWallets/                    # Lootable wallet items that hold cash
 ├── docs/
-│   └── archive/                       # Historical workspace docs (design plans, retired test mods)
+│   └── archive/                       # Historical workspace docs (design plans, retired mods incl. RTVModItemRegistry)
 └── diff_reports/                      # gitignored — HTML output from analyze_mods.bat
 
 F:\rtv-mod-impact-tracker\             # standalone tool repo (separate)
