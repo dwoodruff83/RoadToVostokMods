@@ -3,6 +3,44 @@
 All notable changes to the Cat Auto Feed mod are documented here. Dates are
 YYYY-MM-DD.
 
+## 1.1.2 — 2026-04-27
+
+Critical performance fix. Players reported severe FPS drops (e.g. 140 → 30)
+after installing the mod; root cause was the per-frame mental-buff hot path
+calling a "cache" that re-validated itself with a disk read on every frame.
+
+- **`_find_cat_shelter()` now trusts the cache** instead of re-validating it
+  on every call. The previous implementation called `_shelter_has_catbox()`
+  to confirm the cache, which loaded the shelter `.tres` from disk and
+  iterated its items each call. From `_maybe_buff_mental_from_cat()` (running
+  every frame) that became a per-frame disk read. Trade-off: if the player
+  relocates the catbox to a different shelter mid-session, the buff/feed
+  tracks the original shelter until next game launch. Catboxes rarely move,
+  so this is the right trade.
+- **`_maybe_buff_mental_from_cat()` early-returns on empty cache.** Until the
+  5-second `_try_auto_feed` tick has populated `_cached_cat_shelter`, the
+  per-frame buff function is now a single property read and return — no
+  config calls, no `gameData` reads, no node lookups. Once the cache is
+  populated the function does its existing gates (config, gameData, current
+  map) and applies the buff. Cheap checks reordered to the front.
+- **Cache population hoisted in `_try_auto_feed()`.** The tick now calls
+  `_find_cat_shelter()` immediately after the early-exit gates, before the
+  hunger-threshold check. Previously the lookup only ran when the cat was
+  actually hungry, so a fed cat never populated the cache, which meant the
+  per-frame mental buff stayed dormant indefinitely. With the hoist, the
+  cache fills within ~5s of game load whenever the cat is rescued and the
+  catbox is placed.
+- **First-buff latency:** up to ~5 seconds after game load (one auto-feed
+  tick) before the cat company mental buff activates. After that it ticks
+  every frame until the player leaves the cat shelter. Mental gain rate
+  (`delta / 4.0`, ~0.25/sec) and all gates (cat alive / rescued /
+  not-in-menu / in-the-cat-shelter) unchanged.
+
+## 1.1.1 — 2026-04-26
+
+Re-upload to register the ModWorkshop mod id (`modworkshop=56407` in
+`[updates]`). No functional changes from 1.1.0.
+
 ## 1.1.0 — 2026-04-26
 
 Migrated to Metro Mod Loader v3.x's built-in registry API; dropped the

@@ -120,17 +120,19 @@ func _process(delta: float) -> void:
 # (mirrors the gates on _try_auto_feed). No log output — vanilla's fire
 # buff is silent and players see the gain through the mental HUD readout.
 func _maybe_buff_mental_from_cat(delta: float) -> void:
+    # FAST PATH: until we know which shelter holds the catbox, skip all
+    # per-frame work. The 5s _try_auto_feed tick populates _cached_cat_shelter
+    # the first time the catbox is detected; until then this function is a
+    # single property read and return.
+    if _cached_cat_shelter == "":
+        return
     if !_enabled() or !_cat_company_enabled():
         return
     if gameData.settings or gameData.transition or gameData.isDead:
         return
     if !gameData.catFound or gameData.catDead:
         return
-    var current_map := _current_map_name()
-    if current_map == "":
-        return
-    var cat_shelter := _find_cat_shelter()
-    if cat_shelter == "" or current_map != cat_shelter:
+    if _current_map_name() != _cached_cat_shelter:
         return
     gameData.mental += delta / 4.0
 
@@ -156,6 +158,13 @@ func _try_auto_feed() -> void:
         _log("debug", "Tick: cat is dead")
         return
 
+    # Populate the cat-shelter cache before any early-returns below. The
+    # per-frame mental buff (_maybe_buff_mental_from_cat) reads this cache
+    # and short-circuits when it's empty; if we deferred the lookup until
+    # after the hunger-threshold gate, the buff would never engage while
+    # the cat is fed. Cheap once cached.
+    var shelter_name := _find_cat_shelter()
+
     var current_map := _current_map_name()
     _log("debug", "Tick: cat=%d/%d map=%s cat_shelter=%s warned=%s" % [
         int(gameData.cat),
@@ -173,7 +182,6 @@ func _try_auto_feed() -> void:
         _log("debug", "Scene not ready (no /root/Map), skip")
         return
 
-    var shelter_name := _find_cat_shelter()
     if shelter_name == "":
         _log("warn", "Cat shelter unknown: no CatBox found in any shelter save")
         return
@@ -214,10 +222,14 @@ func _current_map_name() -> String:
     var m = map_node.get("mapName")
     return String(m) if m != null else ""
 
+# Trusts the per-session cache. The catbox rarely moves once placed, so
+# re-validating on every call is expensive overkill — it forces a disk read of
+# the shelter .tres just to confirm what we already know. If the player
+# relocates the catbox to a different shelter mid-session, the buff/feed will
+# keep tracking the original shelter until next launch.
 func _find_cat_shelter() -> String:
-    if _cached_cat_shelter != "" and _shelter_has_catbox(_cached_cat_shelter):
+    if _cached_cat_shelter != "":
         return _cached_cat_shelter
-    _cached_cat_shelter = ""
     for shelter_name in SHELTERS:
         if _shelter_has_catbox(shelter_name):
             _cached_cat_shelter = shelter_name
