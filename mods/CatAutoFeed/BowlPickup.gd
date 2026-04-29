@@ -14,6 +14,16 @@ const PANEL_SCRIPT_PATH := "res://mods/CatAutoFeed/BowlContentsPanel.gd"
 const FOOD_NAMES := ["Cat_Food", "Canned_Meat", "Canned_Tuna", "Perch"]
 const MAX_SERVINGS := 10
 
+# Y of the bowl mesh's lowest point in RB-local space, captured during
+# collision setup. Used by the clip-correction code to compute where the
+# bowl's RB origin should sit so the visual bottom rests on the surface.
+var _bowl_bottom_offset_y: float = 0.0
+
+# Periodic clip check: every CLIP_CHECK_INTERVAL seconds, if the bowl is at
+# rest, raycast down to verify it's not slowly sinking into a surface.
+const CLIP_CHECK_INTERVAL := 0.5
+var _clip_check_timer := 0.0
+
 func _ready() -> void:
     # Heal save-data bowls written before the local_to_scene fix landed:
     # those bowls' SlotData was serialized while shared, so multiple bowls in
@@ -25,19 +35,33 @@ func _ready() -> void:
         slotData = slotData.duplicate(true)
         slotData.resource_local_to_scene = true
 
-    var mesh_inst: MeshInstance3D = null
-    if mesh != null:
-        mesh_inst = mesh
-    else:
-        var meshes := find_children("*", "MeshInstance3D", true, false)
-        if meshes.size() > 0:
-            mesh_inst = meshes[0]
-            mesh = mesh_inst
+    # Enable continuous collision detection so a fast-thrown bowl can't
+    # tunnel through the table between physics ticks. Discrete CD samples
+    # at fixed intervals and can miss overlaps when the bowl traverses
+    # more than its own thickness in one step (which happens easily with
+    # a player-tossed item).
+    continuous_cd = true
+
+    # Lock pitch/roll rotation. Works in tandem with the spawn-Y correction
+    # below: when a bowl spawns slightly clipped, physics needs to resolve
+    # the penetration. Without this lock, the solver applies both linear
+    # AND angular forces, and the bowl can tip-and-wedge itself further
+    # into the surface instead of climbing out. With rotation pinned to
+    # yaw-only, the only resolution path is upward translation, which is
+    # what we want. Mild loss of "throw it hard and watch it tumble"
+    # realism is acceptable for a placeable item.
+    axis_lock_angular_x = true
+    axis_lock_angular_z = true
+
+    var meshes := find_children("*", "MeshInstance3D", true, false)
+    var mesh_inst: MeshInstance3D = meshes[0] if meshes.size() > 0 else null
 
     if mesh_inst and collision and mesh_inst.mesh:
-        # Hand-tuned primitives beat auto-generated convex hulls for dropped
-        # items in RTV — vanilla uses simple BoxShape3D for every consumable.
-        _setup_box_collision_from_aabb(mesh_inst)
+        # Build a snug cylinder collision from the actual mesh AABB. The
+        # .tscn-defined placeholder shape is a stand-in for editor preview;
+        # the bowl's real shape is closer to a cylinder than a box, so a
+        # cylinder hugs it more tightly while still being a simple primitive.
+        _setup_cylinder_collision_from_aabb(mesh_inst)
 
     if mesh_inst:
         var base_mat := mesh_inst.get_active_material(0)
@@ -61,6 +85,28 @@ func _ready() -> void:
             mesh_inst.material_override = tinted
         mesh_inst.visibility_range_end = 0
         _smooth_mesh_normals(mesh_inst)
+
+    # Tiny invisible proxy MeshInstance3D for vanilla Placer's get_aabb()
+    # call — without it, Placer would see the GLB's raw Sketchfab mesh
+    # bounds (source units render as tens of metres in Godot), mis-position
+    # the bowl on placement, and the resulting offset between visual and
+    # collision causes the bowl to intermittently clip through surfaces.
+    # Same proxy trick used by the RTV Wallets mod.
+    var proxy := MeshInstance3D.new()
+    proxy.name = "MeshProxy"
+    var proxy_box := BoxMesh.new()
+    proxy_box.size = Vector3(0.16, 0.07, 0.16)
+    proxy.mesh = proxy_box
+    proxy.visible = false
+    add_child(proxy)
+    mesh = proxy
+
+    # After vanilla setup finishes, verify our spawn Y isn't below the
+    # surface beneath us — vanilla Placer occasionally mis-positions the
+    # bowl on fast upright placements, baking the bowl into the table.
+    # Deferred so the bowl is fully in the scene tree when the raycast runs.
+    call_deferred("_correct_spawn_position")
+
     super()
     _recompute_amount()
 
@@ -182,6 +228,55 @@ func _recompute_amount() -> void:
     if slotData != null:
         slotData.amount = total_servings()
 
+func _correct_spawn_position() -> void:
+    var lift := _compute_lift_to_clear_surface()
+    if lift > 0.0:
+        global_position.y += lift
+
+# Periodic clip correction. Same raycast as the spawn check, but runs while
+# the bowl is at rest — if vanilla physics has let the bowl drift slowly
+# into a surface (residual penetration that the solver can't fully resolve
+# tick-by-tick), lift it back out and zero linear velocity so it stays put.
+func _physics_process(delta: float) -> void:
+    _clip_check_timer -= delta
+    if _clip_check_timer > 0.0:
+        return
+    _clip_check_timer = CLIP_CHECK_INTERVAL
+    # Only correct while at rest — a bowl mid-flight is legitimately moving
+    # through space and shouldn't be teleported.
+    if linear_velocity.length_squared() > 0.0025:  # > 5cm/s
+        return
+    var lift := _compute_lift_to_clear_surface()
+    if lift > 0.0:
+        global_position.y += lift
+        linear_velocity = Vector3.ZERO
+
+# Cast a short vertical ray from just above the bowl down past where the
+# bowl is sitting; if we find a static surface, return the upward distance
+# the RB origin needs to move so the bowl's visual bottom is at-or-above
+# the surface (with a 2mm safety margin). Returns 0 if no correction needed.
+func _compute_lift_to_clear_surface() -> float:
+    if not is_inside_tree():
+        return 0.0
+    var space := get_world_3d().direct_space_state
+    if space == null:
+        return 0.0
+    var origin := global_position
+    var query := PhysicsRayQueryParameters3D.create(
+        origin + Vector3(0, 0.5, 0),
+        origin + Vector3(0, -0.5, 0)
+    )
+    query.exclude = [self.get_rid()]
+    var result := space.intersect_ray(query)
+    if result.is_empty():
+        return 0.0
+    var surface_y: float = result.position.y
+    # Bowl visual bottom in world space = rb_origin.y + _bowl_bottom_offset_y.
+    # For the bowl to rest on the surface, rb_origin.y should equal
+    # surface_y - _bowl_bottom_offset_y. Add 2mm so the bowl is just above.
+    var desired_y := surface_y - _bowl_bottom_offset_y + 0.002
+    return max(0.0, desired_y - origin.y)
+
 func _open_panel() -> void:
     var panel_script = load(PANEL_SCRIPT_PATH)
     if panel_script == null:
@@ -203,9 +298,9 @@ func _open_panel() -> void:
     canvas.add_child(panel)
     panel.open(self)
 
-# --- Mesh / collision setup (unchanged from previous revision) ---
+# --- Mesh / collision setup ---
 
-func _setup_box_collision_from_aabb(mi: MeshInstance3D) -> void:
+func _setup_cylinder_collision_from_aabb(mi: MeshInstance3D) -> void:
     if mi.mesh == null or collision == null:
         return
     # AABB is in mesh-local space; transform it into RigidBody-local space.
@@ -213,14 +308,20 @@ func _setup_box_collision_from_aabb(mi: MeshInstance3D) -> void:
     var mesh_to_rb: Transform3D = global_transform.affine_inverse() * mi.global_transform
     var rb_aabb: AABB = mesh_to_rb * local_aabb
 
-    var box := BoxShape3D.new()
-    # Clamp to a minimum size so any zero-thickness AABB axis doesn't produce
-    # a degenerate box.
-    box.size = Vector3(max(rb_aabb.size.x, 0.01), max(rb_aabb.size.y, 0.01), max(rb_aabb.size.z, 0.01))
-    collision.shape = box
+    var cylinder := CylinderShape3D.new()
+    # Radius wraps the larger of X/Z half-extents with a small margin so the
+    # cylinder slightly overhangs the bowl rim — gives physics resolution
+    # some breathing room without looking obviously oversized.
+    cylinder.radius = max(max(rb_aabb.size.x, rb_aabb.size.z) * 0.5 * 1.05, 0.01)
+    # Height matches full Y extent of the mesh, also with a touch of margin.
+    cylinder.height = max(rb_aabb.size.y * 1.05, 0.01)
+    collision.shape = cylinder
     collision.position = rb_aabb.get_center()
     collision.rotation = Vector3.ZERO
     collision.scale = Vector3.ONE
+    # Cache the AABB's lowest point so _correct_spawn_position() knows
+    # where the bowl's visual bottom sits relative to its RB origin.
+    _bowl_bottom_offset_y = rb_aabb.position.y
 
 # Sketchfab GLBs often ship with per-face (flat) normals, causing dark polygon
 # edges to show up as shading artifacts. Rebuild the surface with smooth
