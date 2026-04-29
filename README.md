@@ -6,7 +6,7 @@ This monorepo houses multiple mods, each with its own independent version. GitHu
 
 | Mod | Version | Release tag | ModWorkshop |
 |-----|---------|-------------|-------------|
-| **Cat Auto Feed** | `1.1.3` | [CatAutoFeed-v1.1.3](https://github.com/dwoodruff83/RoadToVostokMods/releases/tag/CatAutoFeed-v1.1.3) | [56407](https://modworkshop.net/mod/56407) |
+| **Cat Auto Feed** | `1.1.4` | [CatAutoFeed-v1.1.4](https://github.com/dwoodruff83/RoadToVostokMods/releases/tag/CatAutoFeed-v1.1.4) | [56407](https://modworkshop.net/mod/56407) |
 | **RTV Mod Logger** | `1.0.1` | [RTVModLogger-v1.0.1](https://github.com/dwoodruff83/RoadToVostokMods/releases/tag/RTVModLogger-v1.0.1) | [56406](https://modworkshop.net/mod/56406) |
 | **RTV Wallets** | `1.0.1` | [RTVWallets-v1.0.1](https://github.com/dwoodruff83/RoadToVostokMods/releases/tag/RTVWallets-v1.0.1) | [56408](https://modworkshop.net/mod/56408) |
 | **Punisher Guarantee** | `0.1.0` | [PunisherGuarantee-v0.1.0](https://github.com/dwoodruff83/RoadToVostokMods/releases/tag/PunisherGuarantee-v0.1.0) | — (not yet published) |

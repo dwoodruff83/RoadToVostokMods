@@ -3,6 +3,56 @@
 All notable changes to the Cat Auto Feed mod are documented here. Dates are
 YYYY-MM-DD.
 
+## 1.1.4 — 2026-04-29
+
+Bowl placement physics polish and a fix for distance-view rendering
+artifacts. Three issues addressed (#20, #22, #29). No gameplay or save
+format changes — purely visual + physics quality of life.
+
+- **Fast upright placements no longer clip the bowl into the table.** The
+  Cat Food Bowl's hollow upward-facing shape exposed an edge case in
+  vanilla physics where fast placements could spawn the bowl partially
+  below a target surface, with the rigid-body solver unable to fully
+  resolve the penetration tick-by-tick (gravity wins the contest, the
+  bowl slowly sinks deeper). Fix is a layered defence:
+  - Cylinder collision sized from the actual mesh AABB at runtime, with a
+    5% margin so it slightly overhangs the bowl rim.
+  - Wallet-style invisible proxy `MeshInstance3D` so vanilla `Placer`'s
+    `get_aabb()` query sees clean bounds rather than the GLB's raw
+    Sketchfab units.
+  - Spawn-Y correction: at `_ready()`, raycast down to find the surface
+    beneath the bowl; lift the body if vanilla Placer mis-positioned us.
+  - Pitch/roll rotation lock so the solver can't apply torque that would
+    wedge a clipped bowl deeper instead of climbing it out.
+  - Continuous in-process clip-correction: same raycast as the spawn
+    check, gated to a 0.5-second timer and run only while the bowl is
+    at rest. If the spawn correction missed and the bowl is residual-
+    drifting into a surface, lift it back up and zero linear velocity
+    so it stays put.
+  - Continuous collision detection (`continuous_cd = true`) for fast-motion
+    tunneling defence.
+- **Faint dark lines on the bowl at distance are gone.** Cause was the
+  GLB's embedded texture being imported with default S3TC compression;
+  at lower mipmap levels, the 4×4 block compression produces darker
+  pixels at UV-island boundaries (the cat-face decal edge and the
+  cylindrical wrap seam), which appear as faint dark lines once the
+  bowl is small enough on screen for the GPU to sample those mip levels.
+  No texture-filter tweak (anisotropic, etc.) masks them because the
+  dark pixels are baked into the mip data itself. Fix: set the bowl's
+  runtime material `texture_filter` to `TEXTURE_FILTER_LINEAR` (no
+  mipmaps), forcing full-resolution sampling at all distances. Mild
+  rim aliasing at distance is the trade-off; barely visible because
+  the bowl is small in screen space at that range. A cleaner fix
+  (lossless texture re-import to keep working mipmaps) is tracked
+  separately as a future polish task.
+- **Placement preview no longer snaps the bowl to nearby shelves.** A
+  regression from the clip-correction work above: while the player was
+  positioning the bowl in placement preview, the same raycast was
+  detecting nearby surfaces and lifting the bowl onto them, even when
+  the player wasn't aiming there. Fix: gate the clip-correction on
+  `freeze_mode != FREEZE_MODE_KINEMATIC` so it only runs when the bowl
+  is in the post-drop physics-active state, not during placement preview.
+
 ## 1.1.3 — 2026-04-28
 
 Bowl-storage corruption fix and a user-requested in-shelter auto-feed
