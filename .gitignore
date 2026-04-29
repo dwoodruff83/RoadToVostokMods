@@ -28,6 +28,10 @@ diff_reports/*
 # --- Godot import cache (regenerated on import; only needed inside .vmz) ---
 **/.godot/
 
+# --- Python bytecode (from running tools/*.py locally) ---
+**/__pycache__/
+*.pyc
+
 # --- MCM runtime config (per-user) ---
 mods/*/MCM/
 
@@ -36,7 +40,10 @@ mods/*/MCM/
 
 # --- Agent / IDE / OS junk ---
 .claude/
-.vscode/
+.vscode/*
+# Whitelist shared editor config (no secrets, no per-machine paths).
+# .vscode/settings.json stays ignored — it contains absolute editor paths.
+!.vscode/mcp.json
 *.tmp
 *.log
 Thumbs.db

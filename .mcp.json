@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "godotlens": {
+      "type": "stdio",
+      "command": "C:\\Users\\dwood\\.local\\bin\\uvx.exe",
+      "args": ["--from", "godotlens-mcp@latest", "godotlens-mcp"]
+    },
+    "godot-docs": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["run", "tools/godot_docs_mcp/server.py"]
+    }
+  }
+}
