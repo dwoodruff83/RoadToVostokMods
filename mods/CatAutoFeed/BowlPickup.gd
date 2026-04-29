@@ -15,6 +15,16 @@ const FOOD_NAMES := ["Cat_Food", "Canned_Meat", "Canned_Tuna", "Perch"]
 const MAX_SERVINGS := 10
 
 func _ready() -> void:
+    # Heal save-data bowls written before the local_to_scene fix landed:
+    # those bowls' SlotData was serialized while shared, so multiple bowls in
+    # the same save can still point to the same SlotData object on load even
+    # with the .tscn-side fix in place. Duplicate it here so each bowl ends
+    # up with its own storage going forward. One-shot per bowl per save —
+    # subsequent loads see resource_local_to_scene = true and skip.
+    if slotData != null and not slotData.resource_local_to_scene:
+        slotData = slotData.duplicate(true)
+        slotData.resource_local_to_scene = true
+
     var mesh_inst: MeshInstance3D = null
     if mesh != null:
         mesh_inst = mesh
