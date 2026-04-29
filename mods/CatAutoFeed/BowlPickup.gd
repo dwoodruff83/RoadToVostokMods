@@ -242,6 +242,17 @@ func _physics_process(delta: float) -> void:
     if _clip_check_timer > 0.0:
         return
     _clip_check_timer = CLIP_CHECK_INTERVAL
+    # Skip during placement and inventory-held states. Vanilla Pickup uses
+    # three states (see Pickup.gd):
+    #   - Freeze(): freeze=true, mode=STATIC — bowl is parked / pre-placement
+    #   - Kinematic(): freeze=false, mode=KINEMATIC — placement preview, the
+    #     player is positioning via aim/scroll/middle-click
+    #   - Unfreeze(): freeze=false, mode=STATIC — physics-active or settled
+    # We only want to clip-correct in the Unfreeze state. Running the raycast
+    # during placement would snap the bowl to whatever surface is beneath
+    # the current aim point, ignoring where the player intends to place it.
+    if freeze or freeze_mode == FREEZE_MODE_KINEMATIC:
+        return
     # Only correct while at rest — a bowl mid-flight is legitimately moving
     # through space and shouldn't be teleported.
     if linear_velocity.length_squared() > 0.0025:  # > 5cm/s
