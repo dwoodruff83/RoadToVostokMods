@@ -464,6 +464,7 @@ func _process(delta):
 | Metro Mod Loader | required | installed (v3.1.1) | actually loads `.vmz` mods at game start |
 | DepotDownloader | optional | installed | grab specific historical RTV builds from Steam (for backfilling old snapshots) |
 | VS Code + GDScript extension | recommended | check IDE | syntax highlighting + autocomplete |
+| `uv` (Astral) | optional | check `uv --version` | runs the local `godot-docs` MCP server; required only if you use AI assistants with MCP support |
 
 ### Python 3.11+
 
@@ -543,6 +544,39 @@ Not strictly required, but invaluable for editing GDScript.
   https://marketplace.visualstudio.com/items?itemName=geequlim.godot-tools
 - **Setup:** Open the editor settings in Godot → Editor Settings → Network → Language Server. Enable "Use Language Server" and note the port (default 6008). VS Code's extension connects to this for autocomplete/hover.
 
+### MCP servers (optional, for AI assistants)
+
+Two Model Context Protocol servers ship with the workspace, giving any MCP-aware AI assistant (Claude Code, Cursor, Cline, VS Code Copilot Chat, etc.) compiler-accurate knowledge of GDScript and the Godot 4.6 API. Both are registered in `.mcp.json` (Claude Code) and `.vscode/mcp.json` (VS Code MCP extensions); both files are committed and contain no secrets.
+
+**One-time setup:**
+
+1. Install [`uv`](https://docs.astral.sh/uv/) (Astral's Python runner). The local `godot-docs` server uses it to resolve its `mcp` dependency on first run.
+2. Bootstrap the Godot 4.6 docs clone (~440 MB, gitignored):
+   ```bash
+   download_godot_docs.bat
+   ```
+3. Restart your AI assistant so it picks up the MCP config.
+
+**`godotlens` — live LSP queries**
+
+Third-party MCP ([godotlens-mcp](https://github.com/pzalutski-pixel/godotlens-mcp), MIT) that bridges Godot's built-in language server. Gives `find-definition`, `find-references`, `symbols`, `rename`, etc. — compiler-accurate, no false positives from string/comment matches.
+
+- **Best target:** open `reference/RTV_decompiled/project.godot` in Godot Editor so vanilla game code is queryable.
+- **Requires:** Godot Editor running with a project open and the LSP enabled (Editor Settings → Network → Language Server, port 6005, "Enable Smart Resolve" on).
+- **Limitation:** the LSP indexes only files inside the loaded project. Mod folders without a `project.godot` resolve single-file lookups but not cross-file `references` — grep stays the right tool there.
+
+**`godot-docs` — Godot 4.6 reference**
+
+Workspace-local server (`tools/godot_docs_mcp/server.py`, FastMCP, ~150 lines) exposing three tools:
+
+- `godot_search(query, limit=10)` — full-text search across class references and tutorials.
+- `godot_class(name)` — fetch a class reference page (e.g. `ResourceLoader`, `HTTPRequest`) as raw RST.
+- `godot_method(class_name, method_name)` — extract a single method's section from a class reference.
+
+Reads from a local shallow clone of [godotengine/godot-docs](https://github.com/godotengine/godot-docs) at the `4.6` branch (`reference/godot_docs/`, gitignored). Pinned to 4.6 so docs match the game's engine version — no drift to 4.7 when "stable" advances. Refresh with `download_godot_docs.bat --refresh`, or pin a different version with `download_godot_docs.bat --branch X.Y`.
+
+See [`tools/godot_docs_mcp/README.md`](tools/godot_docs_mcp/README.md) for the server's full reference.
+
 ### Workspace utilities (already in `tools/`)
 
 These are local helper scripts, not external tools:
@@ -551,6 +585,7 @@ These are local helper scripts, not external tools:
 - **`tools/sync_logger.py`** — syncs `shared/Logger.gd` (canonical) into each mod's `Logger.gd`, preserving the mod's identity values. Run before building if you've updated the shared logger.
 - **`tools/modworkshop.py`** (`modworkshop.bat`) — read-only client for the public ModWorkshop API. Browse, search, and inspect mods on https://modworkshop.net without leaving the terminal. See "ModWorkshop Browse & Publish" below.
 - **`tools/publish.py`** (`publish.bat`) — one-shot mod publish workflow: bumps the version in `mod.txt`, runs the mod's `build.py` to zip a `.vmz` and install it to the game folder, then opens the browser at the right ModWorkshop page so the file can be uploaded by hand. See "ModWorkshop Browse & Publish" below.
+- **`tools/godot_docs_mcp/`** (`download_godot_docs.bat`) — local MCP server exposing the Godot 4.6 docs as queryable tools for AI assistants. See "MCP servers" above and `tools/godot_docs_mcp/README.md` for setup.
 
 ## Community Resources
 
