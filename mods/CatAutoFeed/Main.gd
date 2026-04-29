@@ -192,7 +192,7 @@ func _try_auto_feed() -> void:
         if _show_warning() and _log_node:
             _log_node.notify("Cat is hungry (%d%%)" % int(gameData.cat), Color.ORANGE)
 
-    if current_map == shelter_name:
+    if current_map == shelter_name and not _autofeed_in_shelter():
         _log("debug", "In cat's shelter (%s), deferring to vanilla feeder" % shelter_name)
         return
 
@@ -476,6 +476,10 @@ func _gunsmith_enabled() -> bool:
 func _cat_company_enabled() -> bool:
     var cfg = _config()
     return cfg.cat_company_buff if cfg else true
+
+func _autofeed_in_shelter() -> bool:
+    var cfg = _config()
+    return cfg.autofeed_in_shelter if cfg else false
 
 func _food_names() -> Array:
     return DEFAULT_FOOD
