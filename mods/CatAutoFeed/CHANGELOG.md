@@ -3,6 +3,38 @@
 All notable changes to the Cat Auto Feed mod are documented here. Dates are
 YYYY-MM-DD.
 
+## 1.1.3 — 2026-04-28
+
+Bowl-storage corruption fix and a user-requested in-shelter auto-feed
+toggle. Both reported via ModWorkshop comments on mod 56407 — thanks to
+Hun Alexander for the bug report and the feature suggestion.
+
+- **Bowl-storage sharing fix.** Cat Food Bowls were sharing a single
+  `SlotData` object across every spawned instance because
+  `Cat_Bowl.tscn`'s inline `SlotData` sub-resource lacked
+  `resource_local_to_scene = true`. Symptoms: food added to one bowl
+  appeared in every bowl simultaneously, and placing a new bowl wiped the
+  existing one's contents (because instantiation re-initialised the shared
+  storage). Two-part fix:
+  - `Cat_Bowl.tscn`: set `resource_local_to_scene = true` on the embedded
+    `SlotData`. Each new bowl spawn now gets its own independent SlotData
+    and its own storage Array.
+  - `BowlPickup.gd._ready()`: defensive heal that duplicates
+    non-local-to-scene SlotData on load. Auto-fixes existing-save bowls
+    that were serialised while shared. Self-disables after one trigger
+    per bowl per save. No-op for fresh installs (the `.tscn` flag means
+    new bowls already pass the check).
+- **New MCM toggle "Auto-Feed Even In Cat's Shelter"** (default OFF).
+  When ON, the auto-feed tick runs even when the player is physically
+  inside the cat's shelter, instead of deferring to vanilla in-shelter
+  feeding. Useful for players who prefer fully hands-off bowl management.
+  Default OFF preserves prior behaviour exactly.
+
+Known minor issues deferred to a future patch: bowl mesh occasionally
+clips into the surface it's placed on (intermittent physics), and dark
+shading lines visible on the bowl at moderate distance (likely auto-LOD
+related).
+
 ## 1.1.2 — 2026-04-27
 
 Critical performance fix. Players reported severe FPS drops (e.g. 140 → 30)

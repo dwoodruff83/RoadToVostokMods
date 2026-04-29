@@ -12,6 +12,7 @@ var allow_shelter_fallback := false
 var bowl_in_loot := true
 var bowl_at_gunsmith := false
 var cat_company_buff := true
+var autofeed_in_shelter := false
 
 var _mcm_helpers = null
 
@@ -98,6 +99,15 @@ func _ready() -> void:
         "menu_pos" = 8,
     })
 
+    config.set_value("Bool", "autofeed_in_shelter", {
+        "name" = "Auto-Feed Even In Cat's Shelter",
+        "tooltip" = "When OFF (default), the mod skips its auto-feed tick whenever you're physically in the cat's shelter — relying on you to feed the cat manually while you're there. When ON, the cat is auto-fed from the bowl regardless of whether you're in the shelter or away. Useful if you want fully hands-off feeding even during shelter time.",
+        "default" = false,
+        "value" = false,
+        "category" = "General",
+        "menu_pos" = 9,
+    })
+
     var logger_for_schema = get_node_or_null("/root/CatAutoFeedLog")
     if logger_for_schema == null:
         logger_for_schema = get_tree().root.find_child("CatAutoFeedLog", true, false)
@@ -168,6 +178,7 @@ func _apply(config: ConfigFile) -> void:
     bowl_in_loot = config.get_value("Bool", "bowl_in_loot", {"value": true})["value"]
     bowl_at_gunsmith = config.get_value("Bool", "bowl_at_gunsmith", {"value": false})["value"]
     cat_company_buff = config.get_value("Bool", "cat_company_buff", {"value": true})["value"]
+    autofeed_in_shelter = config.get_value("Bool", "autofeed_in_shelter", {"value": false})["value"]
 
     var logger = get_node_or_null("/root/CatAutoFeedLog")
     if logger == null:
