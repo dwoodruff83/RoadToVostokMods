@@ -44,6 +44,20 @@ func _ready() -> void:
         if base_mat is StandardMaterial3D:
             var tinted: StandardMaterial3D = base_mat.duplicate()
             tinted.albedo_color = tinted.albedo_color.darkened(0.45)
+            # Bypass mipmaps to suppress dark-seam artifacts that appear at
+            # distance. The artifacts come from S3TC compression blocks baked
+            # into the lower mip levels of the GLB's embedded texture — no
+            # texture-filter setting (anisotropic, etc.) can mask them
+            # because the dark pixels are in the mip data itself. Sampling
+            # the full-resolution texture at all distances avoids the
+            # compressed lower mips entirely. Trade-off: mild aliasing at
+            # the bowl rim when viewed from a few metres. Bowl is small in
+            # screen space at that range and the aliasing is barely visible.
+            #
+            # A cleaner future fix would be to re-import the GLB's embedded
+            # texture as lossless (no S3TC), which preserves working
+            # mipmaps. Tracked separately as a follow-up.
+            tinted.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR
             mesh_inst.material_override = tinted
         mesh_inst.visibility_range_end = 0
         _smooth_mesh_normals(mesh_inst)
