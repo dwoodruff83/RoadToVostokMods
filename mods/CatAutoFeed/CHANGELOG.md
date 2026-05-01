@@ -3,6 +3,19 @@
 All notable changes to the Cat Auto Feed mod are documented here. Dates are
 YYYY-MM-DD.
 
+## 1.1.5 — in progress
+
+- Bowl no longer teleports up onto an upper shelf when placed near
+  another item on the shelf below. Root cause: the periodic
+  clip-correction raycast (`BowlPickup._compute_lift_to_clear_surface`)
+  starts 0.5m above the bowl to handle the "buried in surface" case,
+  but if a shelf was within that 0.5m it became the first hit and the
+  correction lifted the bowl onto it. 1.1.4 reduced this by tightening
+  collision but the raycast itself still found the wrong surface; the
+  fix rejects hits more than 10cm above the bowl origin (a buried
+  bowl's surface sits at most ~3-4cm above origin since bowls are
+  ~7cm tall). Reported via ModWorkshop comments on mod 56407.
+
 ## 1.1.4 — 2026-04-29
 
 Bowl placement and rendering polish. No gameplay or save changes —
