@@ -17,7 +17,7 @@ No more returning to base every 40 minutes to drop a can of tuna in the feeder. 
 - **Auto-feed from anywhere** — when cat hunger drops below the threshold and you're outside the shelter, the cat eats one serving from its bowl. No more returning to base just to refill.
 - **Opt-in shelter-food fallback (safety net)** — if the bowl runs dry, the cat raids raw food on the floor or in cabinets/fridges in its shelter so it doesn't starve. Toggle on in MCM if you want the safety net; off by default for purist bowl-only play.
 - **Hunger and bowl-empty warnings** — orange on-screen notifications, once per hunger cycle, so you know to refill before it's a problem.
-- **Manual feeding preserved** — when you're inside the cat's shelter, the mod defers to the vanilla CatFeeder. Same UX as before.
+- **Manual feeding preserved** — when you're inside the cat's shelter, the mod defers to the vanilla CatFeeder. Same UX as before. (Optional MCM override: *Auto-Feed Even In Cat's Shelter* makes the bowl keep working at home too, for fully hands-off play.)
 - **Cat Food Bowl item** — 2x2 placeable inventory item with a custom 3D model. Sellable, droppable. Holds up to 10 servings of cat-edible food (Cat Food, Canned Meat, Canned Tuna, Perch).
 - **Bowl management panel** — middle-click a placed bowl to open a custom UI: two-column layout (bowl ↔ inventory), Take/Add buttons, capacity indicator, "Pick up bowl" button (enabled when empty).
 - **Spawns in rare loot** — the bowl is registered in the master loot table, so it can spawn in civilian containers at Rare rarity. Toggleable in MCM. Optionally the Gunsmith trader (unlocks day 10) can also stock bowls — opt-in via MCM, default off so bowls remain loot-only.
@@ -36,6 +36,7 @@ No more returning to base every 40 minutes to drop a can of tuna in the feeder. 
 | Bowl in Loot Tables | On | Adds the bowl to the master loot table at Rare rarity. Reload the game after toggling. |
 | Bowl at Gunsmith | **Off** | Lets the Gunsmith trader (day-10 unlock) stock bowls in his random supply. Off by default — bowls are loot-only out of the box. Reload the game after toggling. |
 | Cat Company Mental Buff | On | While in the cat's shelter (cat alive), raise mental at the same rate as a fire. |
+| Auto-Feed Even In Cat's Shelter | **Off** | When off, the auto-feed defers to the vanilla CatFeeder while you're inside the cat's shelter. When on, the mod keeps tickling the bowl regardless — for players who want fully hands-off feeding even when home. |
 
 Plus the standard Logger category (level, file output, overlay output). See [the RTV Mod Logger reference](https://github.com/dwoodruff83/RoadToVostokMods/blob/main/mods/RTVModLogger/LOGGER.md) for details.
 

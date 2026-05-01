@@ -74,7 +74,7 @@ func _ready() -> void:
 
     config.set_value("Bool", "bowl_in_loot", {
         "name" = "Bowl in Loot Tables",
-        "tooltip" = "When ON (default), Cat Food Bowl is added to the master loot table so it can spawn in civilian containers (rarity Legendary, ~1 in 120 containers). Turn off if you want the bowl as a trader-only or unfindable item. Reload the game for changes to take effect.",
+        "tooltip" = "When ON (default), Cat Food Bowl is added to the master loot table so it can spawn in civilian containers (rarity Rare). Turn off if you want the bowl as a trader-only or unfindable item. Reload the game for changes to take effect.",
         "default" = true,
         "value" = true,
         "category" = "General",
