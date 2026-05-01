@@ -3,6 +3,22 @@
 All notable changes to the RTV Mod Logger are documented here. Dates are
 YYYY-MM-DD.
 
+## 1.0.2 — 2026-05-01
+
+- **Fix: `welcome_on_start` runtime fallback default now matches schema.**
+  In `config.gd._apply()`, the `ConfigFile.get_value()` fallback for
+  `welcome_on_start` was hardcoded to `{"value": true}` while the schema
+  (and the README MCM table) specify a default of `false`. The fallback
+  only fires if `config.ini` load fails outright (file missing or parse
+  error), so player impact in normal use was zero — but in the rare path
+  where it triggered, the welcome notification would silently fire
+  against the documented default. Now matches schema: a missing or
+  unreadable `config.ini` no longer surprises users with an unexpected
+  welcome notification at game start.
+- One literal-value flip in fallback code; no save/config file format
+  changes; existing `config.ini` files are unaffected (the fallback
+  only matters when load fails).
+
 ## 1.0.1 — 2026-04-26
 
 Re-upload to register the ModWorkshop mod id (`modworkshop=56406` in
