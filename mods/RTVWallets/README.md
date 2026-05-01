@@ -2,7 +2,7 @@
 
 > Lootable, tradeable wallets that hold cash like a magazine holds rounds — and cash itself drops in loot, so the world keeps your stash refilling.
 
-Find a wallet on a bandit. Find loose cash in a civilian crate. Load the cash into the wallet, spend at traders, lose it all on death — only what's on your body survives. Three wallet tiers scale with risk and loot location.
+Find a wallet on a bandit. Find loose cash in a civilian crate. Load the cash into the wallet, spend at traders, lose it all on death. Three wallet tiers scale with risk and loot location.
 
 | Tier | Capacity | Rarity | Where it spawns |
 |------|----------|--------|-----------------|
