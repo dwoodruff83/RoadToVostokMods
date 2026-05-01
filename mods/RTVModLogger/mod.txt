@@ -1,7 +1,7 @@
 [mod]
 name="RTV Mod Logger"
 id="RTVModLogger"
-version="1.0.1"
+version="1.0.2"
 
 [autoload]
 RTVModLoggerLog="res://mods/RTVModLogger/Logger.gd"
