@@ -127,7 +127,7 @@ func _apply(config: ConfigFile) -> void:
     if fresh.load(FILE_PATH + "/config.ini") == OK:
         config = fresh
 
-    welcome_on_start = bool(config.get_value("Bool", "welcome_on_start", {"value": true})["value"])
+    welcome_on_start = bool(config.get_value("Bool", "welcome_on_start", {"value": false})["value"])
     test_hotkey_keycode = int(config.get_value("Keycode", "test_hotkey", {"value": KEY_F12})["value"])
 
     var idx: int = int(config.get_value("Dropdown", "test_action", {"value": 0})["value"])

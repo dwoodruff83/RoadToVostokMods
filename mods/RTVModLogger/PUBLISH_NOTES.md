@@ -29,8 +29,8 @@ Internal workspace doc. Not bundled in the .vmz.
 
 ## Remaining TODO
 
-- [ ] First publish via ModWorkshop web form
-- [ ] **Post-publish:** write assigned mod id into `mods/RTVModLogger/.publish` AND add `[updates]\nmodworkshop=<id>` to `mod.txt`, then rebuild + re-upload so the shipped `.vmz` is update-aware (Metro Mod Loader auto-update support)
+- [x] First publish via ModWorkshop web form (mod id 56406)
+- [x] **Post-publish:** mod id `56406` written to `mods/RTVModLogger/.publish`; `[updates] modworkshop=56406` added to `mod.txt`
 
 ## References
 
