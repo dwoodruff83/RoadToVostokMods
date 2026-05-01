@@ -4,7 +4,7 @@ Internal workspace doc. Not bundled in the .vmz.
 
 ## Status
 
-**Ready for first publish (1.0.0, 2026-04-26).** Trader Sell-for-€ flow matches vanilla barter (drain → spill → overflow drops via our `Drop()` override). Cash drag-overlay shows €, drops are clean maxAmount chunks, materials dimmed so cash doesn't glow in dim lighting. MCM trimmed to working settings only. README and CHANGELOG match shipping behavior.
+**Current state: v1.0.1 (live on ModWorkshop as id 56408).** Trader Sell-for-€ flow matches vanilla barter (drain → spill → overflow drops via our `Drop()` override). Cash drag-overlay shows €, drops are clean maxAmount chunks, materials dimmed so cash doesn't glow in dim lighting. MCM trimmed to working settings only. README and CHANGELOG match shipping behavior.
 
 **Migrated to Metro v3.x registry (2026-04-26).** Database injection goes through `Engine.get_meta("RTVModLib").register(SCENES, ...)` instead of the retired RTVModItemRegistry shim.
 
@@ -45,8 +45,8 @@ Done before 1.0.0:
 - [x] Bump to 1.0.0 + 1.0.0 CHANGELOG entry
 
 Manual / post-publish:
-- [ ] First publish via ModWorkshop web form
-- [ ] **Post-publish:** write assigned mod id into `mods/RTVWallets/.publish` AND add `[updates]\nmodworkshop=<id>` to `mod.txt`, then rebuild + re-upload so the shipped `.vmz` is update-aware
+- [x] First publish via ModWorkshop web form (mod id 56408)
+- [x] **Post-publish:** mod id `56408` written to `mods/RTVWallets/.publish`; `[updates] modworkshop=56408` added to `mod.txt`
 - [ ] Test side-by-side with Wallet & Cash (#55951) — document exact failure mode
 - [ ] Comment on Wallet & Cash's mod page (friendly, link our mod, frame as "alternative aesthetic, not replacement")
 
