@@ -9,11 +9,15 @@ Usage:
     python modworkshop.py find-game <query>
     python modworkshop.py browse [--sort latest|popular|downloads|likes|created] [--limit N]
     python modworkshop.py search <query> [--limit N]
-    python modworkshop.py info <mod_id>
+    python modworkshop.py info <mod_id> [--field desc|changelog|short_desc|name|author|version|repo_url]
     python modworkshop.py files <mod_id>
     python modworkshop.py top [--limit N]                # alias for browse --sort downloads
 
 Add --game <id> to any subcommand to target a different game section.
+
+`info --field <name>` prints just that field's raw value to stdout — useful
+for piping the description or changelog markdown into a diff against local
+files. See tools/check_mw_bodies.py for an end-to-end usage.
 """
 
 from __future__ import annotations
@@ -109,6 +113,19 @@ def cmd_search(args: argparse.Namespace) -> int:
 
 def cmd_info(args: argparse.Namespace) -> int:
     m = _get(f"/mods/{args.mod_id}")
+
+    # --field <name> short-circuits the formatted output and just prints the
+    # raw value. Useful for piping desc/changelog markdown to a diff tool.
+    if getattr(args, "field", None):
+        value = m.get(args.field)
+        if value is None or value == "":
+            print(f"(no {args.field!r} value on this mod)", file=sys.stderr)
+            return 1
+        # repo_url and similar can be None even when the API returns the key,
+        # _get() can also return non-string types; print whatever it is.
+        print(value)
+        return 0
+
     user = (m.get("user") or {}).get("name") or f"user#{m.get('user_id','?')}"
     cat = m.get("category") or {}
     tags = ", ".join(f"{t.get('name')} (#{t.get('id')})" for t in (m.get("tags") or []))
@@ -209,6 +226,11 @@ def main() -> int:
 
     sp = sub.add_parser("info", help="Show full info for a single mod")
     sp.add_argument("mod_id", type=int)
+    sp.add_argument(
+        "--field",
+        choices=["desc", "changelog", "short_desc", "name", "author", "version", "repo_url"],
+        help="Print just this field's raw value instead of the formatted summary.",
+    )
     sp.set_defaults(func=cmd_info)
 
     sp = sub.add_parser("files", help="List files (versions) for a mod")
