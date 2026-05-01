@@ -20,7 +20,7 @@ No more returning to base every 40 minutes to drop a can of tuna in the feeder. 
 - **Manual feeding preserved** — when you're inside the cat's shelter, the mod defers to the vanilla CatFeeder. Same UX as before.
 - **Cat Food Bowl item** — 2x2 placeable inventory item with a custom 3D model. Sellable, droppable. Holds up to 10 servings of cat-edible food (Cat Food, Canned Meat, Canned Tuna, Perch).
 - **Bowl management panel** — middle-click a placed bowl to open a custom UI: two-column layout (bowl ↔ inventory), Take/Add buttons, capacity indicator, "Pick up bowl" button (enabled when empty).
-- **Spawns in legendary loot** — the bowl is registered in the master loot table, so it can spawn in civilian containers at Legendary rarity (~1 in 120 containers). Toggleable in MCM. Optionally the Gunsmith trader (unlocks day 10) can also stock bowls — opt-in via MCM, default off so bowls remain loot-only.
+- **Spawns in rare loot** — the bowl is registered in the master loot table, so it can spawn in civilian containers at Rare rarity. Toggleable in MCM. Optionally the Gunsmith trader (unlocks day 10) can also stock bowls — opt-in via MCM, default off so bowls remain loot-only.
 - **Cat company mental buff** — being in the same shelter as your cat slowly raises mental at the same rate as sitting near a fire. Vanilla shelter doesn't normally restore mental — this is the cat's contribution. Cat must be alive and rescued. Toggleable in MCM.
 - **Shelter-agnostic** — works with Cabin, Attic, Classroom, Tent, or Bunker.
 
@@ -33,7 +33,7 @@ No more returning to base every 40 minutes to drop a can of tuna in the feeder. 
 | Show Fed Notification | On | Green "Cat ate from bowl: …" / "Cat Auto-Fed: …" messages. |
 | Show Hunger Warning | On | Orange "Cat is hungry" / "Bowl is empty" messages. |
 | Allow Shelter Fallback | **Off** | When off, cat eats only from the bowl. When on, the cat raids raw food in cabinets in its shelter. |
-| Bowl in Loot Tables | On | Adds the bowl to the master loot table at Legendary rarity (~1 in 120 civilian containers). Reload the game after toggling. |
+| Bowl in Loot Tables | On | Adds the bowl to the master loot table at Rare rarity. Reload the game after toggling. |
 | Bowl at Gunsmith | **Off** | Lets the Gunsmith trader (day-10 unlock) stock bowls in his random supply. Off by default — bowls are loot-only out of the box. Reload the game after toggling. |
 | Cat Company Mental Buff | On | While in the cat's shelter (cat alive), raise mental at the same rate as a fire. |
 
