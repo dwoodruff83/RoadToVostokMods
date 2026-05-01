@@ -3,6 +3,23 @@
 All notable changes to the Cat Auto Feed mod are documented here. Dates are
 YYYY-MM-DD.
 
+## 1.1.7 — 2026-05-01
+
+- **Fix: "Bowl in Loot Tables" MCM tooltip still claimed rarity
+  Legendary.** The 1.1.6 demotion to Rare updated the item's actual
+  rarity tier but the in-game tooltip text was missed. Players hovering
+  the toggle in MCM saw "rarity Legendary, ~1 in 120 containers" — both
+  values stale. Tooltip now reads "rarity Rare" without a specific
+  spawn-rate claim (the actual ratio depends on the game's Rare-tier
+  weight in the master loot table and isn't stable to advertise).
+- **Docs: "Auto-Feed Even In Cat's Shelter" MCM toggle now documented
+  in README.** The toggle was added in 1.1.3 but never made it into
+  the README's MCM Configuration table or the Features section. Both
+  updated so players reading the README discover the override option
+  without having to dig through the in-game MCM panel.
+- No code changes beyond the tooltip string; no save format changes;
+  existing saves carry forward unchanged.
+
 ## 1.1.6 — 2026-05-01
 
 - **Bowl rarity demoted from Legendary to Rare.** Previously
