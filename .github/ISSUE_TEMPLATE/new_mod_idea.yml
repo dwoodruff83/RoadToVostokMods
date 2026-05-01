@@ -1,0 +1,160 @@
+name: New mod idea
+description: Propose a new RTV mod for this workspace (community submissions welcome)
+title: "[Mod Idea] "
+labels: [mod-idea, triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Got an idea for a new Road to Vostok mod? Drop it here. The fields
+        below are designed to make the idea easy to evaluate, scope, and
+        (eventually) feed into an automated reviewer that sanity-checks
+        feasibility against the decompiled game scripts.
+
+        Want to do more than just suggest? The workspace ships scaffolding
+        (`scaffold.bat "My Mod"`), a publish flow (`publish.bat`), a shared
+        logger, and a tracker that flags upstream-game changes against your
+        mods. Pointers live in the repo README under "Modding Quick Reference."
+
+  - type: input
+    id: working_title
+    attributes:
+      label: Working title
+      description: A short handle for the mod. Final name can change later.
+      placeholder: e.g. RTV Sleeping Bag, Headlamp Toggle, Quick Stash
+    validations:
+      required: true
+
+  - type: input
+    id: pitch
+    attributes:
+      label: One-line pitch
+      description: What does it do, in one sentence? If you can't fit it in one sentence, the idea probably needs another pass.
+      placeholder: Adds a craftable sleeping bag that lets the player skip night without a shelter.
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Player problem
+      description: What player frustration or missing feature does this address? Lead with the *problem*, not the *solution*.
+      placeholder: |
+        Long expeditions away from the cabin force the player to walk back every
+        night just to sleep through the dark hours. There's no portable rest
+        option, so multi-day map exploration feels punishing.
+    validations:
+      required: true
+
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Detailed behavior
+      description: What does the player do, and what happens? Cover the golden path; edge cases are optional.
+      placeholder: |
+        - Crafted at workbench from cloth + paracord
+        - Equipable in inventory; "Use" deploys it on the ground
+        - Sleep prompt appears within 2m; selecting it skips to dawn
+        - Weight 2kg; takes 4 inventory slots
+    validations:
+      required: true
+
+  - type: dropdown
+    id: systems
+    attributes:
+      label: Game systems likely touched
+      description: |
+        Pick all that apply. These map to subfolders of the decompiled `Scripts/`
+        tree. The automated reviewer (when running) uses your selection to focus
+        its feasibility check on the right area.
+      multiple: true
+      options:
+        - Inventory
+        - NPC behavior / AI
+        - Map / spawning
+        - UI / HUD
+        - Audio
+        - Combat
+        - Loot
+        - Items / placeable scenes
+        - Shaders / lighting
+        - Saves / persistence
+        - Multiplayer / networking
+        - Other / not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: similar
+    attributes:
+      label: Inspiration / similar mods
+      description: Links to mods (RTV or other games) that do something comparable. Helps ground the scope.
+      placeholder: |
+        - Stardew "Sleeping Bag" mod
+        - Rust portable bedroll
+    validations:
+      required: false
+
+  - type: textarea
+    id: overlap
+    attributes:
+      label: Overlap with existing RTV mods
+      description: Does this overlap with a published RTV mod? Replace it? Pair with it? If you've already searched ModWorkshop, share what you found.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: assets
+    attributes:
+      label: Assets needed
+      description: Rough scope check. Asset-heavy mods take longer than script-only ones.
+      options:
+        - label: Icons (trader UI, inventory)
+        - label: 3D models (.glb / .obj)
+        - label: Audio (sfx / ambient)
+        - label: Translations / localized text
+        - label: None, script-only
+
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: Contribution offer
+      description: How involved do you want to be?
+      options:
+        - I'll author it (looking for sign-off or collaboration)
+        - I'll help with assets (icons, models, audio)
+        - Just suggesting, happy if someone else picks it up
+        - Want to learn modding by building this with guidance
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: explored
+    attributes:
+      label: Tools already explored
+      description: |
+        Optional, but helps the reviewer calibrate. The workspace ships a
+        ModWorkshop CLI (`modworkshop.bat search "<term>"`) and a decompiled
+        copy of the game scripts under `reference/RTV_decompiled/Scripts/`.
+      options:
+        - label: I searched ModWorkshop for similar mods
+        - label: I browsed the decompiled scripts for the relevant system
+        - label: I asked in the RTV Discord
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Open-ended. Constraints, dependencies, follow-up ideas, edge cases worth flagging.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmations
+      options:
+        - label: I checked existing issues and ModWorkshop for similar mod ideas
+          required: true
+        - label: I understand this is an idea queue, not a commitment to ship
+          required: true
