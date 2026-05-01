@@ -209,19 +209,60 @@ NOT auto-add NOTICES entries.
 
 ### B10 / B11 — ModWorkshop body diff
 
-Requires extending `modworkshop.py`. Today `info` prints metadata but not the
-two body fields. Add:
+**Operational reality (confirmed during the 1.1.7 ship cycle, 2026-05-01):**
+the MW `desc` and `changelog` body fields DO NOT auto-update when a new
+`.vmz` is uploaded. Every release upload is a three-step manual flow on the
+web form:
+
+1. Drag the new `.vmz` into the upload area
+2. Click **Clear Primary Download** (so Metro auto-update points at the new
+   file slot — confirmed: this rotates `file_id`, e.g. `96249 → 96311`, and
+   resets the per-file download counter)
+3. **Paste both bodies** — copy local `README.md` into the Description tab,
+   copy local `CHANGELOG.md` into the Changelog tab. If you skip this, the
+   live MW page keeps showing the previous version's text even though the
+   `.vmz` is current.
+
+This means the audit cannot infer "live MW = local repo" from a successful
+.vmz upload. The body fields drift forward only when the human pastes them.
+Audit is therefore most useful **just before** the upload (it tells the user
+exactly which body fields need re-pasting and what the new content is).
+
+**Tooling extension required.** Today `modworkshop.bat info` prints metadata
+but not the two body fields (the `info` command only exposes `short_desc`
+which is empty for all our mods). Add:
 
 ```bash
 modworkshop.bat info 56407 --field desc
 modworkshop.bat info 56407 --field changelog
 ```
 
-The audit captures stdout, runs `difflib.unified_diff` against the local
-file, reports added/removed lines. Threshold for FAIL vs WARN: any
-substantive content drift = WARN (drift is normal during the in-between
-window after a local edit and before the MW upload). FAIL only if the live
-MW version is **behind** by an entire CHANGELOG entry.
+Both fields are returned by the public API at
+`GET https://api.modworkshop.net/mods/<id>` as the `desc` and `changelog`
+keys. No auth needed.
+
+**Audit logic** — the audit captures stdout from the two field commands,
+runs `difflib.unified_diff` against `mods/<Mod>/README.md` and
+`mods/<Mod>/CHANGELOG.md` respectively, reports added/removed lines.
+Thresholds:
+
+- `live MW == local`: PASS, no action needed.
+- `live MW behind local by content the user just edited`: WARN, with a
+  clear message like *"upload pending: paste new README into Description
+  tab"* — this is the normal pre-upload state.
+- `live MW behind local by an entire CHANGELOG entry whose version is
+  below `mod.txt` version`: FAIL — the user shipped the .vmz but forgot
+  the body re-paste; the live page is misleading users about what's in
+  the new version.
+- `live MW ahead of local`: WARN — happens when the user edits the body
+  directly on MW (as they did with CatAutoFeed's MCM table row pre-1.1.7)
+  without backporting to the repo.
+
+**Bonus tooling idea (Phase 3 stretch):** `audit.bat <Mod> --release
+--paste-bodies` could print the local `README.md` and `CHANGELOG.md`
+content (or copy to clipboard via `pyperclip` if installed) so the user
+can paste straight from terminal output into the MW form without
+hopping back to the file. Skip if `pyperclip` not installed; just print.
 
 ### B12 — pruning enforcement
 
@@ -341,7 +382,7 @@ shift.
 | **0** | Land §6 fixes 1–7 (manual cleanup) | ~1 hr | — |
 | **1** | `tools/audit_release.py` with checks A1–A4, B1–B9 (in-repo only) + `audit.bat` wrapper | ~3 hrs | — |
 | **2** | Wire `audit_release.py` into `publish.bat` (Gate A on no-open, Gate B on default, `--force` honoured) | ~30 min | Phase 1 |
-| **3** | Extend `modworkshop.py` with `info --field desc`/`--field changelog`, then add audit checks B10/B11 | ~2 hrs | Phase 1 |
+| **3** | Extend `modworkshop.py` with `info --field desc`/`--field changelog` (returns the raw API body fields), add audit checks B10/B11 with directional drift handling, optionally `--paste-bodies` to print local README+CHANGELOG ready for the MW upload form | ~2-3 hrs | Phase 1 |
 | **4** | `tools/prune_changelogs.py` + run it once on CatAutoFeed and RTVWallets, write `.changelog_cutoff` files | ~2 hrs | — (parallel with Phase 1) |
 | **5** | Add audit check B12 (enforce `.changelog_cutoff`) | ~30 min | Phase 1 + Phase 4 |
 | **6** | RTVHideoutLights doc cleanup (§6 items 8–10) when mod approaches publish | ~? | RTVHideoutLights ready |
