@@ -6,7 +6,7 @@ Internal workspace doc. Not bundled in the .vmz.
 
 **Publish position:** SECOND, after RTVModLogger. RTVModItemRegistry was retired (Metro v3.x's built-in registry replaces it natively); we now use Metro's `lib.register(SCENES, ...)` and `lib.register(LOOT, ...)` directly via the `[registry]` opt-in in mod.txt.
 
-**Pre-publish state:** v1.1.0 frozen. Eight MCM toggles. Metro v3.0+ hard-required (uses Metro's registry API). Logger 6/6 API coverage. Cat bowl has Sketchfab CC BY 4.0 attribution in NOTICES.txt.
+**Current state:** v1.1.7 (live on ModWorkshop as id 56407). Nine MCM toggles. Metro v3.0+ hard-required (uses Metro's registry API). Logger 6/6 API coverage. Cat bowl has Sketchfab CC BY 4.0 attribution in NOTICES.txt.
 
 ## TL;DR pitch
 
