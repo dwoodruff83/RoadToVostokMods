@@ -18,8 +18,8 @@ from pathlib import Path
 
 MOD_ID = "RTVHideoutLights"
 ROOT_FILES = ['mod.txt', 'README.md', 'CHANGELOG.md', 'NOTICES.txt', 'LICENSE']
-MOD_FILES = ['Main.gd', 'config.gd', 'Logger.gd']
-ASSET_DIRS = ["assets", "scenes", "items", "icons"]
+MOD_FILES = ['Main.gd', 'config.gd', 'Logger.gd', 'LightFurniture.gd']
+ASSET_DIRS = ["assets", "scenes", "items"]
 GAME_MODS_DIR = Path(r"C:\Program Files (x86)\Steam\steamapps\common\Road to Vostok\mods")
 VERSION_RE = re.compile(r'^(version\s*=\s*)"([^"]+)"', re.MULTILINE)
 

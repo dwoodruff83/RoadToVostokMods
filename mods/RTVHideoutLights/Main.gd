@@ -24,11 +24,70 @@ func _register_with_metro() -> void:
 		return
 	await lib.frameworks_ready
 
+	# Hand-authored wall sconce SKU.
 	_register_lamp(
 		lib,
-		"rtvlights_lamp_cellar_ceiling",
+		"rtvlights_lamp_cellar_wall",
 		preload("res://mods/RTVHideoutLights/scenes/Lamp_Cellar_Ceiling_F.tscn"),
 		load("res://mods/RTVHideoutLights/items/Lamp_Cellar_Ceiling_F.tres"),
+		"Generalist",
+	)
+	# All other v1 SKUs are produced by tools/generate_lights_skus.py.
+	# Edit the FIXTURES list there and re-run to add/remove/tweak.
+	_register_lamp(
+		lib,
+		"rtvlights_lamp_grid_lit_ceiling",
+		preload("res://mods/RTVHideoutLights/scenes/rtvlights_lamp_grid_lit_ceiling_F.tscn"),
+		load("res://mods/RTVHideoutLights/items/rtvlights_lamp_grid_lit_ceiling_F.tres"),
+		"Generalist",
+	)
+	_register_lamp(
+		lib,
+		"rtvlights_lamp_generic_lit_hp_ceiling",
+		preload("res://mods/RTVHideoutLights/scenes/rtvlights_lamp_generic_lit_hp_ceiling_F.tscn"),
+		load("res://mods/RTVHideoutLights/items/rtvlights_lamp_generic_lit_hp_ceiling_F.tres"),
+		"Generalist",
+	)
+	_register_lamp(
+		lib,
+		"rtvlights_lamp_generic_lit_lp_ceiling",
+		preload("res://mods/RTVHideoutLights/scenes/rtvlights_lamp_generic_lit_lp_ceiling_F.tscn"),
+		load("res://mods/RTVHideoutLights/items/rtvlights_lamp_generic_lit_lp_ceiling_F.tres"),
+		"Generalist",
+	)
+	_register_lamp(
+		lib,
+		"rtvlights_candle",
+		preload("res://mods/RTVHideoutLights/scenes/rtvlights_candle_F.tscn"),
+		load("res://mods/RTVHideoutLights/items/rtvlights_candle_F.tres"),
+		"Generalist",
+	)
+	_register_lamp(
+		lib,
+		"rtvlights_lantern_kerosene",
+		preload("res://mods/RTVHideoutLights/scenes/rtvlights_lantern_kerosene_F.tscn"),
+		load("res://mods/RTVHideoutLights/items/rtvlights_lantern_kerosene_F.tres"),
+		"Generalist",
+	)
+	_register_lamp(
+		lib,
+		"rtvlights_lamp_floor",
+		preload("res://mods/RTVHideoutLights/scenes/rtvlights_lamp_floor_F.tscn"),
+		load("res://mods/RTVHideoutLights/items/rtvlights_lamp_floor_F.tres"),
+		"Generalist",
+	)
+	_register_lamp(
+		lib,
+		"rtvlights_sign_exit_lit",
+		preload("res://mods/RTVHideoutLights/scenes/rtvlights_sign_exit_lit_F.tscn"),
+		load("res://mods/RTVHideoutLights/items/rtvlights_sign_exit_lit_F.tres"),
+		"Generalist",
+	)
+	_register_lamp(
+		lib,
+		"rtvlights_computer_lit",
+		preload("res://mods/RTVHideoutLights/scenes/rtvlights_computer_lit_F.tscn"),
+		load("res://mods/RTVHideoutLights/items/rtvlights_computer_lit_F.tres"),
 		"Generalist",
 	)
 

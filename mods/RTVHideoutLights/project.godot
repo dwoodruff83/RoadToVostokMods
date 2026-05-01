@@ -1,0 +1,26 @@
+; This project.godot exists ONLY to let Godot's import system process the
+; mod's assets (PNG icons → .ctex textures, etc.) so the resulting
+; .png.import sidecars and .godot/imported/*.ctex files can be bundled
+; into the .vmz. The mod itself doesn't need a project.godot at runtime —
+; it's mounted via Metro Mod Loader into the game's res:// at load time.
+;
+; Workflow:
+;   1. Run Godot headless on this folder to import assets:
+;        Godot_v4.6.2-stable_win64.exe --headless --quit --editor --path mods/RTVHideoutLights/
+;   2. .godot/imported/ now has the compiled .ctex files
+;   3. assets/icons/Icon_*.png.import sidecars are generated in-place
+;   4. publish/build.py picks both up and bundles them into the .vmz
+;
+; This file is NOT bundled into the .vmz (build.py only includes
+; ROOT_FILES + MOD_FILES + ASSET_DIRS).
+
+config_version=5
+
+[application]
+
+config/name="RTVHideoutLights"
+config/features=PackedStringArray("4.6", "Forward Plus")
+
+[rendering]
+
+textures/vram_compression/import_s3tc_bptc=true

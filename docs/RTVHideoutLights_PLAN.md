@@ -943,7 +943,126 @@ These are choices to make before authoring starts:
 
 ---
 
-## 16. Next session pickup
+## 16. Showroom audit (2026-04-30, in progress)
+
+Findings from `reference/RTV_decompiled/_dev_lamp_showroom.tscn`. As
+each fixture's true form is confirmed visually, log it here. This
+supersedes the AABB-based guesses in §8 (Mount Matrix) and §13 (SKU
+Manifest) — those will be reconciled once the audit is complete.
+
+| Fixture | Audited form | Plan §13 had it as | Action |
+|---|---|---|---|
+| `Lamp_Generic_Lit_LP` | Ceiling light (rectangular shop-light style fixture, same shape as HP) | Wall bracket | Re-tag as ceiling SKU; LP/HP differ only in light energy (5 vs 10) |
+| `Lamp_Generic_Lit_HP` | Ceiling light (same shape as LP) | Wall bracket | Re-tag as ceiling SKU |
+| `Lamp_Grid_Lit` | Square ceiling light (panel-style, fits a small ceiling tile) | Ceiling fluorescent | ✓ matches plan; confirmed ceiling SKU |
+| `Lamp_Cellar_Lit` | Wall-mount industrial / sewer fixture with a protective grille over the bulb | Bare-bulb pendant (cellar) | Re-tag as wall SKU; this is what threw the first POC — mesh is a wall fixture, not a pendant |
+| `Lantern_Kerosene` | Classic kerosene lantern — handle on top, glass globe, visible flame, sits on a base | Floor / ceiling | ✓ matches plan; supports both tabletop (sits on base) and hanging (top loop) variants |
+| `Candle` | Single black taper candle on a wide round saucer base | Tabletop (floor element) | ✓ matches plan; user-confirmed wishlist |
+| `Lamp_Floor` | Tall standing floor lamp — round base, narrow vertical stem, tapered shade on top. **No embedded light** (Tier C, would need OmniLight added inside the shade) | Floor lamp | ✓ matches plan as Tier C; user wants it — add a downward-aimed SpotLight inside the shade for natural look |
+| `Sign_Exit_Lit` | Green emergency exit sign — running-figure icon, downward arrow, classic stalker/industrial aesthetic, self-illuminated panel | Bonus (wall) | ✓ user-confirmed wishlist; perfect wall-mount flavor piece for shelter walls |
+| `Computer_Lit` | Full vintage desktop PC setup — tower, monitor (Win95-era teal background), keyboard, mouse | Bonus (tabletop) | ✓ user-confirmed wishlist; flavor piece for desk dressing — emits screen-glow only, no projected light |
+
+### Deferred to v1.1+ (user call, 2026-04-30)
+
+A "campsite + extra-rooms" pack for the next update. All four need
+their lights added by us (Tier C / B work) but the meshes are good.
+
+- **`Firepot`** and **`Barrel_Metal_Fire`** — outdoor / camp vibes; not core shelter furniture, but worth shipping as a "campsite" pack in a follow-up update. Both already ship with embedded `OmniLight + Flicker`, so they're cheap to wrap once we want them.
+- **`Sauna_Lamp`** — wall-mount half-dome / half-shell sconce. No embedded light; would need a warm low-energy OmniLight added inside the dome. Niche but charming.
+- **`Lamp_Round`** — flat round ceiling disc. No embedded light; would need an OmniLight or downward SpotLight added under the disc. Real ceiling-mount mesh per the AABB, just plain-looking.
+- **`Lamp_Cellar`** (unlit twin) — same mesh as `Lamp_Cellar_Lit` but without the embedded light. Could ship as a "switched-off" companion SKU for the lit variant, or as a cheaper / decorative-only option.
+- **`Lamp_Rail` / `Lamp_Rail_Tall`** — utility wall rails. No embedded light; would need a SpotLight aimed along the rail axis added by us. Best suited to larger shelters (Bunker, Classroom) where the longer reach makes sense — overkill for a Cabin or Tent. Two SKUs since the lengths differ.
+
+### Out of scope for now, but log for future planning (user call, 2026-04-30)
+
+- **`Light_Switch`** — wall switch prop, not a light source itself. Out of scope for v1, but worth keeping in mind: if a future version adds player-toggleable lights (the `Light.gd` `Activate`/`Deactivate` pattern), `Light_Switch` could be the visual component the player interacts with to toggle a paired fixture. Park as a v2+ idea.
+
+### Out of scope (user call, 2026-04-30)
+
+Atmospheric world props rather than shelter furniture, dropped entirely:
+
+- **Pole lights** (`Pole_Light_Concrete`, `Pole_Light_Metal`, `Pole_Light_Metal_Double`, `Pole_Light_Metal_Guard`, `Pole_Light_Wood`) — street furniture, not shelter scale
+- **`Stadium_Light`** — large outdoor floodlight rig
+
+### Final v1 SKU list (post-audit)
+
+| Fixture | Mount | Light | Notes |
+|---|---|---|---|
+| `Lamp_Generic_Lit_HP` | Ceiling | embedded SpotLight, e=10 | Bright accent ceiling light |
+| `Lamp_Generic_Lit_LP` | Ceiling | embedded SpotLight, e=5 (toggleable via `Light.gd`) | Soft ceiling light |
+| `Lamp_Grid_Lit` | Ceiling | embedded SpotLight (toggleable via `Light.gd`) | Square panel ceiling fluorescent |
+| `Lamp_Cellar_Lit` | Wall | embedded OmniLight | Industrial grille wall light |
+| `Lantern_Kerosene` (tabletop) | Floor (table) | OmniLight + Flicker | Carried/sat |
+| `Lantern_Kerosene` (hanging) | Ceiling (pre-baked orientation) | same | Same mesh, ceiling-mount variant |
+| `Candle` | Floor (tabletop) | OmniLight + Flicker | Tiny ambient |
+| `Lamp_Floor` | Floor | **add SpotLight in shade** (Tier C) | Standing floor lamp |
+| `Sign_Exit_Lit` | Wall | self-illuminated mesh | Bonus flavor |
+| `Computer_Lit` | Floor (desk) | screen-glow only | Bonus desk dressing |
+
+**10 SKUs total.** §8 (Mount Matrix) and §13 (SKU Manifest) above are
+now stale and need to be updated to reflect this audited list. Pricing
+tiers in §10 also need refreshing.
+
+## 17. Master fixture status table
+
+Single-source-of-truth for what's shipping when, sized, priced, and named.
+Supersedes the older §8 (mount matrix), §10 (pricing tiers), and §13
+(SKU manifest) — those sections were authored before the showroom audit
+and may have stale numbers; trust this table.
+
+### Currently shipping (v1, in catalog + tradable via Generalist)
+
+| Fixture | Mount | Mesh AABB (W×H×D, m) | Grid | Value | Registry id | Status / Notes |
+|---|---|---|---|---|---|---|
+| `Lamp_Cellar_Lit` | wall | 0.20×0.40×0.13 | 1×2 | 250 | `rtvlights_lamp_cellar_wall` | Hand-authored. Filename misnomer (`_Ceiling_F`) for backwards-compat. Uses LightFurniture.gd. ✅ tested in-game. |
+| `Lamp_Grid_Lit` | ceiling | 0.40×0.13×0.40 | 3×3 | 450 | `rtvlights_lamp_grid_lit_ceiling` | Generated. Square ceiling fluorescent panel. Embedded SpotLight (warm 2.0e). |
+| `Lamp_Generic_Lit_HP` | ceiling | 1.60×0.10×0.20 | 5×2 | 600 | `rtvlights_lamp_generic_lit_hp_ceiling` | Generated. Long fluorescent tube. Bright (SpotLight 10.0e). |
+| `Lamp_Generic_Lit_LP` | ceiling | 1.60×0.10×0.20 | 5×2 | 400 | `rtvlights_lamp_generic_lit_lp_ceiling` | Generated. Same mesh as HP, softer (SpotLight 5.0e). |
+| `Candle` | floor | 0.30×0.10×0.30 | 2×2 | 80 | `rtvlights_candle` | Generated. Tabletop. OmniLight only — vanilla flame VFX skipped for v1, can add in v1.1. |
+| `Lantern_Kerosene` | floor | 0.20×0.30×0.20 | 2×2 | 200 | `rtvlights_lantern_kerosene` | Generated. Floor/table. Same VFX caveat as Candle. |
+| `Lamp_Floor` | floor | 0.40×2.00×0.40 | 2×5 | 350 | `rtvlights_lamp_floor` | Generated. **Tier C** — mesh has no embedded light, we add a downward SpotLight (3.0e, 50°) inside the shade. |
+| `Sign_Exit_Lit` | wall | 0.60×0.20×0.12 | 3×1 | 280 | `rtvlights_sign_exit_lit` | Generated. Green stalker-style emergency sign. SpotLight projects forward into room. |
+| `Computer_Lit` | floor | 0.84×0.55×0.52 | 4×3 | 400 | `rtvlights_computer_lit` | Generated. Vintage desktop set. Cyan screen-glow OmniLight. |
+
+**Total: 9 SKUs in v1.** All registered through Metro's SCENES + ITEMS + LOOT + TRADER_POOLS via Main.gd's `_register_lamp` helper.
+
+### Deferred to v1.1 ("campsite + extra rooms" pack)
+
+| Fixture | Mount | Mesh AABB (W×H×D, m) | Likely grid | Notes / plan |
+|---|---|---|---|---|
+| `Lamp_Cellar` (unlit twin) | wall | 0.20×0.40×0.13 | 1×2 | Same mesh as `Lamp_Cellar_Lit` but no embedded light. Could ship as a "switched-off" companion or cheaper variant. |
+| `Firepot` | floor | 0.60×0.50×0.60 | 3×2 | **Tier B** flame fixture. Has embedded `OmniLight + Flicker.gd`. Outdoor camp vibe — defer until campsite pack. |
+| `Barrel_Metal_Fire` | floor | 0.60×1.00×0.60 | 2×3 | Same — Tier B flame, has Flicker. Trash-fire barrel. |
+| `Sauna_Lamp` | wall | 0.25×0.30×0.14 | 2×2 | **Tier C**. Wooden sauna sconce. Need to add a warm low-energy OmniLight inside the dome. |
+| `Lamp_Round` | ceiling | 1.00×0.10×1.00 | 3×3 | **Tier C**. Real ceiling-disc mesh. Add a downward OmniLight or SpotLight under the disc. Plain look — ranked low priority. |
+| `Lamp_Rail` | wall | 6.00×0.30×0.08 | 5×1 | **Tier C**. 6m wall rail. Add SpotLight aimed along the rail. Best for big shelters (Bunker, Classroom). |
+| `Lamp_Rail_Tall` | wall | 6.00×2.00×0.08 | 5×3 | **Tier C**. Same as Rail but with vertical hangers. Big shelters only. |
+
+### Parked for v2+ (engine work or design decisions needed)
+
+| Fixture | Why parked |
+|---|---|
+| `Light_Switch` | Wall switch prop, not a light source itself. Only useful if we add player-toggleable fixtures (the `Light.gd` `Activate`/`Deactivate` pattern). When we ship that feature, `Light_Switch` becomes the visual for the interaction. |
+
+### Out of scope (won't ship)
+
+| Fixture | Why dropped |
+|---|---|
+| `Pole_Light_Concrete` | Street furniture — not shelter scale. |
+| `Pole_Light_Metal` | Same. |
+| `Pole_Light_Metal_Double` | Same. |
+| `Pole_Light_Metal_Guard` | Same. |
+| `Pole_Light_Wood` | Same. |
+| `Stadium_Light` | Outdoor floodlight rig. |
+
+### Naming / convention notes
+
+- All registry ids prefixed `rtvlights_` to avoid Metro registry collisions with vanilla and other mods.
+- Pricing follows a loose tier: tabletop tiny (80) < lanterns (200) < small wall (250-280) < ceiling soft (350-450) < ceiling bright / desktop (400-600).
+- All v1 SKUs flagged `generalist = true` so they appear in the Generalist's stock pool. None gated to other traders yet.
+- Tier labels: **A** = embedded light + ready to wrap; **B** = flame with `Flicker.gd`; **C** = prop only, light added by us.
+
+## 18. Next session pickup
 
 If a fresh Claude session inherits this plan (e.g. with new MCP servers
 that change capabilities), the first three things to do:
