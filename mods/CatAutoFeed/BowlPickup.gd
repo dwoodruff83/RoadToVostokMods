@@ -282,11 +282,27 @@ func _compute_lift_to_clear_surface() -> float:
     if result.is_empty():
         return 0.0
     var surface_y: float = result.position.y
+    # Reject hits that are obviously too far above the bowl. The ray starts
+    # 0.5m above origin to handle the "buried in surface" case, but if there
+    # is a shelf or other surface within that 0.5m above the bowl the ray
+    # finds it first and lifts the bowl onto it. A buried bowl's surface
+    # sits at most a few cm above its origin (bowls are ~7cm tall); anything
+    # farther is a different surface we don't want to teleport onto.
+    if surface_y - origin.y > 0.10:
+        return 0.0
     # Bowl visual bottom in world space = rb_origin.y + _bowl_bottom_offset_y.
     # For the bowl to rest on the surface, rb_origin.y should equal
     # surface_y - _bowl_bottom_offset_y. Add 2mm so the bowl is just above.
     var desired_y := surface_y - _bowl_bottom_offset_y + 0.002
-    return max(0.0, desired_y - origin.y)
+    var lift := max(0.0, desired_y - origin.y)
+    # Skip sub-5mm corrections — the physics solver self-resolves shallow
+    # penetration tick-by-tick, and our half-second lift fights the solver
+    # when the bowl is touching another item that nudges it microscopically
+    # each tick (visible as a perceptible bump every 0.5s). Real clip-throughs
+    # that need our help (the case 1.1.4 originally addressed) are cm-scale.
+    if lift < 0.005:
+        return 0.0
+    return lift
 
 func _open_panel() -> void:
     var panel_script = load(PANEL_SCRIPT_PATH)

@@ -3,6 +3,47 @@
 All notable changes to the Cat Auto Feed mod are documented here. Dates are
 YYYY-MM-DD.
 
+## 1.1.6 — 2026-05-01
+
+- **Bowl rarity demoted from Legendary to Rare.** Previously
+  `rarity = 2` (Legendary), now `rarity = 1` (Rare). Two reasons:
+  - Gunsmith trader was effectively never stocking the bowl with the
+    "Bowl at Gunsmith" MCM toggle on. Trader supply pools are random
+    samples, and a Legendary item competes against a much larger pool
+    for limited supply slots; in practice the bowl rarely surfaces.
+    Demoting to Rare puts the bowl in a smaller, more-frequently-drawn
+    bucket so the toggle actually does something visible.
+  - Loot-spawn frequency in civilian containers also goes up. The old
+    ~1-in-120-containers spawn rate at Legendary was tuned for the
+    "rescue safety net" pitch but felt punishing for players who just
+    wanted to find a bowl without crafting or buying. Rare is the
+    right tier — uncommon enough to feel like a find, common enough
+    that you'll see one within a hideout-clearing run.
+- **Item value, weight, and tetris size unchanged.** This is a tier
+  shift for spawn frequency and trader-pool behavior only; the bowl's
+  in-game economy and inventory footprint stay the same.
+
+## 1.1.5 — 2026-04-30
+
+- Bowl no longer teleports up onto an upper shelf when placed near
+  another item on the shelf below. Root cause: the periodic
+  clip-correction raycast (`BowlPickup._compute_lift_to_clear_surface`)
+  starts 0.5m above the bowl to handle the "buried in surface" case,
+  but if a shelf was within that 0.5m it became the first hit and the
+  correction lifted the bowl onto it. 1.1.4 reduced this by tightening
+  collision but the raycast itself still found the wrong surface. Two
+  guards added:
+  - Reject ray hits more than 10cm above the bowl origin. A genuinely
+    buried bowl's surface sits at most ~3-4cm above origin (bowls are
+    ~7cm tall); anything farther is a different surface and we skip.
+  - Skip lifts smaller than 5mm. The physics solver self-resolves
+    shallow penetration tick-by-tick; our half-second lift was fighting
+    the solver when a bowl placed touching another item was being
+    nudged microscopically each tick, producing a perceptible bump
+    cycle every 0.5s. Real clip-throughs that need rescue (the case
+    1.1.4 originally addressed) are cm-scale and unaffected.
+  - Reported via ModWorkshop comments on mod 56407.
+
 ## 1.1.4 — 2026-04-29
 
 Bowl placement and rendering polish. No gameplay or save changes —

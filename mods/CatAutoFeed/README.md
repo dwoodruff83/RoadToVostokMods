@@ -20,7 +20,7 @@ No more returning to base every 40 minutes to drop a can of tuna in the feeder. 
 - **Manual feeding preserved** — when you're inside the cat's shelter, the mod defers to the vanilla CatFeeder. Same UX as before.
 - **Cat Food Bowl item** — 2x2 placeable inventory item with a custom 3D model. Sellable, droppable. Holds up to 10 servings of cat-edible food (Cat Food, Canned Meat, Canned Tuna, Perch).
 - **Bowl management panel** — middle-click a placed bowl to open a custom UI: two-column layout (bowl ↔ inventory), Take/Add buttons, capacity indicator, "Pick up bowl" button (enabled when empty).
-- **Spawns in legendary loot** — the bowl is registered in the master loot table, so it can spawn in civilian containers at Legendary rarity (~1 in 120 containers). Toggleable in MCM. Optionally the Gunsmith trader (unlocks day 10) can also stock bowls — opt-in via MCM, default off so bowls remain loot-only.
+- **Spawns in rare loot** — the bowl is registered in the master loot table, so it can spawn in civilian containers at Rare rarity. Toggleable in MCM. Optionally the Gunsmith trader (unlocks day 10) can also stock bowls — opt-in via MCM, default off so bowls remain loot-only.
 - **Cat company mental buff** — being in the same shelter as your cat slowly raises mental at the same rate as sitting near a fire. Vanilla shelter doesn't normally restore mental — this is the cat's contribution. Cat must be alive and rescued. Toggleable in MCM.
 - **Shelter-agnostic** — works with Cabin, Attic, Classroom, Tent, or Bunker.
 
@@ -33,7 +33,7 @@ No more returning to base every 40 minutes to drop a can of tuna in the feeder. 
 | Show Fed Notification | On | Green "Cat ate from bowl: …" / "Cat Auto-Fed: …" messages. |
 | Show Hunger Warning | On | Orange "Cat is hungry" / "Bowl is empty" messages. |
 | Allow Shelter Fallback | **Off** | When off, cat eats only from the bowl. When on, the cat raids raw food in cabinets in its shelter. |
-| Bowl in Loot Tables | On | Adds the bowl to the master loot table at Legendary rarity (~1 in 120 civilian containers). Reload the game after toggling. |
+| Bowl in Loot Tables | On | Adds the bowl to the master loot table at Rare rarity. Reload the game after toggling. |
 | Bowl at Gunsmith | **Off** | Lets the Gunsmith trader (day-10 unlock) stock bowls in his random supply. Off by default — bowls are loot-only out of the box. Reload the game after toggling. |
 | Cat Company Mental Buff | On | While in the cat's shelter (cat alive), raise mental at the same rate as a fire. |
 
@@ -46,6 +46,10 @@ Plus the standard Logger category (level, file output, overlay output). See [the
 - **Likely incompatible with [Put Food Out](https://modworkshop.net/mod/56098)** — both mods touch the cat-feeding loop. Pick one. Untested in combination; if you run both you may get double-feeds or fight over the same hunger ticks.
 - **MCM is optional** — the mod runs with sensible defaults if MCM is absent. It is only required for in-game configuration.
 - **Uninstalling drops bowls and contents.** Save files reference the bowl via `res://mods/CatAutoFeed/Cat_Bowl.tres`. If you remove the .vmz, the game silently strips bowls (and any food they hold) from saves on next load. To migrate, empty all bowls before uninstalling.
+
+## Known issues
+
+- **Bowl can rarely fall through the floor when bumped during placement.** If you're mid-placement and the bowl collides with another item (fishing rod on a shelf, lantern, anything), vanilla physics releases the placement (`Placer.Collided` → `Unfreeze()`) and the bowl can be ejected through a floor seam in the moment between kinematic preview and gravity-active modes. The vanilla "Item Returned" rescue only catches items that fall past the killbox volume far below the world (`y < -50`); a bowl that wedges a few cm under the floor never reaches it, and shallow falls aren't pruned by the save-time `y < -10` threshold either, so the bowl persists in the shelter save just below where you can see or interact with it. Recovery is currently a manual save-file edit: open `%APPDATA%\Road to Vostok\<Shelter>.tres`, find the `Cat Food Bowl` ItemSave block with a negative `position.y`, and either remove it or change `position.y` to a sensible above-floor value (e.g. `0.05`). **Always back up the `.tres` first.** A proper in-mod fix (overlap-aware clip correction that can distinguish "stuck under floor" from "shelf overhead") is on the to-do list.
 
 ## Credits
 
