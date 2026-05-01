@@ -47,6 +47,10 @@ Plus the standard Logger category (level, file output, overlay output). See [the
 - **MCM is optional** — the mod runs with sensible defaults if MCM is absent. It is only required for in-game configuration.
 - **Uninstalling drops bowls and contents.** Save files reference the bowl via `res://mods/CatAutoFeed/Cat_Bowl.tres`. If you remove the .vmz, the game silently strips bowls (and any food they hold) from saves on next load. To migrate, empty all bowls before uninstalling.
 
+## Known issues
+
+- **Bowl can rarely fall through the floor when bumped during placement.** If you're mid-placement and the bowl collides with another item (fishing rod on a shelf, lantern, anything), vanilla physics releases the placement (`Placer.Collided` → `Unfreeze()`) and the bowl can be ejected through a floor seam in the moment between kinematic preview and gravity-active modes. The vanilla "Item Returned" rescue only catches items that fall past the killbox volume far below the world (`y < -50`); a bowl that wedges a few cm under the floor never reaches it, and shallow falls aren't pruned by the save-time `y < -10` threshold either, so the bowl persists in the shelter save just below where you can see or interact with it. Recovery is currently a manual save-file edit: open `%APPDATA%\Road to Vostok\<Shelter>.tres`, find the `Cat Food Bowl` ItemSave block with a negative `position.y`, and either remove it or change `position.y` to a sensible above-floor value (e.g. `0.05`). **Always back up the `.tres` first.** A proper in-mod fix (overlap-aware clip correction that can distinguish "stuck under floor" from "shelf overhead") is on the to-do list.
+
 ## Credits
 
 Built for the Road to Vostok modding ecosystem. In-game configuration via the [Mod Configuration Menu](https://modworkshop.net/mod/53713) by DoinkOink.
