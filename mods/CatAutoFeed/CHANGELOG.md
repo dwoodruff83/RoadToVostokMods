@@ -3,6 +3,26 @@
 All notable changes to the Cat Auto Feed mod are documented here. Dates are
 YYYY-MM-DD.
 
+## 1.1.6 — 2026-05-01
+
+- **Bowl rarity demoted from Legendary to Rare.** Previously
+  `rarity = 2` (Legendary), now `rarity = 1` (Rare). Two reasons:
+  - Gunsmith trader was effectively never stocking the bowl with the
+    "Bowl at Gunsmith" MCM toggle on. Trader supply pools are random
+    samples, and a Legendary item competes against a much larger pool
+    for limited supply slots; in practice the bowl rarely surfaces.
+    Demoting to Rare puts the bowl in a smaller, more-frequently-drawn
+    bucket so the toggle actually does something visible.
+  - Loot-spawn frequency in civilian containers also goes up. The old
+    ~1-in-120-containers spawn rate at Legendary was tuned for the
+    "rescue safety net" pitch but felt punishing for players who just
+    wanted to find a bowl without crafting or buying. Rare is the
+    right tier — uncommon enough to feel like a find, common enough
+    that you'll see one within a hideout-clearing run.
+- **Item value, weight, and tetris size unchanged.** This is a tier
+  shift for spawn frequency and trader-pool behavior only; the bowl's
+  in-game economy and inventory footprint stay the same.
+
 ## 1.1.5 — 2026-04-30
 
 - Bowl no longer teleports up onto an upper shelf when placed near
