@@ -9,3 +9,6 @@ RTVHideoutLightsConfig="res://mods/RTVHideoutLights/config.gd"
 RTVHideoutLights="res://mods/RTVHideoutLights/Main.gd"
 
 [registry]
+
+[updates]
+modworkshop=56519

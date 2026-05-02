@@ -22,6 +22,7 @@ body:
       description: Pick the affected mod. If the issue is in the workspace tooling (build scripts, scaffold, sync_logger, etc.), pick "Workspace tooling".
       options:
         - Cat Auto Feed
+        - RTV Hideout Lights
         - RTV Mod Logger
         - RTV Wallets
         - Punisher Guarantee
@@ -101,7 +102,7 @@ body:
     attributes:
       label: Logs and screenshots
       description: |
-        If the affected mod uses RTV Mod Logger (CatAutoFeed, RTVWallets do), the log file lives at
+        If the affected mod uses RTV Mod Logger (CatAutoFeed, RTVWallets, RTVHideoutLights all do), the log file lives at
         `%APPDATA%\Road to Vostok\MCM\<ModId>\<mod_id>.log`. Attach or paste relevant lines.
 
         Screenshots help a lot for UI / loot / item-state issues — drag images directly into this field.
