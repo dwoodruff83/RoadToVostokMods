@@ -38,6 +38,10 @@ mods/*/MCM/
 # --- Blender autosaves ---
 *.blend1
 
+# --- Junction-mount setup backups (created when temporarily junctioning
+# a mod folder against the decompiled project for in-editor work). ---
+*.bak.preJunction
+
 # --- Agent / IDE / OS junk ---
 .claude/
 .vscode/*
