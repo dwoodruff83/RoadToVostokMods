@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://fb2txth2yy3v"
-path="res://.godot/imported/Icon_Sauna_Lamp.png-31bc6168bcb152b15f39a9b61b39ac39.ctex"
+path="res://.godot/imported/Icon_Sauna_Lamp.png-33ad8a3ff6baf9df9f1e8394493aae9e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/icons/Icon_Sauna_Lamp.png"
-dest_files=["res://.godot/imported/Icon_Sauna_Lamp.png-31bc6168bcb152b15f39a9b61b39ac39.ctex"]
+source_file="res://mods/RTVHideoutLights/assets/icons/Icon_Sauna_Lamp.png"
+dest_files=["res://.godot/imported/Icon_Sauna_Lamp.png-33ad8a3ff6baf9df9f1e8394493aae9e.ctex"]
 
 [params]
 

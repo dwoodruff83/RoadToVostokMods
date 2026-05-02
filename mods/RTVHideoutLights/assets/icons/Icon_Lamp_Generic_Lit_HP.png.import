@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://rn6nfgtnd6p5"
-path="res://.godot/imported/Icon_Lamp_Generic_Lit_HP.png-320f9109e527645b05834ec05364beb6.ctex"
+path="res://.godot/imported/Icon_Lamp_Generic_Lit_HP.png-19eb8a90c9fc562a4f043868cd5d4025.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/icons/Icon_Lamp_Generic_Lit_HP.png"
-dest_files=["res://.godot/imported/Icon_Lamp_Generic_Lit_HP.png-320f9109e527645b05834ec05364beb6.ctex"]
+source_file="res://mods/RTVHideoutLights/assets/icons/Icon_Lamp_Generic_Lit_HP.png"
+dest_files=["res://.godot/imported/Icon_Lamp_Generic_Lit_HP.png-19eb8a90c9fc562a4f043868cd5d4025.ctex"]
 
 [params]
 

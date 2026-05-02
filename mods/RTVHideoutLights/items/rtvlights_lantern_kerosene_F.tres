@@ -3,7 +3,7 @@
 
 [ext_resource type="Script" path="res://Scripts/ItemData.gd" id="1"]
 [ext_resource type="Texture2D" path="res://mods/RTVHideoutLights/assets/icons/Icon_Lantern_Kerosene.png" id="2"]
-[ext_resource type="PackedScene" path="res://mods/RTVHideoutLights/scenes/rtvlights_lantern_kerosene_2x2.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://mods/RTVHideoutLights/scenes/rtvlights_lantern_kerosene_2x3.tscn" id="3"]
 
 [resource]
 script = ExtResource("1")
@@ -17,5 +17,7 @@ value = 200
 rarity = 4
 icon = ExtResource("2")
 tetris = ExtResource("3")
-size = Vector2(2, 2)
+size = Vector2(2, 3)
 generalist = true
+gunsmith = true
+doctor = true

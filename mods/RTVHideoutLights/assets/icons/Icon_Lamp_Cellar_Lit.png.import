@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bh7m4cj0e2wwl"
-path="res://.godot/imported/Icon_Lamp_Cellar_Lit.png-54b0b97268435970ccb07b3b2bcb8fdf.ctex"
+path="res://.godot/imported/Icon_Lamp_Cellar_Lit.png-2386425dd57b7c4de9cb64beb55a269b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/icons/Icon_Lamp_Cellar_Lit.png"
-dest_files=["res://.godot/imported/Icon_Lamp_Cellar_Lit.png-54b0b97268435970ccb07b3b2bcb8fdf.ctex"]
+source_file="res://mods/RTVHideoutLights/assets/icons/Icon_Lamp_Cellar_Lit.png"
+dest_files=["res://.godot/imported/Icon_Lamp_Cellar_Lit.png-2386425dd57b7c4de9cb64beb55a269b.ctex"]
 
 [params]
 

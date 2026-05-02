@@ -4,8 +4,6 @@ const MOD_ID := "RTVHideoutLights"
 const MOD_NAME := "RTV Hideout Lights"
 const FILE_PATH := "user://MCM/RTVHideoutLights"
 
-var enabled := true
-
 var _mcm_helpers = null
 
 func _ready() -> void:
@@ -15,17 +13,9 @@ func _ready() -> void:
 
 	var config := ConfigFile.new()
 
-	config.set_value("Category", "General", { "menu_pos": 1 })
-
-	config.set_value("Bool", "enabled", {
-		"name" = "Enable RTV Hideout Lights",
-		"tooltip" = "Master toggle for the RTV Hideout Lights mod.",
-		"default" = true,
-		"value" = true,
-		"category" = "General",
-		"menu_pos" = 1,
-	})
-
+	# v1 has no mod-specific MCM settings — fixtures are placed via the
+	# vanilla decor mode and toggled in-world. Logger category is always
+	# attached so users can adjust log verbosity / output sinks.
 	var logger = _resolve_logger()
 	if logger:
 		logger.attach_to_mcm_config(config, "Logging", 100)
@@ -43,7 +33,7 @@ func _ready() -> void:
 		MOD_ID,
 		MOD_NAME,
 		FILE_PATH,
-		"Placeable hideout lights, sold by the Generalist",
+		"Placeable hideout lights, stocked by every trader",
 		{ "config.ini" = _apply }
 	)
 
@@ -81,8 +71,6 @@ func _apply(config: ConfigFile) -> void:
 	var err := fresh.load(FILE_PATH + "/config.ini")
 	if err == OK:
 		config = fresh
-
-	enabled = config.get_value("Bool", "enabled", {"value": true})["value"]
 
 	var logger = _resolve_logger()
 	if logger:

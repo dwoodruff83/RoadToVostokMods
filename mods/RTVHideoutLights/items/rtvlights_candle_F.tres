@@ -19,3 +19,5 @@ icon = ExtResource("2")
 tetris = ExtResource("3")
 size = Vector2(2, 2)
 generalist = true
+gunsmith = true
+doctor = true

@@ -1,6 +1,8 @@
 # RTV Hideout Lights — Mod Plan
 
-Status: **Planning complete, implementation not started.** Last updated 2026-04-28.
+Status: **Shipped as v1.0.0 on 2026-05-01.** See [mods/RTVHideoutLights/CHANGELOG.md](../mods/RTVHideoutLights/CHANGELOG.md) for the actual release notes and [mods/RTVHideoutLights/README.md](../mods/RTVHideoutLights/README.md) for player docs. This document is preserved as-is as the original design plan; some details (asset selection, switch wiring, ceiling-only placement) evolved during implementation.
+
+Last updated (planning): 2026-04-28.
 
 ## Concept
 

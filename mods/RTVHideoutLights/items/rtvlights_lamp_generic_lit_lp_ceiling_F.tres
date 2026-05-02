@@ -8,9 +8,9 @@
 [resource]
 script = ExtResource("1")
 file = "rtvlights_lamp_generic_lit_lp_ceiling"
-name = "Soft Wall Lamp"
-inventory = "Soft Wall Lamp"
-display = "Soft Wall Lamp"
+name = "Soft Fluorescent"
+inventory = "Soft Fluorescent"
+display = "Soft Fluorescent"
 type = "Furniture"
 weight = 0.5
 value = 400
@@ -19,3 +19,5 @@ icon = ExtResource("2")
 tetris = ExtResource("3")
 size = Vector2(5, 2)
 generalist = true
+gunsmith = true
+doctor = true

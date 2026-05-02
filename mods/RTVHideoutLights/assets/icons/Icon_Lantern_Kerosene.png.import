@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cog1m2mwk21ou"
-path="res://.godot/imported/Icon_Lantern_Kerosene.png-acd54fb8bc2d28e2fb81e2a62444ce04.ctex"
+path="res://.godot/imported/Icon_Lantern_Kerosene.png-8c62bfe0f9859662899849b1ad576bb8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/icons/Icon_Lantern_Kerosene.png"
-dest_files=["res://.godot/imported/Icon_Lantern_Kerosene.png-acd54fb8bc2d28e2fb81e2a62444ce04.ctex"]
+source_file="res://mods/RTVHideoutLights/assets/icons/Icon_Lantern_Kerosene.png"
+dest_files=["res://.godot/imported/Icon_Lantern_Kerosene.png-8c62bfe0f9859662899849b1ad576bb8.ctex"]
 
 [params]
 

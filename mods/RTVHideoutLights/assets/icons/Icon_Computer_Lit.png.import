@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://ckbhi7etrel4g"
-path="res://.godot/imported/Icon_Computer_Lit.png-3cfa86dc3bb66989e023a8e59a04e766.ctex"
+path="res://.godot/imported/Icon_Computer_Lit.png-91c07ac2b25bec2ee0045cc3165fd6fb.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/icons/Icon_Computer_Lit.png"
-dest_files=["res://.godot/imported/Icon_Computer_Lit.png-3cfa86dc3bb66989e023a8e59a04e766.ctex"]
+source_file="res://mods/RTVHideoutLights/assets/icons/Icon_Computer_Lit.png"
+dest_files=["res://.godot/imported/Icon_Computer_Lit.png-91c07ac2b25bec2ee0045cc3165fd6fb.ctex"]
 
 [params]
 

@@ -1,7 +1,7 @@
 [mod]
 name="RTV Hideout Lights"
 id="RTVHideoutLights"
-version="0.1.0"
+version="1.0.0"
 
 [autoload]
 RTVHideoutLightsLog="res://mods/RTVHideoutLights/Logger.gd"

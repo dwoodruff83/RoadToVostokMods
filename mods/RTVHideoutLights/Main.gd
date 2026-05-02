@@ -91,14 +91,26 @@ func _register_with_metro() -> void:
 		"Generalist",
 	)
 
-# Wires one fixture into the four registries Metro v3.x exposes:
+# Wires one fixture into Metro v3.x registries:
 #   SCENES         — Database.get(id) resolves to the placeable scene
 #   ITEMS          — registers the ItemData (auto-syncs itemData.file = id)
-#   LOOT           — appends the item into LT_Master so traders can stock it
-#   TRADER_POOLS   — flips the trader-flag (e.g. item.generalist = true)
+#   LOOT/LT_Master — appends to LT_Master, which is the source pool the
+#                    vanilla Trader.FillTraderBucket() iterates over to
+#                    decide what to stock. The game also filters
+#                    type=="Furniture" out of loot-container spawns, so
+#                    this only ever has trader effect for our fixtures —
+#                    not actual loot drops.
+#   TRADER_POOLS   — appends the item to each trader's supply pool
 # The same `id` string keys SCENES/ITEMS, and itemData.file must match it
 # because the placement and shelter-load paths both call Database.get(file).
-func _register_lamp(lib, id: String, scene: PackedScene, data: Resource, trader: String) -> void:
+#
+# v1 stocks every fixture at the three currently-revealed traders so
+# players see them everywhere they shop. Grandma is intentionally
+# skipped — she's still story-hidden. We'll scale this back per-fixture
+# in a later release based on user feedback.
+const TRADERS := ["Generalist", "Gunsmith", "Doctor"]
+
+func _register_lamp(lib, id: String, scene: PackedScene, data: Resource, _trader: String) -> void:
 	if data == null:
 		_log("error", "ItemData failed to load for %s" % id)
 		return
@@ -115,14 +127,14 @@ func _register_lamp(lib, id: String, scene: PackedScene, data: Resource, trader:
 	}):
 		_log("warn", "Metro rejected LOOT for %s" % id)
 		return
-	if !lib.register(lib.Registry.TRADER_POOLS, id + "_" + trader.to_lower(), {
-		"item": data,
-		"trader": trader,
-	}):
-		_log("warn", "Metro rejected TRADER_POOLS for %s" % id)
-		return
+	for trader in TRADERS:
+		if !lib.register(lib.Registry.TRADER_POOLS, id + "_" + trader.to_lower(), {
+			"item": data,
+			"trader": trader,
+		}):
+			_log("warn", "Metro rejected TRADER_POOLS for %s @ %s" % [id, trader])
 
-	_log("debug", "Registered %s in %s pool" % [id, trader])
+	_log("debug", "Registered %s at all traders" % id)
 
 func _log(lvl: String, msg: String) -> void:
 	if _log_node == null or !is_instance_valid(_log_node):

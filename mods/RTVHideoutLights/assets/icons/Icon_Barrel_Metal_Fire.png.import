@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://ctxkoe3sexvd4"
-path="res://.godot/imported/Icon_Barrel_Metal_Fire.png-93d0a879c7dfa8afcfd6c89896d2d326.ctex"
+path="res://.godot/imported/Icon_Barrel_Metal_Fire.png-62ff18edfcc6aa05356634b28fc2408b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/icons/Icon_Barrel_Metal_Fire.png"
-dest_files=["res://.godot/imported/Icon_Barrel_Metal_Fire.png-93d0a879c7dfa8afcfd6c89896d2d326.ctex"]
+source_file="res://mods/RTVHideoutLights/assets/icons/Icon_Barrel_Metal_Fire.png"
+dest_files=["res://.godot/imported/Icon_Barrel_Metal_Fire.png-62ff18edfcc6aa05356634b28fc2408b.ctex"]
 
 [params]
 

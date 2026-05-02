@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://jtbndc3a3a2a"
-path="res://.godot/imported/Icon_Sign_Exit_Lit.png-006b5dce4a3eefe2ab10c7822adb9ebc.ctex"
+path="res://.godot/imported/Icon_Sign_Exit_Lit.png-3061a50719e97fb80ad2f54ae312c289.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/icons/Icon_Sign_Exit_Lit.png"
-dest_files=["res://.godot/imported/Icon_Sign_Exit_Lit.png-006b5dce4a3eefe2ab10c7822adb9ebc.ctex"]
+source_file="res://mods/RTVHideoutLights/assets/icons/Icon_Sign_Exit_Lit.png"
+dest_files=["res://.godot/imported/Icon_Sign_Exit_Lit.png-3061a50719e97fb80ad2f54ae312c289.ctex"]
 
 [params]
 

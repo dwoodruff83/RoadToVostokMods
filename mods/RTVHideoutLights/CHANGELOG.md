@@ -3,8 +3,22 @@
 All notable changes to the RTV Hideout Lights mod are documented here. Dates are
 YYYY-MM-DD.
 
-## 0.1.0 — 2026-04-29
+## 1.0.0 — 2026-05-01
 
-Initial scaffold.
+First public release. Nine placeable light fixtures, stocked by all three currently-revealed traders (Generalist, Gunsmith, Doctor):
 
-- TODO: describe the first set of working features as you build them.
+- **Candle** (2x2 floor) and **Kerosene Lantern** (2x3 floor) — vanilla `Fire.gd` integration; ignite/extinguish via Use action.
+- **Floor Lamp** (3x6 floor) — warm 50° spotlight inside a fabric shade, plus an emissive bulb sphere visible through the shade opening. Use to toggle. Includes an upward-pointing fill light so the dome interior reads as lit (vanilla shader doesn't light back-faces from inside).
+- **Vintage Desktop PC** (4x4 floor) — soft cyan glow + animated lit-screen UI when on; matte dark screen when off. Use to toggle.
+- **Exit Sign** (3x2 wall) — green-glow sconce, always on.
+- **Cellar Wall Light** (2x3 wall) — warm bare bulb behind a metal cage. Wired to shelter switch.
+- **Industrial Fluorescent** (2x2 ceiling) — square ceiling panel, neutral white. Wired to shelter switch.
+- **Bright Fluorescent** (5x2 ceiling) and **Soft Fluorescent** (5x2 ceiling) — long fluorescent tubes; the soft variant has lower energy and skips volumetric fog (no visible god-ray cone). Both wired to shelter switch.
+
+Switch integration: ceiling and Cellar fixtures auto-subscribe to any node in the `Switch` group within the placement scene tree, so they react to the shelter's existing wall switch (Cabin, Bunker, Classroom). Subscription appends to the switch's `targets` array — no conflict with vanilla lights.
+
+Material swap on toggle: when off, the lampshade material switches from the emissive `_Lit` variant to the matte default — same pattern vanilla `Light.gd` uses, so the fixture body doesn't keep glowing while the Light3D is hidden.
+
+Placement constraints: ceiling fixtures reject floor placement (surface normal check) so they don't clip into solid floors. Ray clusters are tightened on long fluorescents so they can mount across narrow rafter beams in either orientation.
+
+Built on Metro Mod Loader v3.0.0+ (uses `[registry]` API). Ships zero new asset data — every mesh, texture, and material is loaded from the vanilla game install at runtime.
