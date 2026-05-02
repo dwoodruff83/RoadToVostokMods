@@ -1,0 +1,55 @@
+RTV Hideout Lights — Asset Notices
+==================================
+
+This mod ships zero new mesh, texture, or material data of its own. Every
+3D model, every material, every texture referenced by the mod's scenes
+(.tscn) and item resources (.tres) is loaded from the player's existing
+Road to Vostok game install via res:// paths into the vanilla
+res://Assets/ tree.
+
+In particular, the mod ships NO copies of any of these vanilla files,
+and instead references them at their original res:// locations:
+
+    res://Assets/Candle/Files/MS_Candle.obj
+    res://Assets/Candle/Files/MT_Candle.tres
+    res://Assets/Lantern_Kerosene/Files/MS_Lantern_Kerosene_LOD0.obj
+    res://Assets/Lantern_Kerosene/Files/MT_Lantern_Kerosene.tres
+    res://Assets/Lamp_Floor/Files/MS_Lamp_Floor_LOD0.obj
+    res://Assets/Lamp_Floor/Files/MT_Lamp_Floor.tres
+    res://Assets/Lamp_Cellar/Files/MS_Lamp_Cellar.obj
+    res://Assets/Lamp_Cellar/Files/MT_Lamp_Cellar.tres
+    res://Assets/Lamp_Cellar/Files/MT_Lamp_Cellar_Lit.tres
+    res://Assets/Lamp_Generic/Files/MS_Lamp_Generic.obj
+    res://Assets/Lamp_Generic/Files/MT_Lamp_Generic.tres
+    res://Assets/Lamp_Generic/Files/MT_Lamp_Generic_Lit.tres
+    res://Assets/Lamp_Grid/Files/MS_Lamp_Grid.obj
+    res://Assets/Lamp_Grid/Files/MT_Lamp_Grid.tres
+    res://Assets/Lamp_Grid/Files/MT_Lamp_Grid_Lit.tres
+    res://Assets/Sign_Exit/Files/MS_Sign_Exit.obj
+    res://Assets/Sign_Exit/Files/MT_Sign_Exit.tres
+    res://Assets/Computer/Files/MS_Computer_LOD0.obj
+    res://Assets/Computer/Files/MT_Computer.tres
+    res://Assets/Computer/Files/MT_Computer_Screen.tres
+    res://Assets/Computer/Files/MT_Computer_Screen_Lit.tres
+    res://Effects/Files/MT_Candle_Fire.tres
+    res://Effects/Emitters/Fire.tres
+    res://Modular/Materials/MT_Glass.tres
+    res://Modular/Materials/MT_Hint.tres
+    res://Modular/Materials/MT_Furniture.tres
+    res://UI/Effects/MT_Item.tres
+    res://UI/Sprites/Icon_Object.png
+
+These remain the property of the Road to Vostok developers (Antti Hyytinen
+/ Road to Vostok Productions). The mod merely adds new placeable scene
+wrappers (.tscn) and item data (.tres) that point at them, plus a small
+amount of GDScript to manage placement, switch integration, and on/off
+toggle behavior.
+
+Trader catalog icons (mods/RTVHideoutLights/assets/icons/*.png) are
+derived from screenshots of the vanilla in-game fixtures, processed for
+inventory presentation. These ship inside the .vmz; they are not vanilla
+files but are generated from the visual appearance of vanilla content.
+
+If you are the rights holder and want a credit line added or a file
+removed, open an issue at
+https://github.com/dwoodruff83/RoadToVostokMods/issues

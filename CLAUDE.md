@@ -59,6 +59,13 @@ This is a modding workspace for **Road to Vostok**, a survival FPS built in Godo
 - Game state lives in `GameData.tres` (preload as `res://Resources/GameData.tres`)
 - All game scripts are under `res://Scripts/` (176 files)
 
+## Mod layout conventions
+
+- **Small mods (≤ ~5 placeable items)**: keep all `.tscn`, `.tres`, and `.gd` files at the mod root. Examples: CatAutoFeed (1 item), RTVWallets (4 items). The flat layout is what `tools/scaffold_mod.py` produces by default.
+- **Larger mods (> ~5 placeable items)**: organize as `scenes/` for `.tscn`, `items/` for `.tres`, leaving `.gd` scripts at the mod root. Example: RTVHideoutLights (10+ SKUs). When using subfolders, add them to `build.py`'s `ASSET_DIRS` list so they get bundled into the `.vmz`.
+- **Assets always in `assets/`** regardless of mod size: `assets/icons/` for trader icons, `assets/models/` for `.glb` / `.obj` files. Matches CatAutoFeed's existing `assets/icons/Cat_Bowl.png` and `assets/models/Cat_Bowl.glb`.
+- **Don't restructure published mods** — player saves reference scene/resource paths via `res://...` and shipped item `.tres` paths. Moving files breaks existing saves silently (item disappears from save on next load). For published mods, accept the original layout and only restructure with a save-migration story.
+
 ## Tooling
 
 - **GDRE Tools v2.5.0-beta.5** (installed at `tools/GDRE_tools/`): Decompile PCK, list files, create PCK
