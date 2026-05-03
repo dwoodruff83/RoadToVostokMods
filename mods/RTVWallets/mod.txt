@@ -1,7 +1,7 @@
 [mod]
 name="RTV Wallets"
 id="RTVWallets"
-version="1.0.1"
+version="1.0.2"
 
 [autoload]
 RTVWalletsLog="res://mods/RTVWallets/Logger.gd"
@@ -11,6 +11,9 @@ RTVWallets="res://mods/RTVWallets/Main.gd"
 [registry]
 ; Opts into Metro's registry API so wallet/cash scenes are added to Database
 ; via lib.register() instead of take_over_path (Metro v3.x and later).
+; opt_in keeps the section non-empty so Godot's ConfigFile parser doesn't drop
+; it on Metro v3.0.0 (the workaround for empty sections only landed in v3.0.1).
+opt_in = true
 
 [updates]
 modworkshop=56408

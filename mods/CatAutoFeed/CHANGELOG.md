@@ -3,6 +3,23 @@
 All notable changes to the Cat Auto Feed mod are documented here. Dates are
 YYYY-MM-DD.
 
+## 1.1.8 — 2026-05-02
+
+- **Fix: Cat_Bowl can fail to register on Metro Mod Loader v3.0.0.**
+  The mod's `[registry]` section in `mod.txt` had only `;`-comment lines
+  in its body, which Godot's `ConfigFile` parser strips before checking
+  for emptiness. On Metro v3.0.0 (which lacks the workaround that v3.0.1
+  added) the section was then dropped, `_any_mod_declared_registry`
+  stayed false, the Database.gd rewriter never fired, and
+  `lib.register(SCENES, "Cat_Bowl", ...)` returned false with the
+  warning "Metro rejected SCENES for Cat_Bowl". Effect: bowl wasn't in
+  `Database`, didn't appear at the Gunsmith trader, didn't spawn in
+  loot tables, and couldn't be placed. Fix is one line: added
+  `opt_in = true` under `[registry]` so the section parses on every
+  Metro version. Players already on Metro v3.0.1+ are unaffected.
+- No code changes; no save format changes; existing saves carry forward.
+- Discovered while diagnosing the same bug on RTV Hideout Lights 1.0.0.
+
 ## 1.1.7 — 2026-05-01
 
 - **Fix: "Bowl in Loot Tables" MCM tooltip still claimed rarity
