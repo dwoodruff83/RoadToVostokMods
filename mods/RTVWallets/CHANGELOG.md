@@ -3,6 +3,23 @@
 All notable changes to the RTV Wallets mod are documented here. Dates are
 YYYY-MM-DD.
 
+## 1.0.2 — 2026-05-02
+
+- **Fix: wallet/cash items can fail to register on Metro Mod Loader
+  v3.0.0.** The mod's `[registry]` section in `mod.txt` had only
+  `;`-comment lines in its body, which Godot's `ConfigFile` parser
+  strips before checking for emptiness. On Metro v3.0.0 (which lacks
+  the workaround that v3.0.1 added) the section was then dropped,
+  `_any_mod_declared_registry` stayed false, the Database.gd rewriter
+  never fired, and `lib.register(SCENES, ...)` returned false with the
+  warning "Metro rejected SCENES for ...". Effect: wallets / cash
+  weren't in `Database`, traders had nothing to stock, lootable
+  wallets didn't spawn. Fix is one line: added `opt_in = true` under
+  `[registry]` so the section parses on every Metro version. Players
+  already on Metro v3.0.1+ are unaffected.
+- No code changes; no save format changes; existing saves carry forward.
+- Discovered while diagnosing the same bug on RTV Hideout Lights 1.0.0.
+
 ## 1.0.1 — 2026-04-26
 
 Re-upload to register the ModWorkshop mod id (`modworkshop=56408` in
