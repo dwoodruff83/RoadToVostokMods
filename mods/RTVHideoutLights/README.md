@@ -31,9 +31,21 @@ Every fixture is stocked by all three currently-revealed traders (Generalist, Gu
 
 ## Switch integration
 
-Shelters with a vanilla **Light_Switch** (Cabin, Bunker, Classroom) already control their built-in lights. Place any fixture marked "Shelter switch" above and the mod auto-subscribes it within a fraction of a second. It turns on and off alongside the vanilla lights.
+Shelters with a vanilla **Light_Switch** (Cabin, Bunker, Classroom) already control their built-in lights. Place any fixture marked "Shelter switch" above and the mod auto-subscribes it to the room's switch.
 
-Shelters without a switch (Tent, Attic): wired fixtures still light up; there's just nothing to flip them off with. The Floor Lamp, PC, Candle, Lantern, and Exit Sign are independent of the switch in any shelter.
+**Multi-switch shelters** (the Cabin has one switch per room): the mod picks the switch whose existing static lights are nearest to your placed fixture. That's effectively "which room am I in", without needing line-of-sight or pathfinding tricks. Re-placing the fixture in a different room drops the old subscription and joins the new one.
+
+The nearest-light heuristic can mis-assign on edge cases, like a fixture placed in a doorway between two rooms or next to a switch that's mounted on a shared wall. If the fixture wires to the wrong switch, just pick it up and re-place a step further into the room you want.
+
+Shelters without a switch (Tent, Attic) leave wired fixtures permanently on; there's nothing to flip them off with. The Floor Lamp, PC, Candle, Lantern, and Exit Sign are independent of the switch in any shelter.
+
+## Placement and state
+
+Picking a fixture up to move it always turns it off for the duration of the placement preview, so the green hologram renders cleanly and the fixture lands in a known state. On commit:
+
+- **Switch-controlled fixtures** sync to the nearest room switch's current on/off state.
+- **Manual fixtures** (Floor Lamp, PC, Candle, Lantern) start off; player turns them on with Use.
+- **Always-on fixtures** (Exit Sign) light back up.
 
 When a fixture is off, both the Light3D source and the emissive lampshade material go dark (same pattern as the vanilla cabin pendants).
 

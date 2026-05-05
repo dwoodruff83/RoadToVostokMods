@@ -3,13 +3,25 @@ extends Furniture
 # Furniture subclass for light fixtures. Two behaviours on top of vanilla
 # Furniture:
 #
-# 1. Placement-preview suppression — when the player picks the lamp up to
-#    move it (StartMove), every Light3D descendant AND any "Bulb" decoration
-#    mesh is hidden so the unplaced lamp doesn't bleed light into the room
-#    or show a bright emissive sphere inside the green placement hologram.
-#    Restored on ResetMove. The cancel-to-catalog path
-#    (Catalog -> owner.queue_free) needs no handling — the whole scene is
-#    freed.
+# 1. Placement lifecycle — when the player picks the fixture up to move
+#    it (StartMove) we force it OFF: call the toggle's Deactivate (or
+#    Fire.Deactivate) so active=false AND hide every Light3D descendant
+#    plus any "Bulb" decoration mesh so they don't leak light or show
+#    inside the green placement hologram. The fixture stays off through
+#    placement.
+#
+#    When the player commits placement (ResetMove) we route by spec:
+#      - Switch-controlled fixtures (LightToggle.subscribe_to_switch=true,
+#        the four ceiling/Cellar SKUs) re-run their switch subscription so
+#        their state matches the shelter's vanilla Light_Switch.
+#      - Manual fixtures (Floor Lamp, PC) stay off; player turns them on
+#        with the Use action.
+#      - Fire fixtures (Candle, Lantern) stay off; player ignites with Use.
+#      - Always-on fixtures with no toggle (Exit Sign) restore preview
+#        visibility so they re-light themselves.
+#
+#    The cancel-to-catalog path (Catalog -> owner.queue_free) needs no
+#    handling — the whole scene is freed.
 #
 # 2. Surface-orientation gate — when `ceiling_only = true`, placement is
 #    rejected if the center ray's hit surface normal points more "up" than
@@ -28,11 +40,14 @@ extends Furniture
 
 var _preview_hidden: Array[Node3D] = []
 
-func _ready() -> void:
-    super()
-    if Engine.is_editor_hint():
+# Lazy collection: don't walk the tree during _ready (sibling-subtree
+# ordering with the LightToggle script on the scene root made the array
+# end up empty in some catalog-spawn paths, causing StartMove's hide call
+# to no-op). Walk on first StartMove instead — by then the tree is fully
+# constructed and Placer has just called us.
+func _ensure_preview_hidden_collected() -> void:
+    if !_preview_hidden.is_empty():
         return
-    _preview_hidden.clear()
     _collect_preview_hidden_into(_preview_hidden, owner)
 
 func _collect_preview_hidden_into(out: Array[Node3D], node: Node) -> void:
@@ -47,11 +62,41 @@ func _collect_preview_hidden_into(out: Array[Node3D], node: Node) -> void:
 
 func StartMove() -> void:
     super()
+    _ensure_preview_hidden_collected()
+    # Only hide the preview-visible nodes (Light3D + Bulb). Don't call
+    # Deactivate here — it would re-apply the swap material to swap_mesh,
+    # overwriting the green hologram that vanilla super.StartMove() just
+    # set on the same surface. The fixture LOOKS off during placement
+    # because Light3D nodes are hidden; we'll commit the actual off-state
+    # in ResetMove after super.ResetMove restores sourceMaterials.
     _set_preview_visible(false)
 
 func ResetMove() -> void:
     super()
-    _set_preview_visible(true)
+    var root = owner
+    if root == null:
+        _set_preview_visible(true)
+        return
+
+    # Force the fixture off after placement (user-spec'd: "off when
+    # placed"). super.ResetMove just restored sourceMaterials including
+    # the LIT swap variant where applicable, so we re-apply Deactivate to
+    # put the swap surface back to the off material AND hide lights.
+    if root.has_method("Deactivate"):
+        root.Deactivate()
+
+    # Switch-controlled fixtures (Cellar, Industrial/Bright/Soft Fluo)
+    # immediately re-sync to the shelter's vanilla Light_Switch via the
+    # subscription path, which calls Activate or Deactivate to match.
+    if "subscribe_to_switch" in root and root.subscribe_to_switch \
+            and root.has_method("_try_subscribe_to_switch"):
+        root._try_subscribe_to_switch()
+        return
+
+    # No toggle and no fire (Exit Sign): restore preview visibility so
+    # the always-on light re-illuminates the scene.
+    if "active" not in root:
+        _set_preview_visible(true)
 
 func _set_preview_visible(value: bool) -> void:
     for n in _preview_hidden:
