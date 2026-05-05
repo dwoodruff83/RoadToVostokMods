@@ -6,10 +6,10 @@ This monorepo houses multiple mods, each with its own independent version. GitHu
 
 | Mod | Version | Release tag | ModWorkshop |
 |-----|---------|-------------|-------------|
-| **Cat Auto Feed** | `1.1.7` | [CatAutoFeed-v1.1.7](https://github.com/dwoodruff83/RoadToVostokMods/releases/tag/CatAutoFeed-v1.1.7) | [56407](https://modworkshop.net/mod/56407) |
+| **Cat Auto Feed** | `1.1.8` | [CatAutoFeed-v1.1.8](https://github.com/dwoodruff83/RoadToVostokMods/releases/tag/CatAutoFeed-v1.1.8) | [56407](https://modworkshop.net/mod/56407) |
 | **RTV Mod Logger** | `1.0.2` | [RTVModLogger-v1.0.2](https://github.com/dwoodruff83/RoadToVostokMods/releases/tag/RTVModLogger-v1.0.2) | [56406](https://modworkshop.net/mod/56406) |
-| **RTV Wallets** | `1.0.1` | [RTVWallets-v1.0.1](https://github.com/dwoodruff83/RoadToVostokMods/releases/tag/RTVWallets-v1.0.1) | [56408](https://modworkshop.net/mod/56408) |
-| **RTV Hideout Lights** | `1.0.0` | [RTVHideoutLights-v1.0.0](https://github.com/dwoodruff83/RoadToVostokMods/releases/tag/RTVHideoutLights-v1.0.0) | [56519](https://modworkshop.net/mod/56519) |
+| **RTV Wallets** | `1.0.2` | [RTVWallets-v1.0.2](https://github.com/dwoodruff83/RoadToVostokMods/releases/tag/RTVWallets-v1.0.2) | [56408](https://modworkshop.net/mod/56408) |
+| **RTV Hideout Lights** | `1.0.1` | [RTVHideoutLights-v1.0.1](https://github.com/dwoodruff83/RoadToVostokMods/releases/tag/RTVHideoutLights-v1.0.1) | [56519](https://modworkshop.net/mod/56519) |
 | **Punisher Guarantee** | `0.1.0` | [PunisherGuarantee-v0.1.0](https://github.com/dwoodruff83/RoadToVostokMods/releases/tag/PunisherGuarantee-v0.1.0) | — (not yet published) |
 
 ## Game Info
