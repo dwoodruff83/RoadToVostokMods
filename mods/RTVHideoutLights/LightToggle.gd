@@ -58,6 +58,13 @@ extends Node3D
 var active: bool = false
 var gameData = preload("res://Resources/GameData.tres")
 
+# Cached ref to the switch we subscribed to so _exit_tree can deregister
+# in O(1). If the player picks the fixture back up to the catalog, our
+# scene root gets queue_freed — without this cleanup, the switch's
+# targets array would hold a dead reference and the next toggle would
+# crash the game on dead.Deactivate().
+var _subscribed_switch: Node = null
+
 func _ready() -> void:
     if Engine.is_editor_hint():
         return
@@ -85,23 +92,23 @@ func Interact() -> void:
 func Activate() -> void:
     active = true
     for n in lights:
-        if n:
+        if is_instance_valid(n):
             n.visible = true
     for n in lit_meshes:
-        if n:
+        if is_instance_valid(n):
             n.visible = true
-    if swap_mesh and swap_on_material:
+    if is_instance_valid(swap_mesh) and swap_on_material:
         swap_mesh.set_surface_override_material(swap_surface_index, swap_on_material)
 
 func Deactivate() -> void:
     active = false
     for n in lights:
-        if n:
+        if is_instance_valid(n):
             n.visible = false
     for n in lit_meshes:
-        if n:
+        if is_instance_valid(n):
             n.visible = false
-    if swap_mesh and swap_off_material:
+    if is_instance_valid(swap_mesh) and swap_off_material:
         swap_mesh.set_surface_override_material(swap_surface_index, swap_off_material)
 
 func UpdateTooltip() -> void:
@@ -110,26 +117,92 @@ func UpdateTooltip() -> void:
     gameData.tooltip = "%s [%s]" % [label, "Turn Off" if active else "Turn On"]
 
 func _try_subscribe_to_switch() -> void:
-    # Find any node in the "Switch" group in the active scene tree and
-    # append self to its targets array. Vanilla shelter scenes typically
-    # have at most one Switch, so we just take the first match. Then sync
-    # our visible state to the switch's current state — necessary on save
-    # load: the switch persists its `active` flag across saves, but our
-    # `force_on=true` _ready leaves the light on regardless. Without the
-    # else-Deactivate branch the player sees lights-on / switch-off after
-    # every load until they manually toggle the switch.
+    # Find the NEAREST node in the "Switch" group (by world distance to
+    # this fixture) and append self to its targets array. Multi-switch
+    # shelters like the Cabin have one switch per room — picking the
+    # closest one means a placed fixture joins the room's switch instead
+    # of always grabbing whichever switch enumerates first.
+    #
+    # Then sync our visible state to the switch's current state —
+    # necessary on save load: the switch persists its `active` flag
+    # across saves, but our `force_on=true` _ready leaves the light on
+    # regardless. Without the else-Deactivate branch the player would
+    # see lights-on / switch-off after every load until they manually
+    # toggle the switch.
+    #
+    # Skip while the fixture is in placement preview (Furniture.isMoving).
+    # The initial _ready 0.5s timer would otherwise fire mid-placement and
+    # call Activate, overwriting the hologram material set by
+    # Furniture.StartMove(). LightFurniture.ResetMove() re-invokes us once
+    # placement is committed, so the subscription still happens — just
+    # after the fixture has landed.
+    var furniture = get_node_or_null("Furniture")
+    if furniture and "isMoving" in furniture and furniture.isMoving:
+        return
+
+    # Drop any prior subscription so a re-placement (move from one room
+    # to another) doesn't end up controlled by both rooms' switches.
+    if is_instance_valid(_subscribed_switch):
+        if "targets" in _subscribed_switch and _subscribed_switch.targets is Array:
+            _subscribed_switch.targets.erase(self)
+        _subscribed_switch = null
+
+    # Pick the switch whose existing targets are nearest to us, NOT just
+    # the nearest switch by straight-line distance. Vanilla shelters
+    # (multi-room ones like the Cabin) put each switch's controlled
+    # lights in that switch's room. So "nearest target distance"
+    # functionally answers "which room am I in" — without needing to do
+    # actual navmesh pathfinding or raycast wall-checking. A switch that's
+    # physically close but mounted on a shared wall (so its lights are in
+    # the OTHER room) won't win over a switch whose lights are in our room.
+    #
+    # Fallback: if a switch has no targets yet, score it by its own
+    # position. This happens for shelters with one switch per room and
+    # we're the first fixture being added.
     var switches = get_tree().get_nodes_in_group("Switch")
+    var nearest: Node3D = null
+    var nearest_dist_sq := INF
     for node in switches:
         if not ("targets" in node):
             continue
         if not (node.targets is Array):
             continue
-        if node.targets.has(self):
-            return
-        node.targets.append(self)
-        if "active" in node:
-            if node.active:
-                Activate()
-            else:
-                Deactivate()
+        if not (node is Node3D):
+            continue
+        var switch_score := INF
+        for target in node.targets:
+            if target == self:
+                continue
+            if not is_instance_valid(target) or not (target is Node3D):
+                continue
+            var td := global_position.distance_squared_to(target.global_position)
+            if td < switch_score:
+                switch_score = td
+        if switch_score == INF:
+            # Switch has no valid targets to anchor by — use its own position.
+            switch_score = global_position.distance_squared_to(node.global_position)
+        if switch_score < nearest_dist_sq:
+            nearest_dist_sq = switch_score
+            nearest = node
+
+    if nearest == null:
         return
+
+    nearest.targets.append(self)
+    _subscribed_switch = nearest
+    if "active" in nearest:
+        if nearest.active:
+            Activate()
+        else:
+            Deactivate()
+
+# Remove ourselves from the switch's targets array when leaving the tree
+# (e.g. picked up back to catalog → owner.queue_free → all children exit
+# the tree). Without this, the switch would call .Deactivate() on a
+# dangling reference next toggle and the game crashes.
+func _exit_tree() -> void:
+    if not is_instance_valid(_subscribed_switch):
+        return
+    if "targets" in _subscribed_switch and _subscribed_switch.targets is Array:
+        _subscribed_switch.targets.erase(self)
+    _subscribed_switch = null

@@ -4,7 +4,9 @@ Internal workspace doc. Not bundled in the .vmz.
 
 ## Status
 
-**Pre-publish state:** v1.0.0. Nine placeable light fixtures, stocked by all three currently-revealed traders (Generalist, Gunsmith, Doctor). Grandma intentionally skipped (still story-hidden). Metro v3.0+ hard-required (uses `[registry]` API). MCM optional (only the Logger category attaches; mod has no settings of its own). All assets are vanilla `res://Assets/...` references — the mod ships zero mesh/texture data, only trader-catalog icons and a handful of `.tscn` / `.tres` wrappers + `.gd` scripts.
+**Current state:** v1.1.0 (about to publish). Live on ModWorkshop as id 56519. v1.0.1 (live) hardened the `[registry]` section to survive Metro v3.0.0 ConfigFile parsing. v1.1.0 ships placement-preview cleanup, "off-on-pickup, sync-to-switch-on-drop" lifecycle, and room-aware switch routing (subscribes to whichever switch's static lights are nearest, so multi-room shelters like the Cabin work correctly).
+
+Nine placeable light fixtures, stocked by all three currently-revealed traders (Generalist, Gunsmith, Doctor). Grandma intentionally skipped (still story-hidden). Metro v3.0+ hard-required (uses `[registry]` API). MCM optional (only the Logger category attaches; mod has no settings of its own). All assets are vanilla `res://Assets/...` references; the mod ships zero mesh/texture data, only trader-catalog icons and a handful of `.tscn` / `.tres` wrappers + `.gd` scripts.
 
 ## TL;DR pitch
 
@@ -23,15 +25,15 @@ Internal workspace doc. Not bundled in the .vmz.
 | **Description source** | Use README.md content directly. |
 | **Screenshots** | TODO: capture before publishing — see "Screenshots to capture" below. |
 
-## Screenshots to capture
+## Screenshots (in `screenshots/`, ordered for MW)
 
-Aim for 4-5 hero shots:
-
-1. **Trader catalog** — Generalist supply page showing the row of light icons.
-2. **Hideout interior, lights on** — wide shot of a shelter with several fixtures placed and lit (cabin attic with the bright fluorescent + cellar wall sconce works well).
-3. **Same scene, switch off** — same angle, vanilla light switch flipped, all wired fixtures dark. Demonstrates switch integration.
-4. **PC + Floor Lamp close-ups** — show the cyan-lit monitor and the warm bulb glow inside the floor-lamp shade.
-5. *(optional)* **Candle + Lantern lit in the dark** — shows the ignite/extinguish behavior and warm flicker light.
+- `01_overview.png` — hero: hideout with multiple fixtures placed and lit
+- `02_mcm.png` — MCM page (Logger category only, since mod has no settings)
+- `03_catalog.png` — trader catalog row of light icons
+- `04_placement01.png` — wall placement preview (green hologram on rocky wall)
+- `05_placement02.png` — ceiling placement preview (long fluorescent tube hologram)
+- `06-interactions01.png` — lit lantern close-up (Fire integration)
+- `07-interactions02.png` — Use prompt on a fixture in a dark room
 
 ## Conflict callout (include in description)
 
@@ -39,13 +41,18 @@ Aim for 4-5 hero shots:
 - **Mods that override `res://Scripts/Switch.gd` differently** — wiring relies on Switch.gd's `targets: Array[Node3D]` field and `Activate()`/`Deactivate()` methods. A mod that swaps out Switch.gd would need to preserve that interface.
 - **Uninstall warning** — placed fixtures vanish from saves on next load if the .vmz is removed (Godot can't resolve `res://mods/RTVHideoutLights/...` paths). Pick everything up before uninstalling.
 
-## TODO before publish
+## Per-release publish steps (recurring)
 
-- [ ] Re-run `modworkshop.bat search lamp` / `light` / `placeable` to confirm no new direct competitors appeared since 2026-04-28
-- [ ] Capture the screenshot set above (save under `screenshots/`, naming convention: `01_trader.png`, `02_hideout_lit.png`, etc.)
-- [ ] Final test on a clean profile with only Metro + this mod installed
-- [ ] First publish via ModWorkshop web form
-- [ ] **Post-publish:** write assigned mod id into `mods/RTVHideoutLights/.publish` AND add `[updates]\nmodworkshop=<id>` to `mod.txt`, then rebuild + re-upload so the shipped `.vmz` is update-aware (per workspace memory: also click **Clear Primary Download** on every file swap or Metro auto-update breaks)
+For every new version after 1.0.0:
+
+- [x] Bump `mod.txt` version via `publish.bat <Mod> --version X.Y.Z --no-open` (also rebuilds + installs)
+- [x] Update CHANGELOG with the new version's entry (placement at top)
+- [x] Update README if user-facing behavior changed
+- [ ] Commit + push, PR staging → main, squash-merge
+- [ ] Tag `RTVHideoutLights-vX.Y.Z` against the merge commit on `main`
+- [ ] Post-squash resync: force-reset `staging` to `origin/main`
+- [ ] Bump workspace README releases-table row to new version
+- [ ] On ModWorkshop edit page (`publish.bat RTVHideoutLights` opens it via `.publish`): drop new `.vmz`, click **Clear Primary Download** so Metro auto-update sees the new file, save
 
 ## References
 

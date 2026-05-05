@@ -872,6 +872,7 @@ script = ExtResource("3")
 surface = "{surface}"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Collider_R/StaticBody3D"]
+transform = {transform3d(1, 0, 0, 0, 1, 0, 0, 0, 1, cx, cy, cz)}
 shape = SubResource("BoxShape3D_collider")
 {light_block}{uplight_block}{bulb_node_block}{fire_vfx_block}
 [node name="Furniture" type="Node3D" parent="." node_paths=PackedStringArray("mesh", "colliderR")]
