@@ -49,6 +49,8 @@ Picking a fixture up to move it always turns it off for the duration of the plac
 
 When a fixture is off, both the Light3D source and the emissive lampshade material go dark (same pattern as the vanilla cabin pendants).
 
+**State persistence (1.2.0+):** Floor Lamp, Vintage Desktop PC, all fluorescents, Computer_Lit, and Sign_Exit_Lit now remember their on/off state across shelter visits. Light a Floor Lamp, leave the shelter, come back, the lamp is still on. State is per-shelter and per-position, stored alongside your save in `user://rtvlights_state.cfg`. Re-placing a fixture at a different spot resets it to off (consistent with placement behavior). Candle and Kerosene Lantern persistence is queued for a follow-up release.
+
 ## Configuration (MCM)
 
 The mod has no settings of its own. The standard Logger category (level, file output, overlay output) is exposed via MCM. See [the RTV Mod Logger reference](https://github.com/dwoodruff83/RoadToVostokMods/blob/main/mods/RTVModLogger/LOGGER.md).
@@ -56,6 +58,7 @@ The mod has no settings of its own. The standard Logger category (level, file ou
 ## Compatibility
 
 - **Metro Mod Loader v3.0.0+ required.** Fixtures register via Metro's `lib.register(SCENES/ITEMS/LOOT/TRADER_POOLS, ...)`. No `take_over_path` collisions with other registry-using mods.
+- **Known incompatibility with [Oldman's Immersive Overhaul](https://modworkshop.net/mod/50811) (v3.0.3 and earlier).** The two mods integrate with Metro through different patterns and don't currently compose: this mod uses Metro v3's `[registry]` API, Oldman's uses a Database-replacement pattern that predates `[registry]`. With both installed, this mod's fixtures fail to load at traders, in inventories, or on placement (Metro logs a warning, but the items just don't appear). Not a bug in either mod individually; pending a Metro v3 update on Oldman's side. Workaround until then: run one or the other, not both.
 - **MCM is optional.**
 - **Coexists with vanilla shelter lighting.** Wiring a mod fixture into the shelter switch only appends to the switch's `targets` array; vanilla lights keep working alongside.
 - **Uninstalling drops your placed lights.** Saves reference each fixture via `res://mods/RTVHideoutLights/...`. Removing the .vmz silently strips them on next load. Pick everything up before uninstalling.
