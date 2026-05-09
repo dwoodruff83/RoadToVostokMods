@@ -40,12 +40,22 @@ func _ready() -> void:
     if _fire_root == null:
         return
     _furniture = _fire_root.get_node_or_null("Furniture")
-    # Vanilla Loader.LoadShelter does `add_child(furniture); furniture.global_position = ...`,
-    # so _ready fires BEFORE the saved position is applied. Reading
-    # global_position here would lookup at (0,0,0) and miss the sidecar.
-    # Defer to next idle frame, by which time LoadShelter has assigned
-    # the saved position. Same trick LightToggle uses.
-    call_deferred("_restore_state_from_sidecar")
+    # Two timing concerns to clear before we can restore:
+    #
+    # 1. LoadShelter assigns global_position AFTER the add_child that
+    #    triggers _ready, so reading global_position immediately would
+    #    look up the sidecar at (0,0,0) and miss.
+    #
+    # 2. Vanilla Fire.gd._ready does its own `await get_tree().create_timer(0.1)`
+    #    before forcing `active = false` + Deactivate() on the 98% non-lit
+    #    branch of its 2% spawn-lit roll. If we restore inside that 100ms
+    #    window, vanilla clobbers us when it resumes.
+    #
+    # A 0.25s wait covers both: LoadShelter has long since assigned the
+    # saved position (it's a synchronous loop), and Fire's 0.1s timer plus
+    # the random-roll branch has fully completed. Then we override.
+    await get_tree().create_timer(0.25, false).timeout
+    _restore_state_from_sidecar()
 
 func _restore_state_from_sidecar() -> void:
     if _fire_root == null or not is_instance_valid(_fire_root) or not ("active" in _fire_root):
