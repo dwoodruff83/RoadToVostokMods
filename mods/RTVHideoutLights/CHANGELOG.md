@@ -3,7 +3,7 @@
 All notable changes to the RTV Hideout Lights mod are documented here. Dates are
 YYYY-MM-DD.
 
-## 1.2.0 — 2026-05-?? (in progress)
+## 1.2.0 — 2026-05-09
 
 - **All toggleable fixtures now persist their on/off state across shelter reloads (#47).** Floor Lamp, Vintage Desktop PC, fluorescents, Computer_Lit, **Candle, and Kerosene Lantern** were previously always off after leaving and returning to a shelter, even if you'd lit them. Now their lit state survives between shelter visits, scoped per-fixture-instance so multiple lamps in the same shelter each remember their own state independently. Exit Sign is excluded — it's always-on decorative (matches real emergency-exit lighting) and never had a toggle to begin with.
   - Mechanism: a sidecar config file at `user://rtvlights_state.cfg` keyed by `shelter_<name>` section, `<file_id>_<x>_<y>_<z>` entry. Position rounded to 1cm.
