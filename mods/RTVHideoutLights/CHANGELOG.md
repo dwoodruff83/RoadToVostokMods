@@ -5,7 +5,7 @@ YYYY-MM-DD.
 
 ## 1.2.0 — 2026-05-?? (in progress)
 
-- **Manually-toggled fixtures now persist their on/off state across shelter reloads (#47, partial).** Floor Lamp, Vintage Desktop PC, all fluorescents, Computer_Lit, and Sign_Exit_Lit were previously always off after leaving and returning to a shelter, even if you'd lit them. Now their lit state survives between shelter visits, scoped per-fixture-instance so multiple lamps in the same shelter each remember their own state independently.
+- **Manually-toggled fixtures now persist their on/off state across shelter reloads (#47, partial).** Floor Lamp, Vintage Desktop PC, all fluorescents, and Computer_Lit were previously always off after leaving and returning to a shelter, even if you'd lit them. Now their lit state survives between shelter visits, scoped per-fixture-instance so multiple lamps in the same shelter each remember their own state independently. Exit Sign is excluded — it's an always-on decorative fixture with no toggle (matches real-world emergency lighting) and never needed persistence.
   - Mechanism: a sidecar config file at `user://rtvlights_state.cfg` keyed by `shelter_<name>` section, `<file_id>_<x>_<y>_<z>` entry. Position rounded to 1cm.
   - Switch-controlled fixtures (Cellar Wall Light, Industrial / Bright / Soft Fluorescent) already persisted via vanilla switch state in 1.1.0; they continue to do so. The new sidecar tracks them too as redundant insurance, no behavior change for the player.
   - **Placement always defaults to off**, matching 1.1.0 behavior. Picking up a fixture and replacing it (anywhere) resets to off; you re-toggle from there. Persistence kicks in for fixtures that stay put between shelter visits — the common case.
