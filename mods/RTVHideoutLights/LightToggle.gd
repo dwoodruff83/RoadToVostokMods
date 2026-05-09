@@ -65,19 +65,65 @@ var gameData = preload("res://Resources/GameData.tres")
 # crash the game on dead.Deactivate().
 var _subscribed_switch: Node = null
 
+# Guards Activate/Deactivate against writing to LightStateStore during the
+# initial _ready setup pass. Without this, the default Deactivate() call
+# below would clobber any saved-true state for this fixture, defeating the
+# whole point of #47. Flipped to true at the end of _ready, after the
+# initial state has been set.
+var _initialized: bool = false
+
+const LightStateStoreScript = preload("res://mods/RTVHideoutLights/LightStateStore.gd")
+
 func _ready() -> void:
     if Engine.is_editor_hint():
         return
-    # Set initial state. Default is off; force_on flips that.
+    # Provisional initial state. Vanilla Loader.LoadShelter does
+    # `map.add_child(furniture); furniture.global_position = ...`, so _ready
+    # fires BEFORE the saved position is applied — reading global_position
+    # here gives (0,0,0) and the sidecar lookup misses. We therefore set a
+    # safe default now and defer the real restore to next idle frame, by
+    # which time LoadShelter has finished writing position.
     if force_on:
         Activate()
     else:
         Deactivate()
+    call_deferred("_restore_state_from_sidecar")
     # Subscribe to shelter Switch if enabled. Brief delay so the shelter
     # scene's switch is fully initialized before we touch its array.
     if subscribe_to_switch:
         await get_tree().create_timer(0.5, false).timeout
         _try_subscribe_to_switch()
+
+# Reads the sidecar at the now-correct global_position and overrides the
+# provisional state set by _ready. Used for the leave-and-return shelter
+# load path; placement commits go through LightFurniture.ResetMove and
+# always default to off (any sidecar entry there is then overwritten by
+# Deactivate's _persist_state).
+func _restore_state_from_sidecar() -> void:
+    # Skip during placement preview. ResetMove() will deterministically
+    # set the post-commit state via Deactivate, so a deferred restore here
+    # would just flicker the lights mid-drag and pollute the sidecar with
+    # entries at random preview-cursor positions.
+    var furniture := get_node_or_null("Furniture")
+    if furniture and "isMoving" in furniture and furniture.isMoving:
+        _initialized = true
+        return
+    var shelter := _resolve_shelter_name()
+    var file_id := _resolve_file_id()
+    if shelter.is_empty() or file_id.is_empty():
+        _initialized = true
+        return
+    if LightStateStoreScript.has_state(shelter, file_id, global_position):
+        var saved: bool = LightStateStoreScript.load_state(shelter, file_id, global_position)
+        # Suppress persist-back during the restore itself: we'd otherwise
+        # rewrite the same value we just read, which is wasteful and adds
+        # noise to logs if we ever instrument this.
+        _initialized = false
+        if saved:
+            Activate()
+        else:
+            Deactivate()
+    _initialized = true
 
 func Interact() -> void:
     # Only fire on Use action when interactable; otherwise the Switch is
@@ -99,6 +145,7 @@ func Activate() -> void:
             n.visible = true
     if is_instance_valid(swap_mesh) and swap_on_material:
         swap_mesh.set_surface_override_material(swap_surface_index, swap_on_material)
+    _persist_state()
 
 func Deactivate() -> void:
     active = false
@@ -110,6 +157,49 @@ func Deactivate() -> void:
             n.visible = false
     if is_instance_valid(swap_mesh) and swap_off_material:
         swap_mesh.set_surface_override_material(swap_surface_index, swap_off_material)
+    _persist_state()
+
+# Mirror our `active` flag into the LightStateStore sidecar so the next
+# shelter load can restore it. Skipped during the _ready setup pass to
+# avoid clobbering saved-true state with a default Deactivate(). Switch-
+# controlled fixtures (subscribe_to_switch=true) also call through here
+# during their subscription sync; that's redundant with the vanilla
+# Switch save but harmless and keeps the code path uniform.
+func _persist_state() -> void:
+    if not _initialized:
+        return
+    var shelter := _resolve_shelter_name()
+    var file_id := _resolve_file_id()
+    if shelter.is_empty() or file_id.is_empty():
+        return
+    LightStateStoreScript.save_state(shelter, file_id, global_position, active)
+
+# Resolves the current shelter name from /root/Map.mapName, mirroring the
+# pattern CatAutoFeed and RTVWallets use. Returns "" when not in a shelter
+# (e.g., overworld map) so persistence is a no-op there.
+func _resolve_shelter_name() -> String:
+    var scene = get_tree().current_scene
+    if scene == null:
+        return ""
+    var map_node = scene.get_node_or_null("/root/Map")
+    if map_node == null:
+        return ""
+    var m = map_node.get("mapName")
+    return String(m) if m != null else ""
+
+# Looks up our sibling Furniture node and reads its itemData.file. The
+# Furniture node is added at .tscn build time as a child of the scene root
+# (see scenes/rtvlights_*_F.tscn) and carries the catalog ItemData
+# resource — that resource's `file` field is the stable per-SKU id we
+# want as part of the sidecar key.
+func _resolve_file_id() -> String:
+    var furniture := get_node_or_null("Furniture")
+    if furniture == null or not ("itemData" in furniture):
+        return ""
+    var item_data = furniture.itemData
+    if item_data == null or not ("file" in item_data):
+        return ""
+    return String(item_data.file)
 
 func UpdateTooltip() -> void:
     if not interactable:
