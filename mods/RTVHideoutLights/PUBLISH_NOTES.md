@@ -4,7 +4,7 @@ Internal workspace doc. Not bundled in the .vmz.
 
 ## Status
 
-**Current state:** v1.1.0 (about to publish). Live on ModWorkshop as id 56519. v1.0.1 (live) hardened the `[registry]` section to survive Metro v3.0.0 ConfigFile parsing. v1.1.0 ships placement-preview cleanup, "off-on-pickup, sync-to-switch-on-drop" lifecycle, and room-aware switch routing (subscribes to whichever switch's static lights are nearest, so multi-room shelters like the Cabin work correctly).
+**Current state:** v1.2.0 (about to publish). Live on ModWorkshop as id 56519. v1.1.0 (live) shipped placement-preview cleanup and room-aware switch routing. v1.2.0 closes #47: every toggleable fixture (Floor Lamp, PC, fluorescents, Computer_Lit, Candle, Kerosene Lantern) now persists its on/off state across shelter visits via a sidecar config file (`user://rtvlights_state.cfg`), per-shelter and per-position. Phase 1 covered LightToggle-based fixtures; Phase 2 added Fire-based ones via a small observer node (no `take_over_path` on vanilla `Fire.gd`, so vanilla world fires are unaffected). Exit Sign intentionally excluded — always-on by design.
 
 Nine placeable light fixtures, stocked by all three currently-revealed traders (Generalist, Gunsmith, Doctor). Grandma intentionally skipped (still story-hidden). Metro v3.0+ hard-required (uses `[registry]` API). MCM optional (only the Logger category attaches; mod has no settings of its own). All assets are vanilla `res://Assets/...` references; the mod ships zero mesh/texture data, only trader-catalog icons and a handful of `.tscn` / `.tres` wrappers + `.gd` scripts.
 

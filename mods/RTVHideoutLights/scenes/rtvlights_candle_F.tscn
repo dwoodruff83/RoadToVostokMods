@@ -13,6 +13,7 @@
 [ext_resource type="Material" path="res://Effects/Files/MT_Candle_Fire.tres" id="21"]
 [ext_resource type="Material" path="res://Effects/Emitters/Fire.tres" id="22"]
 [ext_resource type="Script" path="res://Scripts/Flicker.gd" id="23"]
+[ext_resource type="Script" path="res://mods/RTVHideoutLights/FireStatePersist.gd" id="24"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_collider"]
 size = Vector3(0.3, 0.104, 0.3)
@@ -140,3 +141,6 @@ target_position = Vector3(0, -0.2, 0)
 [node name="Hint" type="MeshInstance3D" parent="Furniture"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0.052, 0.0)
 mesh = SubResource("PlaneMesh_hint")
+
+[node name="StatePersist" type="Node" parent="."]
+script = ExtResource("24")

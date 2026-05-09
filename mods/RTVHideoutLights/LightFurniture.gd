@@ -78,10 +78,20 @@ func ResetMove() -> void:
         _set_preview_visible(true)
         return
 
-    # Force the fixture off after placement (user-spec'd: "off when
-    # placed"). super.ResetMove just restored sourceMaterials including
-    # the LIT swap variant where applicable, so we re-apply Deactivate to
-    # put the swap surface back to the off material AND hide lights.
+    # Force the fixture off after placement (1.1.0 behavior). super.ResetMove
+    # just restored sourceMaterials including the LIT swap variant where
+    # applicable, so we re-apply Deactivate to put the swap surface back to
+    # the off material AND hide lights.
+    #
+    # An earlier 1.2.0 build tried to "restore from sidecar" here so that
+    # picking up and re-placing a lit fixture preserved its state. That
+    # caused two bugs: (1) on PC, the swap-mesh material and Light3D
+    # visibility could desync because the deferred sidecar read in
+    # LightToggle._ready raced the placement preview hide; (2) a sidecar
+    # entry left behind by a previous fixture at the same position would
+    # latch onto a freshly-placed different fixture. Simpler design wins:
+    # every commit defaults to off, the sidecar entry gets overwritten with
+    # false, and stale entries can't leak across fixtures.
     if root.has_method("Deactivate"):
         root.Deactivate()
 
