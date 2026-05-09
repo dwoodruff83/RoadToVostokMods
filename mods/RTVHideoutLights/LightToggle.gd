@@ -95,10 +95,19 @@ func _ready() -> void:
         _try_subscribe_to_switch()
 
 # Reads the sidecar at the now-correct global_position and overrides the
-# provisional state set by _ready. Also called by LightFurniture after
-# placement commit so a re-placed lit fixture keeps its prior state
-# instead of being forced off. See RestoreFromSidecarOrOff() below.
+# provisional state set by _ready. Used for the leave-and-return shelter
+# load path; placement commits go through LightFurniture.ResetMove and
+# always default to off (any sidecar entry there is then overwritten by
+# Deactivate's _persist_state).
 func _restore_state_from_sidecar() -> void:
+    # Skip during placement preview. ResetMove() will deterministically
+    # set the post-commit state via Deactivate, so a deferred restore here
+    # would just flicker the lights mid-drag and pollute the sidecar with
+    # entries at random preview-cursor positions.
+    var furniture := get_node_or_null("Furniture")
+    if furniture and "isMoving" in furniture and furniture.isMoving:
+        _initialized = true
+        return
     var shelter := _resolve_shelter_name()
     var file_id := _resolve_file_id()
     if shelter.is_empty() or file_id.is_empty():
@@ -115,15 +124,6 @@ func _restore_state_from_sidecar() -> void:
         else:
             Deactivate()
     _initialized = true
-
-# Public hook for LightFurniture.ResetMove. When a fixture is re-placed
-# (player picks it up and puts it back down), vanilla flow forces it off.
-# That used to be fine, but post-#47 it would clobber the sidecar entry
-# the player had built up by toggling. Instead, restore from sidecar at
-# the new position; default to off only if no entry exists. New catalog
-# placements (no prior entry) still start off, matching 1.1.0 behavior.
-func RestoreFromSidecarOrOff() -> void:
-    _restore_state_from_sidecar()
 
 func Interact() -> void:
     # Only fire on Use action when interactable; otherwise the Switch is

@@ -78,23 +78,21 @@ func ResetMove() -> void:
         _set_preview_visible(true)
         return
 
-    # Re-apply the off state OR restore from sidecar at the final placed
-    # position (#47). super.ResetMove just restored sourceMaterials,
-    # including the LIT swap variant where applicable; we need to put the
-    # swap surface back to whichever material matches the saved state.
+    # Force the fixture off after placement (1.1.0 behavior). super.ResetMove
+    # just restored sourceMaterials including the LIT swap variant where
+    # applicable, so we re-apply Deactivate to put the swap surface back to
+    # the off material AND hide lights.
     #
-    # 1.1.0 always called Deactivate here (forcing off). Post-#47 that
-    # clobbers any persisted-true state when the player picks up a lit
-    # fixture and re-places it at the same spot. RestoreFromSidecarOrOff
-    # checks the sidecar at the final position and restores; if no entry
-    # exists (new catalog placement), it defaults to off — matching 1.1.0
-    # behavior for the new-placement case.
-    if root.has_method("RestoreFromSidecarOrOff"):
-        root.RestoreFromSidecarOrOff()
-    elif root.has_method("Deactivate"):
-        # Fire-based fixtures (Candle, Lantern) don't have RestoreFromSidecarOrOff
-        # since their persistence is Phase 2 of #47. Fall through to vanilla
-        # behavior: force them off after placement.
+    # An earlier 1.2.0 build tried to "restore from sidecar" here so that
+    # picking up and re-placing a lit fixture preserved its state. That
+    # caused two bugs: (1) on PC, the swap-mesh material and Light3D
+    # visibility could desync because the deferred sidecar read in
+    # LightToggle._ready raced the placement preview hide; (2) a sidecar
+    # entry left behind by a previous fixture at the same position would
+    # latch onto a freshly-placed different fixture. Simpler design wins:
+    # every commit defaults to off, the sidecar entry gets overwritten with
+    # false, and stale entries can't leak across fixtures.
+    if root.has_method("Deactivate"):
         root.Deactivate()
 
     # Switch-controlled fixtures (Cellar, Industrial/Bright/Soft Fluo)

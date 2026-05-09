@@ -49,7 +49,7 @@ Picking a fixture up to move it always turns it off for the duration of the plac
 
 When a fixture is off, both the Light3D source and the emissive lampshade material go dark (same pattern as the vanilla cabin pendants).
 
-**State persistence (1.2.0+):** Floor Lamp, Vintage Desktop PC, all fluorescents, Computer_Lit, and Sign_Exit_Lit now remember their on/off state across shelter visits. Light a Floor Lamp, leave the shelter, come back, the lamp is still on. State is per-shelter and per-position, stored alongside your save in `user://rtvlights_state.cfg`. Re-placing a fixture at a different spot resets it to off (consistent with placement behavior). Candle and Kerosene Lantern persistence is queued for a follow-up release.
+**State persistence (1.2.0+):** Floor Lamp, Vintage Desktop PC, all fluorescents, Computer_Lit, and Sign_Exit_Lit now remember their on/off state between shelter visits. Light a Floor Lamp, leave the shelter, come back, the lamp is still on. Multiple lamps in the same shelter each keep their own state. State is per-shelter and per-position, stored alongside your save in `user://rtvlights_state.cfg`. Picking up and re-placing any fixture defaults it to off (matches 1.1.0 placement behavior). Candle and Kerosene Lantern persistence is queued for a follow-up release.
 
 ## Configuration (MCM)
 
