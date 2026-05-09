@@ -9,6 +9,16 @@ extends Pickup
 # call so it doesn't see the raw Sketchfab mesh bounds (tens of metres).
 
 func _ready() -> void:
+    # Heal save-data wallets written before the local_to_scene fix landed:
+    # those wallets' SlotData was serialized while shared, so two ammo tins
+    # in the same save can still point to the same SlotData object on load
+    # even after the .tscn-side fix is in place. Duplicate it here so each
+    # wallet ends up with its own state going forward. One-shot per wallet
+    # per save — subsequent loads see resource_local_to_scene = true and skip.
+    if slotData != null and not slotData.resource_local_to_scene:
+        slotData = slotData.duplicate(true)
+        slotData.resource_local_to_scene = true
+
     var meshes := find_children("*", "MeshInstance3D", true, false)
     if collision and meshes.size() > 0:
         _setup_box_collision_from_combined_aabb(meshes)

@@ -39,6 +39,7 @@ Plus the standard Logger category (level, file output, overlay output). See [the
 ## Compatibility
 
 - **Metro Mod Loader v3.0.0+ required.** Wallet items are added via Metro's registry (`lib.register(SCENES, ...)`), so they coexist cleanly with any other mod also using the registry — no `take_over_path` collisions on Database.gd.
+- **Known incompatibility with [Oldman's Immersive Overhaul](https://modworkshop.net/mod/50811) (v3.0.3 and earlier).** The two mods integrate with Metro through different patterns and don't currently compose: this mod uses Metro v3's `[registry]` API, Oldman's uses a Database-replacement pattern that predates `[registry]`. With both installed, this mod's wallets and cash fail to load at traders, in inventories, or on placement (Metro logs a warning, but the items just don't appear). Not a bug in either mod individually; pending a Metro v3 update on Oldman's side. Workaround until then: run one or the other, not both.
 - **MCM is optional.** The mod runs with sensible defaults if MCM is absent — only used to rebind the Stash Report hotkey.
 - **Conflicts with other "cash economy" mods** (e.g. *Wallet & Cash*). Pick one or the other; both replace the same Trader Buy/Sell flow.
 - **Uninstalling drops wallets and cash.** Save files reference wallet items via `res://mods/RTVWallets/<Tier>.tres`. If you remove the .vmz, the game silently strips wallets (and any cash they hold) from saves on next load. To migrate, withdraw cash from all wallets and drop the empty wallets before uninstalling.

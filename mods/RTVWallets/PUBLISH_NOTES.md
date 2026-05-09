@@ -4,7 +4,9 @@ Internal workspace doc. Not bundled in the .vmz.
 
 ## Status
 
-**Current state: v1.0.1 (live on ModWorkshop as id 56408).** Trader Sell-for-€ flow matches vanilla barter (drain → spill → overflow drops via our `Drop()` override). Cash drag-overlay shows €, drops are clean maxAmount chunks, materials dimmed so cash doesn't glow in dim lighting. MCM trimmed to working settings only. README and CHANGELOG match shipping behavior.
+**Current state: v1.1.0 (publishing).** Hotfix release for #50 (cash duplication exploit, reported by ppfota). Two-part fix: `resource_local_to_scene = true` on every wallet `.tscn`'s SlotData SubResource so fresh placements get unique state, plus a one-shot heal in `WalletPickup._ready` that duplicates shared SlotData on legacy 1.0.2 saves. Same bug shape Cat Bowl 1.1.0 fixed. Existing saves carry forward.
+
+**v1.0.2 (live on ModWorkshop as id 56408)** patched the Metro v3.0.0 `[registry]` empty-section drop. v1.1.0 supersedes.
 
 **Migrated to Metro v3.x registry (2026-04-26).** Database injection goes through `Engine.get_meta("RTVModLib").register(SCENES, ...)` instead of the retired RTVModItemRegistry shim.
 
