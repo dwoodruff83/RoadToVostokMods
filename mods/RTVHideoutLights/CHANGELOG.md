@@ -5,11 +5,12 @@ YYYY-MM-DD.
 
 ## 1.2.0 — 2026-05-?? (in progress)
 
-- **Manually-toggled fixtures now persist their on/off state across shelter reloads (#47, partial).** Floor Lamp, Vintage Desktop PC, all fluorescents, and Computer_Lit were previously always off after leaving and returning to a shelter, even if you'd lit them. Now their lit state survives between shelter visits, scoped per-fixture-instance so multiple lamps in the same shelter each remember their own state independently. Exit Sign is excluded — it's an always-on decorative fixture with no toggle (matches real-world emergency lighting) and never needed persistence.
+- **All toggleable fixtures now persist their on/off state across shelter reloads (#47).** Floor Lamp, Vintage Desktop PC, fluorescents, Computer_Lit, **Candle, and Kerosene Lantern** were previously always off after leaving and returning to a shelter, even if you'd lit them. Now their lit state survives between shelter visits, scoped per-fixture-instance so multiple lamps in the same shelter each remember their own state independently. Exit Sign is excluded — it's always-on decorative (matches real emergency-exit lighting) and never had a toggle to begin with.
   - Mechanism: a sidecar config file at `user://rtvlights_state.cfg` keyed by `shelter_<name>` section, `<file_id>_<x>_<y>_<z>` entry. Position rounded to 1cm.
+  - **Phase 1** covered LightToggle-based fixtures (Lamp / PC / fluorescents / Computer / Sign).
+  - **Phase 2** added Fire-based fixtures (Candle, Kerosene Lantern) via a small `FireStatePersist` observer node attached as a child of each Fire-rooted scene root. The observer polls the parent's `active` flag once per frame and mirrors transitions into the same sidecar. No `take_over_path` on vanilla `Fire.gd`, so vanilla world candles / lanterns / fire pits / barrels are unaffected and keep their existing ~2% spawn-lit behavior.
   - Switch-controlled fixtures (Cellar Wall Light, Industrial / Bright / Soft Fluorescent) already persisted via vanilla switch state in 1.1.0; they continue to do so. The new sidecar tracks them too as redundant insurance, no behavior change for the player.
   - **Placement always defaults to off**, matching 1.1.0 behavior. Picking up a fixture and replacing it (anywhere) resets to off; you re-toggle from there. Persistence kicks in for fixtures that stay put between shelter visits — the common case.
-  - **Not yet covered: Candle and Kerosene Lantern.** They use vanilla `Fire.gd` rather than `LightToggle`, so they need a different hook pattern. Vanilla's tiny ~2% spawn-lit chance still applies as before. Phase 2 work tracked in #47 and a follow-up release.
 - No save format changes (the sidecar is additive, not part of any vanilla save); existing 1.1.0 saves carry forward. The sidecar is created on first toggle.
 
 ## 1.1.0 — 2026-05-04
