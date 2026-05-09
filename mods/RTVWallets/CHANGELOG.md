@@ -3,6 +3,25 @@
 All notable changes to the RTV Wallets mod are documented here. Dates are
 YYYY-MM-DD.
 
+## 1.1.0 — 2026-05-09
+
+- **Fix: cash duplication exploit on multiple wallets of the same tier
+  (#50, reported by ppfota).** Every wallet `.tscn` declared its
+  `SlotData` SubResource without `resource_local_to_scene = true`, so
+  every spawned instance of the same tier shared the SAME SlotData
+  object reference. Filling one wallet visually filled all the others
+  too; reload + unload returned the cash for each, doubling the player's
+  money per duplicate. Fix has two parts:
+  - `Leather_Wallet.tscn`, `Ammo_Tin.tscn`, `Money_Case.tscn`, and
+    `Cash.tscn` all set `resource_local_to_scene = true` on their
+    SlotData SubResource. Fresh placements now have unique SlotData.
+  - `WalletPickup._ready` adds a one-shot heal: any wallet loaded from
+    a save written before this fix has its shared SlotData duplicated
+    so existing saves are repaired transparently on next load.
+  Same root cause + same shape of fix as Cat Bowl 1.1.0. No save
+  format changes; existing 1.0.2 saves carry forward.
+- **Docs: known incompatibility with Oldman's Immersive Overhaul (v3.0.3 and earlier)** noted in README. The two mods integrate with Metro through different patterns and don't currently compose — Oldman's pre-`[registry]` Database-replacement overrides cause our wallets and cash to silently fail to load. Pending Metro v3 update on Oldman's side; workaround is to run one or the other, not both.
+
 ## 1.0.2 — 2026-05-02
 
 - **Fix: wallet/cash items can fail to register on Metro Mod Loader
