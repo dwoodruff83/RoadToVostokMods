@@ -39,7 +39,7 @@ This mod is a **different aesthetic**, not a replacement: cash and wallets are *
 - ✅ **Coexists with other registry-using mods** (e.g. CatAutoFeed, etc.). No Database.gd takeover.
 - ❌ **Wallet & Cash** by domfrags — see incompatibility callout above.
 - ❌ **Oldman's Immersive Overhaul** (v3.0.3 and earlier). Different Metro integration patterns don't currently compose; our wallets and cash silently fail to load. Pending a Metro v3 update on Oldman's side. Run one or the other, not both.
-- ⚠ **Uninstalling strips wallets from saves.** Save files reference wallet items via `res://mods/RTVWallets/<Tier>.tres`. Removing the `.vmz` causes the game to silently drop wallets (and any cash they hold) on next load. To migrate cleanly, withdraw cash from all wallets and drop the empty wallets before uninstalling.
+- ⚠ **Uninstalling strips wallets AND cash.** Both wallets (`res://mods/RTVWallets/<Tier>.tres`) and the Cash item itself (`res://mods/RTVWallets/Cash.tres`) are mod-owned. Removing the `.vmz` causes the game to silently drop both on next load, including any cash inside wallets and any loose cash stacks in inventory or shelter storage. **To migrate cleanly, spend your cash at traders before uninstalling** so it converts to vanilla items (food, ammo, gear, weapons) that survive. The empty wallets themselves will still be lost.
 
 ## Credits
 
