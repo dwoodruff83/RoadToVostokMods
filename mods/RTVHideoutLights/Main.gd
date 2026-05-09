@@ -6,11 +6,55 @@ const ITEM_PATHS := [
 ]
 
 var _log_node: Node = null
+var gameData = preload("res://Resources/GameData.tres")
 
 func _ready() -> void:
 	name = "RTVHideoutLights"
 	_log("debug", "RTV Hideout Lights mod loaded")
 	_register_with_metro()
+	set_process_unhandled_input(true)
+
+
+# ============================================================================
+# DEV-ONLY (remove before next public release after #47 phase 1 ships).
+# F10 spawns one Vintage Desktop PC + one Floor Lamp at the player's feet, so
+# the user can test the new sidecar state-persistence (#47) without waiting
+# on trader rotation. Idempotent across presses — pressing again drops more.
+# ============================================================================
+func _unhandled_input(event: InputEvent) -> void:
+	if not (event is InputEventKey):
+		return
+	if not event.pressed or event.echo:
+		return
+	if event.keycode == KEY_F10:
+		_dev_spawn_test_fixtures()
+
+
+func _dev_spawn_test_fixtures() -> void:
+	var map = get_tree().current_scene.get_node_or_null("/root/Map")
+	if map == null:
+		_log("warn", "[DEV] No /root/Map in current scene; cannot spawn test fixtures")
+		return
+	var pos: Vector3 = gameData.playerPosition
+	if pos.is_equal_approx(Vector3.ZERO):
+		_log("warn", "[DEV] playerPosition is zero; can't place fixtures sensibly. Try after the player has moved.")
+		return
+
+	var pc_scene = preload("res://mods/RTVHideoutLights/scenes/rtvlights_computer_lit_F.tscn")
+	var lamp_scene = preload("res://mods/RTVHideoutLights/scenes/rtvlights_lamp_floor_F.tscn")
+
+	var pc = pc_scene.instantiate()
+	map.add_child(pc)
+	# Offset 1.5m on +X relative to the player. Both fixtures land at floor
+	# height (Y = playerPosition.y, which is roughly the player's feet);
+	# placement-grade alignment isn't important for a dev test affordance.
+	pc.global_position = pos + Vector3(1.5, 0.0, 0.0)
+
+	var lamp = lamp_scene.instantiate()
+	map.add_child(lamp)
+	lamp.global_position = pos + Vector3(-1.5, 0.0, 0.0)
+
+	_log("info", "[DEV] Spawned test Vintage PC and Floor Lamp at player position")
 
 # Registers each item scene as a SCENES entry via Metro's registry API.
 # Metro v3.x wraps Database.gd at loader startup when [registry] is declared

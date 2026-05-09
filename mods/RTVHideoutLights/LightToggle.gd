@@ -77,24 +77,53 @@ const LightStateStoreScript = preload("res://mods/RTVHideoutLights/LightStateSto
 func _ready() -> void:
     if Engine.is_editor_hint():
         return
-    # Restore from sidecar if a saved entry exists for this fixture (#47).
-    # Otherwise fall back to the per-fixture default (`force_on`).
-    var initial_state := force_on
-    var shelter := _resolve_shelter_name()
-    var file_id := _resolve_file_id()
-    if not shelter.is_empty() and not file_id.is_empty():
-        if LightStateStoreScript.has_state(shelter, file_id, global_position):
-            initial_state = LightStateStoreScript.load_state(shelter, file_id, global_position)
-    if initial_state:
+    # Provisional initial state. Vanilla Loader.LoadShelter does
+    # `map.add_child(furniture); furniture.global_position = ...`, so _ready
+    # fires BEFORE the saved position is applied — reading global_position
+    # here gives (0,0,0) and the sidecar lookup misses. We therefore set a
+    # safe default now and defer the real restore to next idle frame, by
+    # which time LoadShelter has finished writing position.
+    if force_on:
         Activate()
     else:
         Deactivate()
-    _initialized = true
+    call_deferred("_restore_state_from_sidecar")
     # Subscribe to shelter Switch if enabled. Brief delay so the shelter
     # scene's switch is fully initialized before we touch its array.
     if subscribe_to_switch:
         await get_tree().create_timer(0.5, false).timeout
         _try_subscribe_to_switch()
+
+# Reads the sidecar at the now-correct global_position and overrides the
+# provisional state set by _ready. Also called by LightFurniture after
+# placement commit so a re-placed lit fixture keeps its prior state
+# instead of being forced off. See RestoreFromSidecarOrOff() below.
+func _restore_state_from_sidecar() -> void:
+    var shelter := _resolve_shelter_name()
+    var file_id := _resolve_file_id()
+    if shelter.is_empty() or file_id.is_empty():
+        _initialized = true
+        return
+    if LightStateStoreScript.has_state(shelter, file_id, global_position):
+        var saved: bool = LightStateStoreScript.load_state(shelter, file_id, global_position)
+        # Suppress persist-back during the restore itself: we'd otherwise
+        # rewrite the same value we just read, which is wasteful and adds
+        # noise to logs if we ever instrument this.
+        _initialized = false
+        if saved:
+            Activate()
+        else:
+            Deactivate()
+    _initialized = true
+
+# Public hook for LightFurniture.ResetMove. When a fixture is re-placed
+# (player picks it up and puts it back down), vanilla flow forces it off.
+# That used to be fine, but post-#47 it would clobber the sidecar entry
+# the player had built up by toggling. Instead, restore from sidecar at
+# the new position; default to off only if no entry exists. New catalog
+# placements (no prior entry) still start off, matching 1.1.0 behavior.
+func RestoreFromSidecarOrOff() -> void:
+    _restore_state_from_sidecar()
 
 func Interact() -> void:
     # Only fire on Use action when interactable; otherwise the Switch is
