@@ -10,7 +10,7 @@ Ships **zero new mesh or texture data**. Every model and material loads from the
 
 ## ⚠ Compatibility
 
-- ❌ **[Oldman's Immersive Overhaul](https://modworkshop.net/mod/50811)** (v3.0.3 and earlier) — different Metro integration patterns don't currently compose; our fixtures silently fail to load. Pending a Metro v3 update on Oldman's side. Run one or the other, not both.
+- ❌ **Mods that replace the live `Database` autoload script** (a pre-`[registry]` pattern for adding items). Wipes Metro's `[registry]` injection — our fixtures silently fail to load at traders, in inventories, or on placement. Known examples: **[Oldman's Immersive Overhaul](https://modworkshop.net/mod/50811)** (v3.0.3 and earlier), **[Swift Island](https://modworkshop.net/mod/56192)** (v1.1.0 and earlier). Pending Metro v3 migrations on those. Run one or the other, not both.
 - ✅ **Coexists with other registry-using mods** (Cat Auto Feed, RTV Wallets, etc.). No `Database.gd` takeover — uses Metro's `[registry]` API.
 - ✅ **Coexists with vanilla shelter lighting.** Wiring a mod fixture into the shelter switch only appends to the switch's `targets` array; vanilla lights keep working alongside.
 
