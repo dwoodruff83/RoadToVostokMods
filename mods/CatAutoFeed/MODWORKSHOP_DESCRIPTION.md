@@ -10,6 +10,7 @@ No more returning to base every 40 minutes to drop a can of tuna in the feeder. 
 
 - ❌ **Cat Food Shelter** (and any other cat auto-feeder mod) — remove before installing to avoid double-feeding.
 - ⚠ **Likely incompatible with [Put Food Out (#56098)](https://modworkshop.net/mod/56098)** by Improvise — both mods touch the cat-feeding loop. Pick one. Untested in combination; running both may cause double-feeds or contention over hunger ticks.
+- ❌ **Mods that replace the live `Database` autoload script** (a pre-`[registry]` pattern for adding items). Wipes Metro's `[registry]` injection — the Cat Food Bowl silently fails to load at the Gunsmith trader, in inventories, in loot containers, or on placement. Known examples: **[Oldman's Immersive Overhaul](https://modworkshop.net/mod/50811)** (v3.0.3 and earlier), **[Swift Island](https://modworkshop.net/mod/56192)** (v1.1.0 and earlier). Pending Metro v3 migrations on those. Run one or the other, not both.
 - ✅ **Coexists with other registry-using mods** (RTV Wallets, etc.). No `Database.gd` takeover — uses Metro's `[registry]` API.
 
 This mod is a **different aesthetic** from "cat doesn't starve" mods like [Immortal Cat (#55927)](https://modworkshop.net/mod/55927). The cat-anxiety problem is *solved*, not *removed* — you still build, loot, and manage a bowl. If you'd rather skip the mechanic entirely, Immortal Cat is the right pick.
